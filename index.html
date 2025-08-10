@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fascinar Eventos - Gerenciador</title>
+    <meta name="description" content="Sistema de gerenciamento de eventos" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#3b82f6" />
+    <meta name="msapplication-TileColor" content="#3b82f6" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Fascinar Eventos" />
+    <link rel="apple-touch-icon" href="/icon-192.svg" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Preload key resources -->
+    <link rel="preload" href="/icon-192.svg" as="image" />
+    
+    <!-- Protocol Handler for custom links -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="Fascinar Eventos" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+      // Registrar Service Worker para PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              // Service Worker registrado com sucesso
+            })
+            .catch((error) => {
+              // Falha no registro do Service Worker
+            })
+        })
+      }
+
+      // Escutar mensagens do Service Worker
+      navigator.serviceWorker?.addEventListener('message', (event) => {
+        if (event.data.type === 'HANDLE_EXTERNAL_LINK') {
+          // Redirecionar para a URL do link
+          window.location.href = event.data.url
+        }
+      })
+
+      // Detectar se foi aberto via protocolo personalizado
+      const urlParams = new URLSearchParams(window.location.search)
+      const action = urlParams.get('action')
+      
+      if (action) {
+        // Processar ação personalizada
+      }
+    </script>
+  </body>
+</html>
