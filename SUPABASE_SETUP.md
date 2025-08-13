@@ -1,52 +1,86 @@
-# � Configuração das Políticas RLS - Supabase
+# 🚀 Setup do Supabase - Fascinar Eventos
 
-A tabela `events` já existe, mas precisa das **políticas RLS (Row Level Security)** configuradas corretamente.
+## 📋 Pré-requisitos
+- Projeto criado no [Supabase](https://app.supabase.com)
+- Variáveis de ambiente configuradas no arquivo `.env`
 
-## ⚠️ **Problema Identificado**
-O erro `400 Bad Request` indica que as políticas RLS não estão configuradas para usar o campo `profile_id`.
+## ⚡ Setup Rápido
 
-## �️ **Solução: Configure as Políticas RLS**
+### 1. **Execute o Script Completo**
+Copie e cole todo o conteúdo do arquivo `sql/complete_database_setup.sql` no **SQL Editor** do Supabase.
 
-### 1. Acesse o SQL Editor do Supabase
-- Vá para [app.supabase.com](https://app.supabase.com)
-- Faça login e acesse seu projeto
-- Clique em **SQL Editor** (menu lateral)
+### 2. **Verificar Configuração**
+Execute o arquivo `sql/verify_setup.sql` para verificar se tudo foi criado corretamente.
 
-### 2. Execute o Script de Configuração
-Copie e cole este SQL no editor:
+## 🗃️ Estrutura do Banco
 
-```sql
--- Habilitar RLS (Row Level Security)
-ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
+### **Tabelas Principais:**
+- ✅ `events` - Eventos e celebrações
+- ✅ `clients` - Clientes e contratos  
+- ✅ `profiles` - Perfis de usuários
 
--- Remover políticas antigas se existirem
-DROP POLICY IF EXISTS "Users can view own events" ON public.events;
-DROP POLICY IF EXISTS "Users can insert own events" ON public.events;
-DROP POLICY IF EXISTS "Users can update own events" ON public.events;
-DROP POLICY IF EXISTS "Users can delete own events" ON public.events;
+### **Relacionamentos:**
+- ✅ `events.created_by` → `auth.users.id`
+- ✅ `clients.profile_id` → `auth.users.id`
+- ✅ `clients.related_client_id` → `clients.id`
+- ✅ `profiles.user_id` → `auth.users.id`
 
--- Criar políticas corretas usando profile_id
-CREATE POLICY "Users can view own events" ON public.events
-    FOR SELECT USING (auth.uid() = profile_id);
+## 🔒 Segurança (RLS)
 
-CREATE POLICY "Users can insert own events" ON public.events
-    FOR INSERT WITH CHECK (auth.uid() = profile_id);
+### **Políticas Configuradas:**
+- ✅ Usuários autenticados podem ver todos os eventos
+- ✅ Usuários podem criar/editar apenas seus próprios eventos
+- ✅ Administradores têm acesso total aos clientes
+- ✅ Usuários podem gerenciar apenas seu próprio perfil
 
-CREATE POLICY "Users can update own events" ON public.events
-    FOR UPDATE USING (auth.uid() = profile_id);
+## 🚨 Resolução de Problemas
 
-CREATE POLICY "Users can delete own events" ON public.events
-    FOR DELETE USING (auth.uid() = profile_id);
+### **Erro: "Tabela não existe"**
+```bash
+# Execute o setup completo novamente
+# Arquivo: sql/complete_database_setup.sql
 ```
 
-### 3. (Opcional) Inserir Dados de Teste
-Para testar, primeiro obtenha seu User ID:
-
+### **Erro: "Sem permissão"**
 ```sql
-SELECT auth.uid();
+-- Verificar se RLS está habilitado
+SELECT schemaname, tablename, rowsecurity 
+FROM pg_tables 
+WHERE schemaname = 'public';
+
+-- Verificar políticas
+SELECT * FROM pg_policies WHERE schemaname = 'public';
 ```
 
-Depois insira alguns eventos de exemplo (substitua `SEU_USER_ID_AQUI`):
+### **Erro: "Relacionamento não encontrado"**
+```sql
+-- Recriar foreign keys
+ALTER TABLE public.clients 
+ADD CONSTRAINT clients_profile_id_fkey 
+FOREIGN KEY (profile_id) REFERENCES auth.users(id) ON DELETE SET NULL;
+```
+
+## 🔧 Variáveis de Ambiente
+
+Certifique-se de ter estas variáveis no arquivo `.env`:
+
+```env
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_ANON_KEY=sua-chave-publica-aqui
+```
+
+## ✅ Checklist de Verificação
+
+- [ ] Projeto Supabase criado
+- [ ] Variáveis de ambiente configuradas
+- [ ] Script SQL executado sem erros
+- [ ] Tabelas criadas (events, clients, profiles)
+- [ ] Políticas RLS configuradas
+- [ ] App conectando sem erros
+
+---
+
+**🎯 Após o setup, reinicie o app e todas as funcionalidades estarão disponíveis!**
 
 ```sql
 INSERT INTO public.events (title, description, event_date, max_attendees, status, profile_id) VALUES

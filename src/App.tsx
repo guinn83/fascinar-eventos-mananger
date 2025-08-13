@@ -6,8 +6,10 @@ import LoginView from './views/LoginView'
 import ResetPasswordView from './views/ResetPasswordView'
 import DashboardView from './views/DashboardView'
 import EventsView from './views/EventsView'
+import ClientsView from './views/ClientsView'
 import SupabaseTest from './components/SupabaseTest'
 import ProfilesTest from './components/ProfilesTest'
+import ClientsTest from './components/ClientsTest'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
 
 function App() {
@@ -61,6 +63,7 @@ function App() {
           {/* Rotas de teste temporárias */}
           <Route path="/test-supabase" element={<SupabaseTest />} />
           <Route path="/test-profiles" element={<ProfilesTest />} />
+          <Route path="/test-clients" element={<ClientsTest />} />
           
           {user ? (
             <Route path="/*" element={
@@ -68,6 +71,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/dashboard" element={<DashboardView />} />
+                  <Route path="/clientes" element={<ClientsView />} />
                   <Route path="/eventos" element={<EventsView />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>

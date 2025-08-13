@@ -100,6 +100,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </button>
 
             <button
+              onClick={() => handleNavigation('/clientes')}
+              className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                location.pathname === '/clientes'
+                  ? 'bg-gradient-to-r from-primary to-primary-hover text-white shadow-lg shadow-primary/25'
+                  : 'text-slate-700 hover:text-primary hover:bg-primary/10'
+              }`}
+            >
+              <i className="fas fa-users mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+              Clientes
+            </button>
+
+            <button
               onClick={() => handleNavigation('/eventos')}
               className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 location.pathname === '/eventos'
