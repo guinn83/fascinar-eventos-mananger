@@ -197,6 +197,7 @@ const ClientsView: React.FC = () => {
                         onClick={() => openEditModal(client)}
                         className="p-2 text-slate-600 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
                         title="Editar cliente"
+                        aria-label="Editar cliente"
                       >
                         <i className="fas fa-edit"></i>
                       </button>
@@ -205,6 +206,7 @@ const ClientsView: React.FC = () => {
                         onClick={() => handleDeleteClient(client.id)}
                         className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Excluir cliente"
+                        aria-label="Excluir cliente"
                       >
                         <i className="fas fa-trash"></i>
                       </button>
@@ -227,6 +229,7 @@ const ClientsView: React.FC = () => {
               <button
                 onClick={() => setShowCreateModal(false)}
                 className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                aria-label="Fechar modal"
               >
                 <i className="fas fa-times text-slate-600"></i>
               </button>
@@ -316,6 +319,7 @@ const ClientsView: React.FC = () => {
               <button
                 onClick={() => setShowEditModal(false)}
                 className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                aria-label="Fechar modal"
               >
                 <i className="fas fa-times text-slate-600"></i>
               </button>

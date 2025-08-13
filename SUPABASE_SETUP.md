@@ -83,12 +83,13 @@ VITE_SUPABASE_ANON_KEY=sua-chave-publica-aqui
 **🎯 Após o setup, reinicie o app e todas as funcionalidades estarão disponíveis!**
 
 ```sql
-INSERT INTO public.events (title, description, event_date, max_attendees, status, profile_id) VALUES
+INSERT INTO public.events (title, description, event_date, attendees, staff, status, profile_id) VALUES
 (
     'Festival de Música de Verão',
     'Um evento incrível com os melhores artistas da região',
     '2025-12-15 20:00:00+00',
     120,
+    8,
     'active',
     'SEU_USER_ID_AQUI'
 ),
@@ -119,8 +120,8 @@ Sua tabela tem esta estrutura:
 - `event_date` (timestamp)
 - `end_date` (timestamp, opcional)
 - `location` (text, opcional)
-- `max_attendees` (integer, opcional)
-- `current_attendees` (integer, padrão 0)
+- `attendees` (integer, padrão 0) - Número de convidados
+- `staff` (integer, padrão 0) - Número de pessoas da equipe de organização
 - `price` (numeric, padrão 0)
 - `image_url` (text, opcional)
 - `status` (event_status: active/inactive/cancelled/completed)

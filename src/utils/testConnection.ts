@@ -80,7 +80,8 @@ export const testSupabaseConnection = async () => {
       title: 'TESTE_CONEXAO_DELETE_ME',
       description: 'Evento de teste - pode deletar',
       event_date: new Date().toISOString(),
-      max_attendees: 1,
+      attendees: 10,
+      staff: 3,
       profile_id: user.id
     }
     

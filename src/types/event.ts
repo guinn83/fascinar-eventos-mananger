@@ -6,8 +6,8 @@ export interface Event {
   event_date: string
   end_date?: string
   location?: string
-  max_attendees?: number
-  current_attendees: number
+  attendees: number // Número de convidados
+  staff: number // Número de pessoas da equipe de organização
   price: number
   status: 'active' | 'inactive' | 'cancelled' | 'completed'
   profile_id: string
@@ -22,8 +22,8 @@ export interface CreateEventData {
   event_date: string
   end_date?: string
   location?: string
-  max_attendees?: number
-  current_attendees?: number
+  attendees?: number // Número de convidados
+  staff?: number // Número de pessoas da equipe de organização
   price?: number
   status?: Event['status']
   profile_id: string

@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useEvents } from '../hooks/useEvents'
 import { useAuthStore } from '../store/authStore'
 import { testSupabaseConnection } from '../utils/testConnection'
@@ -43,6 +44,7 @@ const formatDateTime = (dateTime: string) => {
 const EventsView: React.FC = () => {
   const { events, loading, error } = useEvents()
   const { getUserRole } = useAuthStore()
+  const navigate = useNavigate()
   const [testResult, setTestResult] = useState<any>(null)
   const [testing, setTesting] = useState(false)
 
@@ -340,7 +342,7 @@ const EventsView: React.FC = () => {
               <div 
                 key={event.id} 
                 onClick={() => {
-                  // Navegação para detalhes do evento pode ser implementada aqui
+                  navigate(`/eventos/${event.id}`)
                 }}
                 className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-[1.01] cursor-pointer border border-slate-100 w-full max-w-none overflow-hidden relative"
               >
@@ -357,10 +359,10 @@ const EventsView: React.FC = () => {
                       : 'bg-primary/10 text-primary'
                   }`}>
                     {event.status === 'cancelled' ? 'Cancelado' : 
-                     event.status === 'completed' ? 'Concluído' : 
+                     event.status === 'completed' ? 'Realizado' : 
                      status === 'today' ? 'HOJE' :
                      status === 'future' ? (days === 1 ? 'Amanhã' : `${days} dias`) :
-                     `${days} dias atrás`}
+                     'Realizado'}
                   </span>
                 </div>
                 
@@ -417,10 +419,10 @@ const EventsView: React.FC = () => {
                               : 'bg-primary/10 text-primary'
                           }`}>
                             {event.status === 'cancelled' ? 'Cancelado' : 
-                             event.status === 'completed' ? 'Concluído' : 
+                             event.status === 'completed' ? 'Realizado' : 
                              status === 'today' ? 'HOJE' :
                              status === 'future' ? (days === 1 ? 'Amanhã' : `Faltam ${days} dias`) :
-                             `${days} dias atrás`}
+                             'Realizado'}
                           </span>
                         </div>
                       </div>

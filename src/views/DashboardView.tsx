@@ -51,7 +51,7 @@ const DashboardView: React.FC = () => {
         <div className="bg-white/70 backdrop-blur-sm rounded-2xl lg:rounded-3xl p-6 shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-slate-300/50 transition-all duration-300 border border-white/20">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-slate-600 text-sm font-medium">Participantes</p>
+              <p className="text-slate-600 text-sm font-medium">Convidados</p>
               <p className="text-3xl font-bold text-slate-800 mt-1">247</p>
             </div>
             <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25">
