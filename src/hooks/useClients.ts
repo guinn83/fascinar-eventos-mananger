@@ -13,23 +13,17 @@ export function useClients() {
       setLoading(true)
       setError(null)
       
-      console.log('🔍 Buscando clientes...')
-      
-      // Query simples - todos os dados estão na tabela clients
       const { data, error } = await supabase
         .from('clients')
         .select('*')
         .order('created_at', { ascending: false })
 
-      console.log('📊 Resultado da query:', { data, error })
-
       if (error) throw error
       setClients(data || [])
-      console.log('✅ Clientes carregados:', data?.length || 0)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar clientes'
       setError(errorMessage)
-      console.error('❌ Erro ao buscar clientes:', err)
+      console.error('Erro ao buscar clientes:', err)
     } finally {
       setLoading(false)
     }

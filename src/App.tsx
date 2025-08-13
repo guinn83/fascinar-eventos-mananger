@@ -8,8 +8,6 @@ import DashboardView from './views/DashboardView'
 import EventsView from './views/EventsView'
 import ClientsView from './views/ClientsView'
 import SupabaseTest from './components/SupabaseTest'
-import ProfilesTest from './components/ProfilesTest'
-import ClientsTest from './components/ClientsTest'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
 
 function App() {
@@ -60,10 +58,8 @@ function App() {
           {/* Reset password route - sempre disponível independente do estado de autenticação */}
           <Route path="/reset-password" element={<ResetPasswordView />} />
           
-          {/* Rotas de teste temporárias */}
+          {/* Rota de teste para diagnóstico */}
           <Route path="/test-supabase" element={<SupabaseTest />} />
-          <Route path="/test-profiles" element={<ProfilesTest />} />
-          <Route path="/test-clients" element={<ClientsTest />} />
           
           {user ? (
             <Route path="/*" element={

@@ -3,7 +3,6 @@ import { useEvents } from '../hooks/useEvents'
 import { useAuthStore } from '../store/authStore'
 import { testSupabaseConnection } from '../utils/testConnection'
 import { canViewAllEvents } from '../types/user'
-import ProfilesAlert from '../components/ProfilesAlert'
 
 // Função para calcular dias até o evento
 const getDaysUntilEvent = (eventDate: string): { days: number; status: string } => {
@@ -58,7 +57,6 @@ const EventsView: React.FC = () => {
     try {
       const result = await testSupabaseConnection()
       setTestResult(result)
-      console.log('🔍 Resultado do teste:', result)
     } catch (err) {
       setTestResult({ success: false, error: 'Erro ao executar teste', details: err })
     } finally {
@@ -294,9 +292,6 @@ const EventsView: React.FC = () => {
 
   return (
     <div className="w-full space-y-6 overflow-visible">
-      {/* Alerta de configuração do sistema de roles */}
-      <ProfilesAlert />
-      
       {/* Header */}
       <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl p-6 border border-primary/10 w-full">
         <div className="flex flex-col gap-4">
@@ -345,7 +340,7 @@ const EventsView: React.FC = () => {
               <div 
                 key={event.id} 
                 onClick={() => {
-                  console.log('Navegando para evento:', event.id)
+                  // Navegação para detalhes do evento pode ser implementada aqui
                 }}
                 className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-[1.01] cursor-pointer border border-slate-100 w-full max-w-none overflow-hidden relative"
               >

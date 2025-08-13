@@ -25,21 +25,7 @@ export const useEvents = () => {
       const userRole = getUserRole()
       const shouldViewAllEvents = canViewAllEvents(userRole)
 
-      console.log(`🔍 Buscando eventos para usuário ${userRole}...`)
-      
-      // Primeiro, vamos tentar uma consulta simples sem filtros
-      const { error: testError } = await supabase
-        .from('events')
-        .select('id, title')
-        .limit(1)
-
-      if (testError) {
-        console.error('❌ Erro na consulta simples:', testError)
-        throw testError
-      }
-
-      console.log('✅ Consulta simples OK, agora buscando eventos...')
-
+      // Query direta sem testes desnecessários
       let query = supabase
         .from('events')
         .select('*')
@@ -47,17 +33,12 @@ export const useEvents = () => {
 
       // Se não for admin/organizer, filtrar apenas eventos do usuário
       if (!shouldViewAllEvents) {
-        console.log('🔒 Filtrando apenas eventos do usuário...')
-        query = query.eq('profile_id', currentUser.id)
-      } else {
-        console.log('👥 Usuário pode ver todos os eventos!')
+        query = query.eq('created_by', currentUser.id)
       }
 
       const { data, error: fetchError } = await query
 
       if (fetchError) {
-        console.error('❌ Erro ao buscar eventos:', fetchError)
-        
         // Detectar se a tabela não existe
         if (fetchError.message?.includes('relation "public.events" does not exist') ||
             fetchError.code === 'PGRST116' || 
@@ -75,11 +56,8 @@ export const useEvents = () => {
         throw fetchError
       }
 
-      console.log('✅ Eventos carregados:', data?.length || 0)
       setEvents(data || [])
     } catch (err: any) {
-      console.error('❌ Erro no fetchEvents:', err)
-      
       if (err.message === 'TABELA_NAO_EXISTE') {
         setError('A tabela "events" não foi criada no Supabase. Consulte o arquivo SUPABASE_SETUP.md para instruções de configuração.')
       } else if (err.message === 'ERRO_PERMISSOES') {
