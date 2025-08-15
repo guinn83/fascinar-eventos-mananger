@@ -10,6 +10,9 @@ interface AuthState {
   initialized: boolean
   initializeAuth: () => Promise<void>
   signIn: (email: string, password: string) => Promise<{ error?: string }>
+  login: (email: string, password: string) => Promise<{ error?: string }>
+  checkEmail: (email: string) => Promise<{ exists: boolean; firstAccess: boolean }>
+  createPassword: (email: string, password: string) => Promise<{ error?: string }>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error?: string }>
   updatePassword: (newPassword: string) => Promise<{ error?: string }>
@@ -19,6 +22,51 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
+  // Verifica se o email existe e se é o primeiro acesso
+  checkEmail: async (email: string) => {
+    try {
+      // Chama a Edge Function do Supabase
+  const res = await fetch('https://zpxhrkybttkkgofjiibz.functions.supabase.co/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (!res.ok) {
+        return { exists: false, firstAccess: false };
+      }
+      const data = await res.json();
+      return data;
+    } catch {
+      return { exists: false, firstAccess: false };
+    }
+  },
+
+  // Cria senha para o primeiro acesso
+  createPassword: async (userId: string, password: string) => {
+    try {
+      // Atualiza senha no Auth
+      const { error: updateError } = await supabase.auth.admin.updateUserById(userId, { password });
+      if (updateError) {
+        console.error('Erro ao atualizar senha:', updateError);
+        return { error: updateError.message };
+      }
+      // Marca que o usuário já tem senha no perfil
+      const { error: profileError } = await supabase.from('profiles').update({ has_password: true }).eq('user_id', userId);
+      if (profileError) {
+        console.error('Erro ao atualizar profile:', profileError);
+        return { error: profileError.message };
+      }
+      return {};
+    } catch (err) {
+      console.error('Erro inesperado ao criar senha:', err);
+      return { error: 'Erro ao criar senha.' };
+    }
+  },
+
+  // Alias para signIn
+  login: async (email: string, password: string) => {
+    return await get().signIn(email, password);
+  },
   user: null,
   userProfile: null,
   loading: false,

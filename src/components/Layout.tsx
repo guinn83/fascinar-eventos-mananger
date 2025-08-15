@@ -8,7 +8,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { signOut } = useAuthStore()
+  const { signOut, user, userProfile } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -125,12 +125,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </nav>
 
           {/* User Section */}
-          <div className="px-4 py-4 border-t border-slate-200/60">
+          <div className="px-4 py-4 border-t border-slate-200/60 flex flex-col gap-0">
+            <div className="group flex items-center px-2.5 py-0 gap-2 min-w-0 mb-0">
+              <i className="fas fa-user-circle text-slate-700 text-xl" title="Usuário"></i>
+              <span className="truncate text-slate-700 text-sm font-medium" title={userProfile?.full_name || user?.email || ''}>
+                {userProfile?.full_name && userProfile.full_name.trim() !== '' ? userProfile.full_name : user?.email}
+              </span>
+            </div>
             <button
               onClick={handleLogout}
-              className="w-full group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 text-slate-700 hover:text-red-500 hover:bg-red-50"
+              className="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 text-slate-700 hover:text-red-500 hover:bg-red-50"
+              title="Sair"
             >
-              <i className="fas fa-sign-out-alt mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+              <i className="fas fa-sign-out-alt mr-2 text-lg group-hover:scale-110 transition-transform"></i>
               Sair
             </button>
           </div>

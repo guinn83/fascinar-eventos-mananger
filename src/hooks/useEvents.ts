@@ -33,7 +33,7 @@ export const useEvents = () => {
 
       // Se não for admin/organizer, filtrar apenas eventos do usuário
       if (!shouldViewAllEvents) {
-        query = query.eq('created_by', currentUser.id)
+        query = query.eq('profile_id', currentUser.id)
       }
 
       const { data, error: fetchError } = await query

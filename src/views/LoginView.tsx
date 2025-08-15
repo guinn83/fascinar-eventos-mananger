@@ -1,89 +1,92 @@
-import React, { FormEvent, useState } from 'react'
-import { useAuthStore } from '../store/authStore'
 
-// Define a type for the view state
-type ViewState = 'login' | 'forgot-password';
+import React, { useState } from 'react';
+import { useAuthStore } from '../store/authStore';
+
+type LoginStep = 'email' | 'create-password' | 'enter-password' | 'forgot-password';
 
 const LoginView: React.FC = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('') // Add password state
-  const [showPassword, setShowPassword] = useState(false) // Add showPassword state
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [resetMessage, setResetMessage] = useState('') // Add resetMessage state
-  const [resetLoading, setResetLoading] = useState(false) // Add resetLoading state
-  const [resetEmail, setResetEmail] = useState('') // Add resetEmail state
-  const [currentView, setCurrentView] = useState<ViewState>('login') // Add currentView state
-  const [error, setError] = useState('')
-  const { resetPassword } = useAuthStore()
+  const [step, setStep] = useState<LoginStep>('email');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const { checkEmail, login, resetPassword } = useAuthStore();
 
-  const handleContinueWithEmail = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setMessage('')
-    setLoading(true)
 
-    if (!email) {
-      setError('Por favor, insira seu email.')
-      setLoading(false)
-      return
-    }
-
+  // 1. Verifica email e decide próximo passo
+  const handleCheckEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setMessage('');
+    setLoading(true);
     try {
-      const result = await resetPassword(email)
-      if (result.error) {
-        setError(`Erro: ${result.error}`)
+      const result = await checkEmail(email);
+      if (!result.exists) {
+        setError('Email não encontrado.');
+      } else if (result.firstAccess) {
+        // Envia email de recuperação de senha automaticamente
+        const resetResult = await resetPassword(email);
+        if (resetResult.error) {
+          setError(resetResult.error);
+        } else {
+          setMessage('Enviamos um link para você criar sua senha. Verifique seu email.');
+        }
       } else {
-        setMessage('Enviamos um link para o seu email. Clique nele para acessar ou criar sua senha.')
+        setStep('enter-password');
       }
     } catch {
-      setError('Ocorreu um erro inesperado. Tente novamente.')
+      setError('Erro ao verificar email.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setMessage('')
-    setLoading(true)
+  // 2. Criação de senha no primeiro acesso
+  // Removido handleCreatePassword: agora o fluxo é sempre pelo ResetPasswordView
 
-    if (!email || !password) {
-      setError('Por favor, insira seu email e senha.')
-      setLoading(false)
-      return
-    }
-
+  // 3. Login normal
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
     try {
-      // Assuming you have a login function in your authStore
-      // const result = await login(email, password)
-      // if (result.error) {
-      //   setError(`Erro: ${result.error}`)
-      // } else {
-      //   setMessage('Login bem-sucedido!')
-      //   // Redirect or perform other actions on successful login
-      // }
-      setError('Funcionalidade de login ainda não implementada.') // Placeholder
+      const result = await login(email, password);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setMessage('Login realizado com sucesso!');
+        // Redirecionar ou atualizar app
+      }
     } catch {
-      setError('Ocorreu um erro inesperado. Tente novamente.')
+      setError('Erro ao fazer login.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handlePasswordReset = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setResetMessage('')
-    setResetLoading(true)
+  // 4. Esqueceu a senha
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const result = await resetPassword(email);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setMessage('Email de recuperação enviado!');
+      }
+    } catch {
+      setError('Erro ao enviar email de recuperação.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // This function already exists as handleContinueWithEmail,
-    // so we can reuse its logic or call it directly.
-    await handleContinueWithEmail(e)
-    setResetLoading(false)
-  }
-  // Removed the placeholder functions as they are now implemented or handled.
+  // Removidos handleSubmit e handlePasswordReset não utilizados
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 px-4 py-8">
@@ -92,176 +95,141 @@ const LoginView: React.FC = () => {
         <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-gradient-to-br from-primary/20 to-purple-400/20 blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-gradient-to-br from-blue-400/20 to-primary/20 blur-3xl"></div>
       </div>
-
-      {/* Login Card */}
       <div className="relative w-full max-w-md">
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-slate-300/20 border border-white/20 p-8 sm:p-10">
-          {/* Header */}
           <div className="text-center mb-8">
             <div className="w-20 h-20 bg-gradient-to-r from-primary to-primary-hover rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/25">
               <i className="fas fa-calendar-star text-white text-2xl"></i>
             </div>
             <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              Fascinar Eventos {/* This line remains unchanged */}
+              Fascinar Eventos
             </h2>
             <p className="mt-2 text-slate-600 font-medium">
-              {currentView === 'login' ? 'Entre na sua conta' : 'Recupere sua senha'}
+              {step === 'email' && 'Digite seu email para continuar'}
+              {step === 'create-password' && 'Crie sua senha'}
+              {step === 'enter-password' && 'Digite sua senha'}
+              {step === 'forgot-password' && 'Recupere sua senha'}
             </p>
           </div>
-
-          {/* Login Form */}
-          {/* The following block is part of the original file but was not in the provided selection.
-              It is included here to show the context of the fix. */}
-          {currentView === 'login' ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm">
-                  {error}
-                </div>
-              )}
-
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
-                  <div className="relative">
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
-                      <i className="fas fa-envelope text-sm"></i>
-                    </div>
-                    <input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full pl-10 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-slate-400 text-slate-900"
-                      placeholder="seu@email.com"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2">Senha</label>
-                  <div className="relative">
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
-                      <i className="fas fa-lock text-sm"></i>
-                    </div>
-                    <input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="w-full pl-10 pr-12 py-3 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-slate-400 text-slate-900"
-                      placeholder="••••••••"
-                    />
-                    <button
-                      type="button"
-                      title={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                    >
-                      <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-sm`}></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-primary to-primary-hover text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg hover:shadow-primary/25 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  {loading ? (
-                    <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
-                      Entrando...
-                    </div>
-                  ) : (
-                    'Entrar'
-                  )}
-                </button>
-              {/* The following button was not in the provided selection but is part of the original file.
-                  It is included here to show the context of the fix. */}
-
-                <button
-                  type="button"
-                  onClick={() => setCurrentView('forgot-password')}
-                  className="w-full text-primary hover:text-primary-hover text-sm font-semibold py-2 transition-colors"
-                >
-                  Esqueceu sua senha?
-                </button>
-              </div>
-              {/* The rest of the form and the forgot password section are also part of the original file
-                  but were not in the provided selection. */}
-            </form>
-          ) : (
-            /* Forgot Password Form */
-            <form onSubmit={handlePasswordReset} className="space-y-6">
-              {resetMessage && (
-                <div className={`border px-4 py-3 rounded-2xl text-sm ${
-                  resetMessage.includes('erro') || resetMessage.includes('Erro')
-                    ? 'bg-red-50 border-red-200 text-red-700'
-                    : 'bg-green-50 border-green-200 text-green-700'
-                }`}>
-                  {resetMessage}
-                </div>
-              )}
-
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm mb-4">
+              {error}
+            </div>
+          )}
+          {message && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-2xl text-sm mb-4">
+              {message}
+            </div>
+          )}
+          {/* Step 1: Email */}
+          {step === 'email' && (
+            <form onSubmit={handleCheckEmail} className="space-y-6">
               <div>
-                <label htmlFor="reset-email" className="block text-sm font-semibold text-slate-700 mb-2">
-                  Email para recuperação
-                </label>
+                <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
                     <i className="fas fa-envelope text-sm"></i>
                   </div>
                   <input
-                    id="reset-email"
+                    id="email"
                     type="email"
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                     className="w-full pl-10 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-slate-400 text-slate-900"
                     placeholder="seu@email.com"
                   />
                 </div>
               </div>
-
-              <div className="space-y-4">
-                <button
-                  type="submit"
-                  disabled={resetLoading}
-                  className="w-full bg-gradient-to-r from-primary to-primary-hover text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg hover:shadow-primary/25 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  {resetLoading ? (
-                    <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
-                      Enviando...
-                    </div>
-                  ) : (
-                    'Enviar email de recuperação'
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrentView('login')
-                    setResetMessage('')
-                    setResetEmail('')
-                  }}
-                  className="w-full text-slate-600 hover:text-slate-800 text-sm font-semibold py-2 transition-colors"
-                >
-                  Voltar para o login
-                </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-primary to-primary-hover text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg hover:shadow-primary/25 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {loading ? 'Verificando...' : 'Continuar'}
+              </button>
+            </form>
+          )}
+          {/* Step 2a: Criar senha removido, agora sempre usa ResetPasswordView */}
+          {/* Step 2b: Digitar senha */}
+          {step === 'enter-password' && (
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2">Senha</label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                    <i className="fas fa-lock text-sm"></i>
+                  </div>
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full pl-10 pr-12 py-3 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-slate-400 text-slate-900"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    title={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                  >
+                    <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-sm`}></i>
+                  </button>
+                </div>
               </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-primary to-primary-hover text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg hover:shadow-primary/25 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {loading ? 'Entrando...' : 'Entrar'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setStep('forgot-password')}
+                className="w-full text-primary hover:text-primary-hover text-sm font-semibold py-2 transition-colors"
+              >
+                Esqueceu sua senha?
+              </button>
+            </form>
+          )}
+          {/* Step 3: Esqueceu a senha */}
+          {step === 'forgot-password' && (
+            <form onSubmit={handleForgotPassword} className="space-y-6">
+              <div>
+                <label htmlFor="email-forgot" className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+                <input
+                  id="email-forgot"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-slate-400 text-slate-900"
+                  placeholder="seu@email.com"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-primary to-primary-hover text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg hover:shadow-primary/25 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {loading ? 'Enviando...' : 'Enviar email de recuperação'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setStep('email')}
+                className="w-full text-slate-600 hover:text-slate-800 text-sm font-semibold py-2 transition-colors"
+              >
+                Voltar para o início
+              </button>
             </form>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default LoginView

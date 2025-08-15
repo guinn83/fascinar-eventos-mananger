@@ -14,6 +14,7 @@ const ResetPasswordView: React.FC = () => {
   
   const navigate = useNavigate()
   const { updatePassword, verifyPasswordResetToken } = useAuthStore()
+  const [canSubmit, setCanSubmit] = useState(false)
   const { focusExistingWindow, hasOtherWindows } = usePWAWindowManager()
 
   // Verificar se há outras janelas abertas na inicialização
@@ -83,23 +84,26 @@ const ResetPasswordView: React.FC = () => {
       const tokenResult = await verifyPasswordResetToken()
       if (tokenResult.success) {
         setError('')
+        setCanSubmit(true)
         return
       }
-      
       // Se não, tentar extrair da URL
       const result = extractTokensFromUrl()
-      
       if (result.error) {
         setError(result.error)
+        setCanSubmit(false)
         return
       }
-      
       if (result.accessToken) {
         setError('') // Limpar qualquer erro anterior
+        // Mesmo assim, não há sessão válida, então não permite submit
+        setCanSubmit(false)
         return
       }
+      // Se chegou aqui, não há token válido
+      setError('Link inválido ou expirado. Solicite um novo link.');
+      setCanSubmit(false)
     }
-    
     captureTokenImmediately()
   }, [verifyPasswordResetToken])
 
@@ -121,6 +125,11 @@ const ResetPasswordView: React.FC = () => {
       return
     }
 
+    if (!canSubmit) {
+      setError('Link inválido ou expirado. Solicite um novo link.');
+      setLoading(false);
+      return;
+    }
     try {
       const result = await updatePassword(password)
       if (result.error) {
@@ -147,14 +156,17 @@ const ResetPasswordView: React.FC = () => {
               <i className="fas fa-check text-white text-2xl"></i>
             </div>
             <h2 className="text-2xl font-bold text-slate-800 mb-4">
-              Senha Atualizada!
+              Senha criada!
             </h2>
             <p className="text-slate-600 mb-6">
-              Sua senha foi atualizada com sucesso. Você será redirecionado para a tela de login em alguns segundos.
+              Sua senha foi criada com sucesso. Agora você já pode acessar o app normalmente.
             </p>
-            <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent"></div>
-            </div>
+            <button
+              className="w-full bg-gradient-to-r from-primary to-primary-hover text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg hover:shadow-primary/25 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] mt-4"
+              onClick={() => navigate('/')}
+            >
+              Abrir o app
+            </button>
           </div>
         </div>
       </div>
@@ -265,7 +277,7 @@ const ResetPasswordView: React.FC = () => {
             <div className="space-y-4">
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !canSubmit}
                 className="w-full bg-gradient-to-r from-primary to-primary-hover text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg hover:shadow-primary/25 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {loading ? (
