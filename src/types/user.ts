@@ -4,12 +4,21 @@ export type UserRole = 'client' | 'organizer' | 'admin'
 
 export interface UserProfile {
   id: string
-  user_id: string
-  full_name?: string
+  user_id?: string // Nullable para clientes sem login
+  full_name: string
   avatar_url?: string
   phone?: string
   bio?: string
   role: UserRole
+  email?: string
+  has_password: boolean
+  
+  // Campos adicionados para clientes (estrutura unificada)
+  cpf?: string
+  address?: string
+  company_name?: string
+  related_profile_id?: string
+  
   created_at: string
   updated_at: string
 }

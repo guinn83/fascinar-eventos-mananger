@@ -70,6 +70,34 @@ export const useEvents = () => {
     }
   }
 
+  // Buscar um evento específico por ID
+  const getEvent = async (eventId: string): Promise<Event | null> => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const { data, error: fetchError } = await supabase
+        .from('events')
+        .select('*')
+        .eq('id', eventId)
+        .single()
+
+      if (fetchError) {
+        if (fetchError.code === 'PGRST116') {
+          throw new Error('Evento não encontrado')
+        }
+        throw fetchError
+      }
+
+      return data
+    } catch (err: any) {
+      setError(err.message)
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Criar novo evento
   const createEvent = async (eventData: CreateEventData) => {
     try {
@@ -215,6 +243,7 @@ export const useEvents = () => {
     events,
     loading,
     error,
+    getEvent,
     createEvent,
     updateEvent,
     deleteEvent,

@@ -122,6 +122,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <i className="fas fa-calendar-alt mr-3 text-lg group-hover:scale-110 transition-transform"></i>
               Eventos
             </button>
+
+            <button
+              onClick={() => handleNavigation('/disponibilidade')}
+              className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                location.pathname === '/disponibilidade'
+                  ? 'bg-gradient-to-r from-primary to-primary-hover text-white shadow-lg shadow-primary/25'
+                  : 'text-slate-700 hover:text-primary hover:bg-primary/10'
+              }`}
+            >
+              <i className="fas fa-calendar-check mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+              Minha Disponibilidade
+            </button>
           </nav>
 
           {/* User Section */}

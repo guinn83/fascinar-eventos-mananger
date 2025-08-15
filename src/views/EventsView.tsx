@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useEvents } from '../hooks/useEvents'
 import { useAuthStore } from '../store/authStore'
 import { testSupabaseConnection } from '../utils/testConnection'
+import { Card, CardContent } from '../components/ui/card'
 import { canViewAllEvents } from '../types/user'
 
 // Função para calcular dias até o evento
@@ -295,22 +296,24 @@ const EventsView: React.FC = () => {
   return (
     <div className="w-full space-y-6 overflow-visible">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl p-6 border border-primary/10 w-full">
-        <div className="flex flex-col gap-4">
-          <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
-              Eventos
-            </h1>
-            <p className="text-slate-600 mt-2 font-medium">
-              Gerencie todos os seus eventos
-            </p>
+      <Card className="w-full">
+        <CardContent size="lg">
+          <div className="flex flex-col gap-4">
+            <div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+                Eventos
+              </h1>
+              <p className="text-slate-600 mt-2 font-medium">
+                Gerencie todos os seus eventos
+              </p>
+            </div>
+            <button className="bg-gradient-to-r from-primary to-primary-hover text-white font-semibold px-6 py-3 rounded-2xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-200 transform hover:scale-[1.02] w-full">
+              <i className="fas fa-plus mr-2"></i>
+              Novo Evento
+            </button>
           </div>
-          <button className="bg-gradient-to-r from-primary to-primary-hover text-white font-semibold px-6 py-3 rounded-2xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-200 transform hover:scale-[1.02] w-full">
-            <i className="fas fa-plus mr-2"></i>
-            Novo Evento
-          </button>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Events List - Layout Horizontal */}
       <div className="space-y-4 pb-6 w-full overflow-visible">
@@ -339,40 +342,41 @@ const EventsView: React.FC = () => {
             const { date, time } = formatDateTime(event.event_date)
             
             return (
-              <div 
-                key={event.id} 
-                onClick={() => {
-                  navigate(`/eventos/${event.id}`)
-                }}
-                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-[1.01] cursor-pointer border border-slate-100 w-full max-w-none overflow-hidden relative"
+              <Card
+                key={event.id}
+                className="cursor-pointer"
+                size="md"
+                padding="px-3 py-2"
               >
-                
-                {/* Status no canto superior direito - mobile */}
-                <div className="absolute top-0 right-1 md:hidden z-10">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-small ${
-                    event.status === 'cancelled' 
-                      ? 'bg-red-100 text-red-700' 
-                      : event.status === 'completed'
-                      ? 'bg-red-100 text-red-700'
-                      : status === 'today'
-                      ? 'bg-red-100 text-red-700'
-                      : 'bg-primary/10 text-primary'
-                  }`}>
-                    {event.status === 'cancelled' ? 'Cancelado' : 
-                     event.status === 'completed' ? 'Realizado' : 
-                     status === 'today' ? 'HOJE' :
-                     status === 'future' ? (days === 1 ? 'Amanhã' : `${days} dias`) :
-                     'Realizado'}
-                  </span>
-                </div>
-                
-                <div className="p-3">
+                <div
+                  onClick={() => navigate(`/eventos/${event.id}`)}
+                  className="w-full relative"
+                >
+                  {/* Status no canto superior direito - mobile */}
+                  <div className="absolute top-0 right-1 md:hidden z-10">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-small ${
+                      event.status === 'cancelled'
+                        ? 'bg-red-100 text-red-700'
+                        : event.status === 'completed'
+                        ? 'bg-red-100 text-red-700'
+                        : status === 'today'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-primary/10 text-primary'
+                    }`}>
+                      {event.status === 'cancelled' ? 'Cancelado' :
+                        event.status === 'completed' ? 'Realizado' :
+                        status === 'today' ? 'HOJE' :
+                        status === 'future' ? (days === 1 ? 'Amanhã' : `${days} dias`) :
+                        'Realizado'}
+                    </span>
+                  </div>
+
                   <div className="flex items-center gap-3">
                     {/* Imagem do Evento */}
                     <div className="flex-shrink-0">
                       {event.image_url ? (
-                        <img 
-                          src={event.image_url} 
+                        <img
+                          src={event.image_url}
                           alt={event.title}
                           className="w-20 h-20 object-cover rounded-full border-4 border-primary/20"
                         />
@@ -391,7 +395,7 @@ const EventsView: React.FC = () => {
                           <h3 className="text-lg font-bold text-slate-800 mb-0 truncate">
                             {event.title}
                           </h3>
-                          
+
                           {/* Data e hora (sem contagem de dias) */}
                           <div className="flex items-center text-slate-600 text-sm mb-0">
                             <i className="fas fa-calendar mr-2"></i>
@@ -399,7 +403,7 @@ const EventsView: React.FC = () => {
                             <i className="fas fa-clock mr-2"></i>
                             <span className="mr-2">{time}</span>
                           </div>
-                          
+
                           {/* Localização */}
                           <div className="flex items-center text-slate-600 text-sm">
                             <i className="fas fa-map-marker-alt mr-2 flex-shrink-0"></i>
@@ -410,16 +414,16 @@ const EventsView: React.FC = () => {
                         {/* Status no canto direito - desktop */}
                         <div className="hidden md:flex flex-col items-end ml-4">
                           <span className={`px-1 py-1 rounded-full text-xs font-medium ${
-                            event.status === 'cancelled' 
-                              ? 'bg-red-100 text-red-700' 
+                            event.status === 'cancelled'
+                              ? 'bg-red-100 text-red-700'
                               : event.status === 'completed'
                               ? 'bg-gray-100 text-gray-700'
                               : status === 'today'
                               ? 'bg-red-100 text-red-700'
                               : 'bg-primary/10 text-primary'
                           }`}>
-                            {event.status === 'cancelled' ? 'Cancelado' : 
-                             event.status === 'completed' ? 'Realizado' : 
+                            {event.status === 'cancelled' ? 'Cancelado' :
+                             event.status === 'completed' ? 'Realizado' :
                              status === 'today' ? 'HOJE' :
                              status === 'future' ? (days === 1 ? 'Amanhã' : `Faltam ${days} dias`) :
                              'Realizado'}
@@ -434,7 +438,7 @@ const EventsView: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Card>
             )
           })
         )}

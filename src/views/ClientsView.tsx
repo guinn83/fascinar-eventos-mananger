@@ -183,7 +183,7 @@ const ClientsView: React.FC = () => {
                       </div>
 
                       {client.related_client && (
-                        <div className="bg-slate-50 rounded-lg p-3 mt-3">
+                        <div className="bg-slate-50 rounded-lg px-3 py-2 mt-3">
                           <p className="text-sm text-slate-600">
                             <strong>Relacionado com:</strong> {client.related_client.name}
                             {client.related_client.phone && ` • ${client.related_client.phone}`}

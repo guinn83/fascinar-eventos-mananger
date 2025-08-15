@@ -248,7 +248,7 @@ const EventDetailView: React.FC = () => {
               Equipe de Organização
             </h3>
             <div className="grid grid-cols-1 gap-4">
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+              <div className="bg-purple-50 border border-purple-200 rounded-lg px-3 py-2">
                 <div className="flex items-center justify-between">
                   <span className="text-purple-700 font-medium">Número de Pessoas</span>
                   <span className="text-2xl font-bold text-purple-800">
@@ -267,7 +267,7 @@ const EventDetailView: React.FC = () => {
               <i className="fas fa-dollar-sign text-primary"></i>
               Informações Financeiras
             </h3>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">
               <div className="flex items-center justify-between">
                 <span className="text-green-700 font-medium">Valor do Evento</span>
                 <span className="text-2xl font-bold text-green-800">
@@ -286,6 +286,14 @@ const EventDetailView: React.FC = () => {
           >
             <i className="fas fa-edit"></i>
             Editar Evento
+          </button>
+          
+          <button
+            onClick={() => navigate(`/eventos/${event.id}/staff`)}
+            className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-colors"
+          >
+            <i className="fas fa-users"></i>
+            Gerenciar Equipe
           </button>
           
           <button
