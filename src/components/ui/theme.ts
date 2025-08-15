@@ -10,9 +10,10 @@ export const cardTokens = {
 
   // spacing variants — used by CardHeader/CardContent
   spacing: {
-  sm: 'px-2 py-1',
-  md: 'px-3 py-2',
-  lg: 'px-4 py-3'
+  // responsive spacing: smaller screens use compact padding, larger screens get more room
+  sm: 'p-2 md:p-3',
+  md: 'p-4 md:p-6',
+  lg: 'p-6 md:p-8'
   },
 
   // title

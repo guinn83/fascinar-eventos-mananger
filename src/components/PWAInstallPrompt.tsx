@@ -1,5 +1,6 @@
 import React from 'react'
 import { usePWADetection, usePWAInstall } from '../hooks/usePWA'
+import { Card, CardContent } from './ui/card'
 
 const PWAInstallPrompt: React.FC = () => {
   const { isPWA, canInstall } = usePWADetection()
@@ -17,8 +18,10 @@ const PWAInstallPrompt: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 bg-white border border-blue-200 rounded-2xl p-4 shadow-lg z-50 max-w-sm mx-auto">
-      <div className="flex items-start space-x-3">
+    <div className="fixed bottom-4 left-4 right-4 z-50 max-w-sm mx-auto">
+      <Card className="bg-white border border-blue-200 rounded-2xl shadow-lg">
+        <CardContent size="md">
+          <div className="flex items-start space-x-3">
         <div className="flex-shrink-0">
           <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
             <i className="fas fa-download text-blue-600"></i>
@@ -57,7 +60,9 @@ const PWAInstallPrompt: React.FC = () => {
         >
           <i className="fas fa-times text-sm"></i>
         </button>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

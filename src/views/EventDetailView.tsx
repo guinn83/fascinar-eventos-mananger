@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Card, CardContent } from '../components/ui/card'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../services/supabase'
 import type { Event } from '../types/event'
@@ -123,7 +124,7 @@ const EventDetailView: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 px-4 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-6">
         
         {/* Header com imagem circular */}
@@ -192,91 +193,101 @@ const EventDetailView: React.FC = () => {
         </div>
 
         {/* Event Details Card */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-slate-200/50 border border-white/20 p-8">
-          <div className="space-y-6">
-            {/* Event Description */}
-            {event.description && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                  <i className="fas fa-align-left text-primary"></i>
-                  Descrição Detalhada
-                </h3>
-                <p className="text-slate-700 leading-relaxed">
-                  {event.description}
-                </p>
-              </div>
-            )}
+        <Card className="w-full">
+          <CardContent size="lg">
+            <div className="space-y-6">
+              {/* Event Description */}
+              {event.description && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                    <i className="fas fa-align-left text-primary"></i>
+                    Descrição Detalhada
+                  </h3>
+                  <p className="text-slate-700 leading-relaxed">
+                    {event.description}
+                  </p>
+                </div>
+              )}
 
-            {/* Date, Location and Attendees */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                  <i className="fas fa-calendar text-primary"></i>
-                  Data e Horário: <span className="font-normal text-slate-700">{formatDate(event.event_date)}</span>
-                </h3>
-                {event.end_date && (
-                  <div className="flex items-center gap-3 mt-2">
-                    <i className="fas fa-calendar-check w-4 text-slate-500"></i>
-                    <span className="text-slate-700">Até: {formatDate(event.end_date)}</span>
-                  </div>
-                )}
+              {/* Date, Location and Attendees */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                    <i className="fas fa-calendar text-primary"></i>
+                    Data e Horário: <span className="font-normal text-slate-700">{formatDate(event.event_date)}</span>
+                  </h3>
+                  {event.end_date && (
+                    <div className="flex items-center gap-3 mt-2">
+                      <i className="fas fa-calendar-check w-4 text-slate-500"></i>
+                      <span className="text-slate-700">Até: {formatDate(event.end_date)}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                    <i className="fas fa-map-marker-alt text-primary"></i>
+                    Local: <span className="font-normal text-slate-700">{event.location || 'Local não informado'}</span>
+                  </h3>
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                    <i className="fas fa-users text-primary"></i>
+                    Número de convidados: <span className="font-normal text-slate-700">{event.attendees}</span>
+                  </h3>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                  <i className="fas fa-map-marker-alt text-primary"></i>
-                  Local: <span className="font-normal text-slate-700">{event.location || 'Local não informado'}</span>
-                </h3>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                  <i className="fas fa-users text-primary"></i>
-                  Número de convidados: <span className="font-normal text-slate-700">{event.attendees}</span>
-                </h3>
-              </div>
             </div>
-
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Equipe Card */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-slate-200/50 border border-white/20 p-8">
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-              <i className="fas fa-user-tie text-primary"></i>
-              Equipe de Organização
-            </h3>
-            <div className="grid grid-cols-1 gap-4">
-              <div className="bg-purple-50 border border-purple-200 rounded-lg px-3 py-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-purple-700 font-medium">Número de Pessoas</span>
-                  <span className="text-2xl font-bold text-purple-800">
-                    {event.staff}
-                  </span>
+        <Card className="w-full">
+          <CardContent size="md">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                <i className="fas fa-user-tie text-primary"></i>
+                Equipe de Organização
+              </h3>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg px-3 py-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-purple-700 font-medium">Número de Pessoas</span>
+                      <span className="text-2xl font-bold text-purple-800">
+                        {event.staff}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Financial Information Card */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-slate-200/50 border border-white/20 p-8">
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-              <i className="fas fa-dollar-sign text-primary"></i>
-              Informações Financeiras
-            </h3>
-            <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-              <div className="flex items-center justify-between">
-                <span className="text-green-700 font-medium">Valor do Evento</span>
-                <span className="text-2xl font-bold text-green-800">
-                  {formatCurrency(event.price)}
-                </span>
+        <Card className="w-full">
+          <CardContent size="md">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                <i className="fas fa-dollar-sign text-primary"></i>
+                Informações Financeiras
+              </h3>
+              <div>
+                <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-green-700 font-medium">Valor do Evento</span>
+                    <span className="text-2xl font-bold text-green-800">
+                      {formatCurrency(event.price)}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">

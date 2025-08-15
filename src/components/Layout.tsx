@@ -158,7 +158,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Main Content */}
       <main className="md:pl-64 min-h-screen transition-all duration-300">
-        <div className="p-4 lg:p-8">
+        <div className="px-4 lg:px-8">
           {children}
         </div>
       </main>

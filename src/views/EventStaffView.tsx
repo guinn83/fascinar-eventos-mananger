@@ -191,7 +191,7 @@ export function EventStaffView() {
 
   if (!event) {
     return (
-      <div className="p-6">
+      <div className="px-4 lg:px-8">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-1/3"></div>
           <div className="h-64 bg-gray-200 rounded"></div>
@@ -201,7 +201,7 @@ export function EventStaffView() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="px-4 lg:px-8 max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
@@ -473,10 +473,12 @@ export function EventStaffView() {
       {/* Loading/Error States */}
       {loading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg">
-            <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
-            <p className="mt-4 text-center">Carregando...</p>
-          </div>
+          <Card className="rounded-lg">
+            <CardContent size="md">
+              <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
+              <p className="mt-4 text-center">Carregando...</p>
+            </CardContent>
+          </Card>
         </div>
       )}
 

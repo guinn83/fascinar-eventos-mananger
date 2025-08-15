@@ -71,35 +71,39 @@ const EventsView: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl p-8 border border-primary/10">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
-                Eventos
-              </h1>
-              <p className="text-slate-600 mt-2 font-medium">
-                Carregando seus eventos...
-              </p>
+        <Card className="w-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl border border-primary/10">
+          <CardContent size="lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+                  Eventos
+                </h1>
+                <p className="text-slate-600 mt-2 font-medium">
+                  Carregando seus eventos...
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Loading skeleton */}
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white/80 rounded-2xl shadow-lg p-6 animate-pulse">
-              <div className="flex items-start gap-6">
-                <div className="w-32 h-24 bg-gray-300 rounded-xl"></div>
-                <div className="flex-1 space-y-3">
-                  <div className="h-4 bg-gray-300 rounded w-1/3"></div>
-                  <div className="h-3 bg-gray-300 rounded w-2/3"></div>
-                  <div className="flex gap-4">
-                    <div className="h-3 bg-gray-300 rounded w-20"></div>
-                    <div className="h-3 bg-gray-300 rounded w-20"></div>
+            <Card key={i} className="animate-pulse">
+              <CardContent size="md">
+                <div className="flex items-start gap-6">
+                  <div className="w-32 h-24 bg-gray-300 rounded-xl"></div>
+                  <div className="flex-1 space-y-3">
+                    <div className="h-4 bg-gray-300 rounded w-1/3"></div>
+                    <div className="h-3 bg-gray-300 rounded w-2/3"></div>
+                    <div className="flex gap-4">
+                      <div className="h-3 bg-gray-300 rounded w-20"></div>
+                      <div className="h-3 bg-gray-300 rounded w-20"></div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
@@ -110,184 +114,188 @@ const EventsView: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl p-8 border border-primary/10">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
-                Eventos
-              </h1>
-              <p className="text-slate-600 mt-2 font-medium">
-                {canViewAll 
-                  ? `Visualizando todos os eventos (${userRole})`
-                  : 'Gerencie seus eventos'
-                }
-              </p>
-              {/* Indicador de nível de acesso */}
-              <div className="mt-3 flex items-center gap-2">
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                  userRole === 'admin' 
-                    ? 'bg-red-100 text-red-800' 
-                    : userRole === 'organizer'
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                  <i className={`fas ${
-                    userRole === 'admin' ? 'fa-crown' 
-                    : userRole === 'organizer' ? 'fa-users-cog'
-                    : 'fa-user'
-                  } mr-1`}></i>
-                  {userRole === 'admin' ? 'Administrador' 
-                   : userRole === 'organizer' ? 'Organizador'
-                   : 'Cliente'}
-                </span>
-                {canViewAll && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    <i className="fas fa-globe mr-1"></i>
-                    Acesso Total
+        <Card className="w-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl border border-primary/10">
+          <CardContent size="lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+                  Eventos
+                </h1>
+                <p className="text-slate-600 mt-2 font-medium">
+                  {canViewAll 
+                    ? `Visualizando todos os eventos (${userRole})`
+                    : 'Gerencie seus eventos'
+                  }
+                </p>
+                {/* Indicador de nível de acesso */}
+                <div className="mt-3 flex items-center gap-2">
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                    userRole === 'admin' 
+                      ? 'bg-red-100 text-red-800' 
+                      : userRole === 'organizer'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    <i className={`fas ${
+                      userRole === 'admin' ? 'fa-crown' 
+                      : userRole === 'organizer' ? 'fa-users-cog'
+                      : 'fa-user'
+                    } mr-1`}></i>
+                    {userRole === 'admin' ? 'Administrador' 
+                     : userRole === 'organizer' ? 'Organizador'
+                     : 'Cliente'}
                   </span>
-                )}
+                  {canViewAll && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <i className="fas fa-globe mr-1"></i>
+                      Acesso Total
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Error state */}
         {error?.includes('tabela "events" não foi criada') ? (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-                  <i className="fas fa-database text-amber-600 text-xl"></i>
+          <Card className="w-full">
+            <CardContent size="lg">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                    <i className="fas fa-database text-amber-600 text-xl"></i>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-amber-800 mb-2">
+                    Configuração do Banco de Dados Necessária
+                  </h3>
+                  <p className="text-amber-700 mb-4">
+                    A tabela "events" ainda não foi criada no seu projeto Supabase. 
+                    É necessário executar o script SQL para criar a estrutura do banco de dados.
+                  </p>
+                  <div className="bg-amber-100 rounded-xl px-3 py-2 mb-4">
+                    <h4 className="font-semibold text-amber-800 mb-2 flex items-center gap-2">
+                      <i className="fas fa-list-ol"></i>
+                      Passos para Configuração:
+                    </h4>
+                    <ol className="text-sm text-amber-700 space-y-1 list-decimal list-inside">
+                      <li>Acesse o dashboard do Supabase</li>
+                      <li>Vá para o <strong>SQL Editor</strong></li>
+                      <li>Execute o script do arquivo <code>sql/create_events_table.sql</code></li>
+                      <li>Recarregue esta página</li>
+                    </ol>
+                  </div>
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={() => window.location.reload()}
+                      className="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
+                    >
+                      <i className="fas fa-redo"></i>
+                      Recarregar Página
+                    </button>
+                    <button 
+                      onClick={handleTestConnection}
+                      disabled={testing}
+                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
+                    >
+                      <i className={`fas ${testing ? 'fa-spinner fa-spin' : 'fa-stethoscope'}`}></i>
+                      {testing ? 'Testando...' : 'Diagnosticar'}
+                    </button>
+                    <a 
+                      href="https://app.supabase.com" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="bg-white border border-amber-300 hover:bg-amber-50 text-amber-700 font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
+                    >
+                      <i className="fas fa-external-link-alt"></i>
+                      Abrir Supabase
+                    </a>
+                  </div>
                 </div>
               </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-amber-800 mb-2">
-                  Configuração do Banco de Dados Necessária
-                </h3>
-                <p className="text-amber-700 mb-4">
-                  A tabela "events" ainda não foi criada no seu projeto Supabase. 
-                  É necessário executar o script SQL para criar a estrutura do banco de dados.
-                </p>
-                <div className="bg-amber-100 rounded-xl p-4 mb-4">
-                  <h4 className="font-semibold text-amber-800 mb-2 flex items-center gap-2">
-                    <i className="fas fa-list-ol"></i>
-                    Passos para Configuração:
-                  </h4>
-                  <ol className="text-sm text-amber-700 space-y-1 list-decimal list-inside">
-                    <li>Acesse o dashboard do Supabase</li>
-                    <li>Vá para o <strong>SQL Editor</strong></li>
-                    <li>Execute o script do arquivo <code>sql/create_events_table.sql</code></li>
-                    <li>Recarregue esta página</li>
-                  </ol>
-                </div>
-                <div className="flex gap-3">
-                  <button 
-                    onClick={() => window.location.reload()}
-                    className="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
-                  >
-                    <i className="fas fa-redo"></i>
-                    Recarregar Página
-                  </button>
-                  <button 
-                    onClick={handleTestConnection}
-                    disabled={testing}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
-                  >
-                    <i className={`fas ${testing ? 'fa-spinner fa-spin' : 'fa-stethoscope'}`}></i>
-                    {testing ? 'Testando...' : 'Diagnosticar'}
-                  </button>
-                  <a 
-                    href="https://app.supabase.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-white border border-amber-300 hover:bg-amber-50 text-amber-700 font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
-                  >
-                    <i className="fas fa-external-link-alt"></i>
-                    Abrir Supabase
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         ) : (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
-            <div className="flex items-start gap-3 text-red-700 mb-4">
-              <i className="fas fa-exclamation-triangle"></i>
-              <div className="flex-1">
-                <h3 className="font-semibold">Erro ao carregar eventos</h3>
-                <p className="text-sm mt-1">{error}</p>
+          <Card className="w-full">
+            <CardContent size="md">
+              <div className="flex items-start gap-3 text-red-700 mb-4">
+                <i className="fas fa-exclamation-triangle"></i>
+                <div className="flex-1">
+                  <h3 className="font-semibold">Erro ao carregar eventos</h3>
+                  <p className="text-sm mt-1">{error}</p>
+                </div>
               </div>
-            </div>
-            <div className="flex gap-3">
-              <button 
-                onClick={handleTestConnection}
-                disabled={testing}
-                className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
-              >
-                <i className={`fas ${testing ? 'fa-spinner fa-spin' : 'fa-stethoscope'}`}></i>
-                {testing ? 'Diagnosticando...' : 'Diagnosticar Problema'}
-              </button>
-              <button 
-                onClick={() => window.location.reload()}
-                className="bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
-              >
-                <i className="fas fa-redo"></i>
-                Recarregar
-              </button>
-            </div>
-          </div>
+              <div className="flex gap-3">
+                <button 
+                  onClick={handleTestConnection}
+                  disabled={testing}
+                  className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
+                >
+                  <i className={`fas ${testing ? 'fa-spinner fa-spin' : 'fa-stethoscope'}`}></i>
+                  {testing ? 'Diagnosticando...' : 'Diagnosticar Problema'}
+                </button>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
+                >
+                  <i className="fas fa-redo"></i>
+                  Recarregar
+                </button>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Resultados do Teste de Diagnóstico */}
         {testResult && (
-          <div className={`rounded-2xl p-6 border ${
-            testResult.success 
-              ? 'bg-green-50 border-green-200' 
-              : 'bg-red-50 border-red-200'
-          }`}>
-            <div className="flex items-start gap-3">
-              <i className={`fas ${
-                testResult.success 
-                  ? 'fa-check-circle text-green-600' 
-                  : 'fa-times-circle text-red-600'
-              } text-xl`}></i>
-              <div className="flex-1">
-                <h3 className={`font-bold text-lg mb-2 ${
-                  testResult.success ? 'text-green-800' : 'text-red-800'
-                }`}>
-                  {testResult.success ? '✅ Diagnóstico Completo' : '❌ Problema Identificado'}
-                </h3>
-                <p className={`mb-3 ${
-                  testResult.success ? 'text-green-700' : 'text-red-700'
-                }`}>
-                  {testResult.message || testResult.error}
-                </p>
-                {testResult.user && (
-                  <div className="bg-white rounded-lg p-3 mb-3">
-                    <h4 className="font-semibold text-sm text-slate-700 mb-1">Informações da Sessão:</h4>
-                    <p className="text-sm text-slate-600">Email: {testResult.user.email}</p>
-                    <p className="text-sm text-slate-600">User ID: {testResult.user.id}</p>
-                  </div>
-                )}
-                {testResult.details && (
-                  <details className="mt-3">
-                    <summary className="cursor-pointer text-sm font-medium">
-                      Ver detalhes técnicos
-                    </summary>
-                    <pre className="mt-2 text-xs bg-white p-3 rounded border overflow-auto">
-                      {JSON.stringify(testResult.details, null, 2)}
-                    </pre>
-                  </details>
-                )}
-                <button 
-                  onClick={() => setTestResult(null)}
-                  className="mt-3 text-sm text-slate-600 hover:text-slate-800 underline"
-                >
-                  Fechar diagnóstico
-                </button>
+          <Card className="w-full">
+            <CardContent size="md">
+              <div className="flex items-start gap-3">
+                <i className={`fas ${
+                  testResult.success 
+                    ? 'fa-check-circle text-green-600' 
+                    : 'fa-times-circle text-red-600'
+                } text-xl`}></i>
+                <div className="flex-1">
+                  <h3 className={`font-bold text-lg mb-2 ${
+                    testResult.success ? 'text-green-800' : 'text-red-800'
+                  }`}>
+                    {testResult.success ? '✅ Diagnóstico Completo' : '❌ Problema Identificado'}
+                  </h3>
+                  <p className={`mb-3 ${
+                    testResult.success ? 'text-green-700' : 'text-red-700'
+                  }`}>
+                    {testResult.message || testResult.error}
+                  </p>
+                  {testResult.user && (
+                    <div className="bg-white rounded-lg px-3 py-2 mb-3">
+                      <h4 className="font-semibold text-sm text-slate-700 mb-1">Informações da Sessão:</h4>
+                      <p className="text-sm text-slate-600">Email: {testResult.user.email}</p>
+                      <p className="text-sm text-slate-600">User ID: {testResult.user.id}</p>
+                    </div>
+                  )}
+                  {testResult.details && (
+                    <details className="mt-3">
+                      <summary className="cursor-pointer text-sm font-medium">
+                        Ver detalhes técnicos
+                      </summary>
+                      <pre className="mt-2 text-xs bg-white px-3 py-2 rounded border overflow-auto">
+                        {JSON.stringify(testResult.details, null, 2)}
+                      </pre>
+                    </details>
+                  )}
+                  <button 
+                    onClick={() => setTestResult(null)}
+                    className="mt-3 text-sm text-slate-600 hover:text-slate-800 underline"
+                  >
+                    Fechar diagnóstico
+                  </button>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     )
@@ -445,21 +453,23 @@ const EventsView: React.FC = () => {
 
         {/* Card para Adicionar Novo Evento */}
         {events.length > 0 && (
-          <div className="group bg-white/50 backdrop-blur-sm hover:bg-white/70 rounded-2xl shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-slate-300/50 transition-all duration-300 hover:scale-[1.01] border-2 border-dashed border-slate-300 hover:border-primary cursor-pointer overflow-hidden">
-            <div className="flex items-center justify-center p-8 gap-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-slate-400 to-slate-500 group-hover:from-primary group-hover:to-primary-hover rounded-2xl flex items-center justify-center shadow-lg shadow-slate-400/25 group-hover:shadow-primary/25 transition-all duration-300">
-                <i className="fas fa-plus text-white text-xl"></i>
+          <Card className="group bg-white/50 backdrop-blur-sm hover:bg-white/70 rounded-2xl shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-slate-300/50 transition-all duration-300 hover:scale-[1.01] border-2 border-dashed border-slate-300 hover:border-primary cursor-pointer overflow-hidden">
+            <CardContent size="md">
+              <div className="flex items-center justify-center gap-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-slate-400 to-slate-500 group-hover:from-primary group-hover:to-primary-hover rounded-2xl flex items-center justify-center shadow-lg shadow-slate-400/25 group-hover:shadow-primary/25 transition-all duration-300">
+                  <i className="fas fa-plus text-white text-xl"></i>
+                </div>
+                <div className="text-left">
+                  <h3 className="text-xl font-bold text-slate-600 group-hover:text-primary transition-colors mb-1">
+                    Criar Novo Evento
+                  </h3>
+                  <p className="text-slate-500 text-sm">
+                    Clique aqui para adicionar um novo evento ao seu calendário
+                  </p>
+                </div>
               </div>
-              <div className="text-left">
-                <h3 className="text-xl font-bold text-slate-600 group-hover:text-primary transition-colors mb-1">
-                  Criar Novo Evento
-                </h3>
-                <p className="text-slate-500 text-sm">
-                  Clique aqui para adicionar um novo evento ao seu calendário
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

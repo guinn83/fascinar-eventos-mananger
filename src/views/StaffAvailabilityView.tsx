@@ -83,7 +83,7 @@ export function StaffAvailabilityView() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
+    <div className="px-4 lg:px-8 max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
         <Calendar className="w-8 h-8 text-blue-600" />
         <h1 className="text-3xl font-bold text-gray-900">Minha Disponibilidade</h1>

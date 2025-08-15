@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Card, CardContent } from '../components/ui/card'
 import { useClients } from '../hooks/useClients'
 import type { Client } from '../types/client'
 
@@ -81,7 +82,7 @@ const ClientsView: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 p-6">
+    <>
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Header */}
@@ -100,18 +101,20 @@ const ClientsView: React.FC = () => {
         </div>
 
         {/* Search */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-slate-200/50 border border-white/20">
-          <div className="relative">
-            <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-            <input
-              type="text"
-              placeholder="Buscar clientes por nome, telefone, CPF ou email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-            />
-          </div>
-        </div>
+        <Card>
+          <CardContent size="md">
+            <div className="relative">
+              <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+              <input
+                type="text"
+                placeholder="Buscar clientes por nome, telefone, CPF ou email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+              />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Error Message */}
         {error && (
@@ -121,10 +124,11 @@ const ClientsView: React.FC = () => {
           </div>
         )}
 
-        {/* Clients List */}
-        <div className="grid gap-6">
+  {/* Clients List */}
+  <>
           {filteredClients.length === 0 ? (
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 text-center shadow-lg shadow-slate-200/50 border border-white/20">
+            <Card>
+              <CardContent size="lg" className="text-center">
               <i className="fas fa-users text-6xl text-slate-300 mb-4"></i>
               <h3 className="text-xl font-semibold text-slate-700 mb-2">
                 {searchTerm ? 'Nenhum cliente encontrado' : 'Nenhum cliente cadastrado'}
@@ -144,15 +148,14 @@ const ClientsView: React.FC = () => {
                   Criar Primeiro Cliente
                 </button>
               )}
-            </div>
+              </CardContent>
+            </Card>
           ) : (
             <div className="grid gap-4">
               {filteredClients.map((client) => (
-                <div
-                  key={client.id}
-                  className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-slate-200/50 border border-white/20 hover:shadow-xl transition-all duration-300"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <Card key={client.id} className="hover:shadow-xl transition-all duration-300">
+                  <CardContent size="md">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-3">
                         <h3 className="text-xl font-semibold text-slate-800">{client.name}</h3>
@@ -211,31 +214,33 @@ const ClientsView: React.FC = () => {
                         <i className="fas fa-trash"></i>
                       </button>
                     </div>
-                  </div>
-                </div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
-        </div>
+        </>
 
       </div>
 
       {/* Create Client Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-slate-800">Novo Cliente</h2>
-              <button
-                onClick={() => setShowCreateModal(false)}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-                aria-label="Fechar modal"
-              >
-                <i className="fas fa-times text-slate-600"></i>
-              </button>
-            </div>
+          <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <CardContent size="md">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-slate-800">Novo Cliente</h2>
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                  aria-label="Fechar modal"
+                >
+                  <i className="fas fa-times text-slate-600"></i>
+                </button>
+              </div>
 
-            <form onSubmit={handleCreateClient} className="space-y-4">
+              <form onSubmit={handleCreateClient} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Nome completo *
@@ -306,26 +311,28 @@ const ClientsView: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
       {/* Edit Client Modal */}
       {showEditModal && selectedClient && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-slate-800">Editar Cliente</h2>
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-                aria-label="Fechar modal"
-              >
-                <i className="fas fa-times text-slate-600"></i>
-              </button>
-            </div>
+          <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <CardContent size="md">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-slate-800">Editar Cliente</h2>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                  aria-label="Fechar modal"
+                >
+                  <i className="fas fa-times text-slate-600"></i>
+                </button>
+              </div>
 
-            <form onSubmit={handleEditClient} className="space-y-4">
+              <form onSubmit={handleEditClient} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Nome completo *
@@ -396,11 +403,12 @@ const ClientsView: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
-    </div>
+    </>
   )
 }
 

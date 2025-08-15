@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
+import { Card, CardContent } from '../components/ui/card';
 
 type LoginStep = 'email' | 'create-password' | 'enter-password' | 'forgot-password';
 
@@ -96,7 +97,8 @@ const LoginView: React.FC = () => {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-gradient-to-br from-blue-400/20 to-primary/20 blur-3xl"></div>
       </div>
       <div className="relative w-full max-w-md">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-slate-300/20 border border-white/20 p-8 sm:p-10">
+        <Card className="w-full">
+          <CardContent size="md">
           <div className="text-center mb-8">
             <div className="w-20 h-20 bg-gradient-to-r from-primary to-primary-hover rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/25">
               <i className="fas fa-calendar-star text-white text-2xl"></i>
@@ -226,7 +228,8 @@ const LoginView: React.FC = () => {
               </button>
             </form>
           )}
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
