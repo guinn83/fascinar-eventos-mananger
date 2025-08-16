@@ -201,7 +201,7 @@ export function EventStaffView() {
   }
 
   return (
-    <div className="px-4 lg:px-8 max-w-7xl mx-auto space-y-6">
+    <>
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
@@ -308,7 +308,7 @@ export function EventStaffView() {
             Equipe Alocada
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent size="md">
           {filteredStaff.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -322,10 +322,10 @@ export function EventStaffView() {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredStaff.map((staff) => (
+                {filteredStaff.map((staff) => (
                 <div
                   key={staff.id}
-                  className="flex items-center justify-between px-3 py-2 border rounded-lg"
+                  className="flex items-center justify-between border rounded-lg"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
@@ -395,7 +395,7 @@ export function EventStaffView() {
               </Button>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent size="md">
             {filteredSuggestions.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <AlertCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -406,7 +406,7 @@ export function EventStaffView() {
                 {filteredSuggestions.map((suggestion) => (
                   <div
                     key={`${suggestion.profile_id}-${suggestion.staff_role}`}
-                    className="flex items-center justify-between px-3 py-2 border rounded-lg"
+                    className="flex items-center justify-between border rounded-lg"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
@@ -449,12 +449,12 @@ export function EventStaffView() {
         <CardHeader>
           <CardTitle>Templates de Equipe</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent size="md">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {DEFAULT_STAFF_TEMPLATES.map((template) => (
               <div
                 key={template.id}
-                className="px-3 py-2 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                className="border rounded-lg hover:bg-gray-50 cursor-pointer"
                 onClick={() => applyTemplate(template.id)}
               >
                 <h3 className="font-semibold">{template.name}</h3>
@@ -487,6 +487,6 @@ export function EventStaffView() {
           <p>{error}</p>
         </div>
       )}
-    </div>
+    </>
   )
 }

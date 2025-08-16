@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { pageTokens } from './ui/theme'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -158,7 +159,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Main Content */}
       <main className="md:pl-64 min-h-screen transition-all duration-300">
-        <div className="px-4 lg:px-8">
+        <div className={pageTokens.container.md}>
           {children}
         </div>
       </main>

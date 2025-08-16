@@ -124,7 +124,7 @@ const EventDetailView: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 px-4 lg:px-8">
+    <>
       <div className="max-w-4xl mx-auto space-y-6">
         
         {/* Header com imagem circular */}
@@ -243,13 +243,13 @@ const EventDetailView: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Equipe Card */}
-        <Card className="w-full">
+        {/* Equipe Card (staffCard) */}
+        <Card className="w-full staff-card">
           <CardContent size="md">
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
                 <i className="fas fa-user-tie text-primary"></i>
-                Equipe de Organização
+                Equipe
               </h3>
               <div className="grid grid-cols-1 gap-4">
                 <div>
@@ -263,6 +263,17 @@ const EventDetailView: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              <div className="flex justify-end">
+                <button
+                  onClick={() => navigate(`/eventos/${event.id}/staff`)}
+                  className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-colors"
+                >
+                  <i className="fas fa-users"></i>
+                  Gerenciar Equipe
+                </button>
+              </div>
+
             </div>
           </CardContent>
         </Card>
@@ -300,14 +311,6 @@ const EventDetailView: React.FC = () => {
           </button>
           
           <button
-            onClick={() => navigate(`/eventos/${event.id}/staff`)}
-            className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-colors"
-          >
-            <i className="fas fa-users"></i>
-            Gerenciar Equipe
-          </button>
-          
-          <button
             onClick={() => window.print()}
             className="flex items-center justify-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-800 px-6 py-3 rounded-xl transition-colors"
           >
@@ -317,7 +320,7 @@ const EventDetailView: React.FC = () => {
         </div>
 
       </div>
-    </div>
+    </>
   )
 }
 

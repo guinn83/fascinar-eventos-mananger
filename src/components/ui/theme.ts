@@ -25,3 +25,13 @@ export const uiTokens = {
 }
 
 export default { cardTokens, uiTokens }
+
+// Page-level spacing tokens for Layout and views to consume.
+export const pageTokens = {
+  // options: sm | md | lg — maps to Tailwind padding utilities
+  container: {
+    sm: 'px-4 py-4',
+    md: 'px-4 py-4',
+    lg: 'px-8 py-8'
+  }
+}
