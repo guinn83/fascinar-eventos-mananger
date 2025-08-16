@@ -9,9 +9,10 @@ export type StaffRole =
   | 'monitora'
   | 'produtor_camarim'
   | 'mestre_cerimonia'
-  | 'seguranca';
+  | 'seguranca'
+  | 'fiscal_limpeza';
 
-export type AvailabilityStatus = 'available' | 'unavailable' | 'busy' | 'maybe';
+export type AvailabilityStatus = 'available' | 'unavailable' | 'maybe';
 
 export interface StaffAvailability {
   id: string;
@@ -102,20 +103,21 @@ export interface EventStaffTemplate {
 export const STAFF_ROLE_LABELS: Record<StaffRole, string> = {
   cerimonialista: 'Cerimonialista',
   coordenador: 'Coordenador(a)',
-  planner: 'Wedding Planner',
+  planner: 'Planner',
   assistente: 'Assistente',
   recepcionista: 'Recepcionista',
-  monitora: 'Monitora',
+  monitora: 'Monitor(a)',
   produtor_camarim: 'Produtor(a) de Camarim',
   mestre_cerimonia: 'Mestre de Cerimônia',
-  seguranca: 'Segurança'
+  seguranca: 'Segurança',
+  fiscal_limpeza: 'Fiscal de Limpeza'
 };
 
 // Labels para status de disponibilidade
 export const AVAILABILITY_STATUS_LABELS: Record<AvailabilityStatus, string> = {
   available: 'Disponível',
   unavailable: 'Indisponível',
-  busy: 'Ocupado',
+  // 'busy' removed — use 'unavailable' instead
   maybe: 'Talvez'
 };
 
@@ -123,7 +125,7 @@ export const AVAILABILITY_STATUS_LABELS: Record<AvailabilityStatus, string> = {
 export const AVAILABILITY_STATUS_COLORS: Record<AvailabilityStatus, string> = {
   available: 'text-green-600 bg-green-100',
   unavailable: 'text-red-600 bg-red-100',
-  busy: 'text-orange-600 bg-orange-100',
+  // 'busy' removed — reuse 'unavailable' styles where appropriate
   maybe: 'text-yellow-600 bg-yellow-100'
 };
 

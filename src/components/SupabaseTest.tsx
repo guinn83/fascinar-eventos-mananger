@@ -61,8 +61,8 @@ const SupabaseTest: React.FC = () => {
   }
 
   return (
-    <div className="px-4 lg:px-8">
-      <Card className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto">
+      <Card>
         <CardContent size="md">
           <h2 className="text-2xl font-bold mb-4">🧪 Teste de Conexão Supabase</h2>
           

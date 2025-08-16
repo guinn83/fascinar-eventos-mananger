@@ -233,12 +233,18 @@ export function useStaff() {
       setLoading(true)
       setError(null)
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('event_staff')
         .delete()
         .eq('id', eventStaffId)
 
+      // Log response for debugging removal issues (RLS / permissions / not found)
+      console.log('useStaff.removeStaffFromEvent response', { eventStaffId, data, error })
+
       if (error) throw error
+      
+      // If no error, the delete was successful (data can be null in Supabase deletes)
+      console.log('Staff removed successfully:', eventStaffId)
       return true
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erro ao remover staff'

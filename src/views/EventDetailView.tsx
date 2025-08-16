@@ -125,7 +125,7 @@ const EventDetailView: React.FC = () => {
 
   return (
     <>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-0xl mx-auto space-y-0">
         
         {/* Header com imagem circular */}
         <div className="text-center space-y-4 mb-8">
@@ -193,7 +193,7 @@ const EventDetailView: React.FC = () => {
         </div>
 
         {/* Event Details Card */}
-        <Card className="w-full">
+        <Card className="w-full details-card">
           <CardContent size="lg">
             <div className="space-y-6">
               {/* Event Description */}
@@ -264,7 +264,7 @@ const EventDetailView: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => navigate(`/eventos/${event.id}/staff`)}
                   className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-colors"

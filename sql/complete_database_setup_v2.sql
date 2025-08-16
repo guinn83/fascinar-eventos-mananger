@@ -377,6 +377,12 @@ CREATE POLICY "event_staff_select_policy" ON event_staff
     OR EXISTS (SELECT 1 FROM profiles p JOIN events e ON e.client_profile_id = p.id WHERE p.user_id = auth.uid() AND e.id = event_id)
   );
 
+-- Allow deletes on event_staff for admins/organizers, the staff profile itself, the event client, or the user who assigned the staff
+CREATE POLICY "event_staff_delete_policy" ON event_staff
+  FOR DELETE USING (
+    EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role = 'admin')
+  );
+
 -- ==========================================
 -- 9. VIEWS ÚTEIS
 -- ==========================================

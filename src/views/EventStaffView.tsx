@@ -56,7 +56,6 @@ import {
   Plus, 
   CheckCircle, 
   Clock, 
-  DollarSign, 
   Search,
   Filter,
   AlertCircle
@@ -74,7 +73,8 @@ export function EventStaffView() {
     removeStaffFromEvent,
     getEventStaffSummary,
     loading,
-    error
+    error,
+    getAvailableStaff
   } = useStaff()
 
   const [event, setEvent] = useState<any>(null)
@@ -82,6 +82,7 @@ export function EventStaffView() {
   const [staffSuggestions, setStaffSuggestions] = useState<StaffSuggestion[]>([])
   const [summary, setSummary] = useState<EventStaffSummary | null>(null)
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [suggestionsFallback, setSuggestionsFallback] = useState(false)
   const [selectedRole, setSelectedRole] = useState<StaffRole | 'all'>('all')
 
   useEffect(() => {
@@ -112,13 +113,41 @@ export function EventStaffView() {
 
   const loadSuggestions = async () => {
     if (!id) return
-
     try {
+      setSuggestionsFallback(false)
       const suggestions = await getStaffSuggestions(id)
+      if (!suggestions || suggestions.length === 0) {
+        console.info('Nenhuma sugestão retornada para o evento', id)
+        // try fallback to available staff for the event date
+        if (event?.event_date) {
+          const available = await getAvailableStaff(event.event_date, selectedRole === 'all' ? undefined : (selectedRole as StaffRole))
+          if (available && available.length > 0) {
+            setStaffSuggestions(available)
+            setSuggestionsFallback(true)
+            setShowSuggestions(true)
+            return
+          }
+        }
+      }
+
       setStaffSuggestions(suggestions)
       setShowSuggestions(true)
     } catch (err) {
       console.error('Erro ao carregar sugestões:', err)
+      // try fallback to available staff
+      try {
+        if (event?.event_date) {
+          const available = await getAvailableStaff(event.event_date, selectedRole === 'all' ? undefined : (selectedRole as StaffRole))
+          setStaffSuggestions(available)
+          setSuggestionsFallback(true)
+        } else {
+          setStaffSuggestions([])
+        }
+      } catch (inner) {
+        console.error('Fallback também falhou:', inner)
+        setStaffSuggestions([])
+      }
+      setShowSuggestions(true)
     }
   }
 
@@ -152,13 +181,18 @@ export function EventStaffView() {
   }
 
   const handleRemoveStaff = async (eventStaffId: string) => {
+    if (!confirm('Remover este membro da equipe? Esta ação não pode ser desfeita.')) return
     try {
+      console.log('Removendo staff id=', eventStaffId)
       const success = await removeStaffFromEvent(eventStaffId)
       if (success) {
         await loadEventData()
+      } else {
+        alert('Não foi possível remover o membro da equipe.')
       }
     } catch (err) {
       console.error('Erro ao remover staff:', err)
+      alert('Erro ao remover membro da equipe. Verifique o console para mais detalhes.')
     }
   }
 
@@ -191,7 +225,7 @@ export function EventStaffView() {
 
   if (!event) {
     return (
-      <div className="px-4 lg:px-8">
+      <div className="max-w-6xl mx-auto">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-1/3"></div>
           <div className="h-64 bg-gray-200 rounded"></div>
@@ -201,11 +235,11 @@ export function EventStaffView() {
   }
 
   return (
-    <>
+    <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Equipe do Evento</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Equipe</h1>
           <p className="text-gray-600 mt-2">{event.title}</p>
           <p className="text-sm text-gray-500">
             {new Date(event.event_date).toLocaleDateString('pt-BR')} • {event.location}
@@ -214,13 +248,9 @@ export function EventStaffView() {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => navigate(`/events/${id}`)}
+            onClick={() => navigate(`/eventos/${id}`)}
           >
             Voltar ao Evento
-          </Button>
-          <Button onClick={loadSuggestions}>
-            <Plus className="w-4 h-4 mr-2" />
-            Adicionar Staff
           </Button>
         </div>
       </div>
@@ -232,8 +262,15 @@ export function EventStaffView() {
             <CardContent size="md">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total de Roles</p>
-                  <p className="text-2xl font-bold">{summary.total_roles}</p>
+                  <p className="text-sm text-gray-600">Total</p>
+                  <p className="text-2xl font-bold">{summary.total_roles} {summary.total_roles === 1 ? 'profissional' : 'profissionais'}</p>
+                  {/* breakdown small text */}
+                  <p className="text-xs text-gray-500 mt-1">
+                    {Object.entries(summary.roles_by_type)
+                      .filter(([,count]) => count > 0)
+                      .map(([role, count]) => `${count} ${STAFF_ROLE_LABELS[role as keyof typeof STAFF_ROLE_LABELS]}`)
+                      .join(', ')}
+                  </p>
                 </div>
                 <Users className="w-8 h-8 text-blue-500" />
               </div>
@@ -242,41 +279,27 @@ export function EventStaffView() {
 
           <Card>
             <CardContent size="md">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Confirmados</p>
-                  <p className="text-2xl font-bold text-green-600">{summary.confirmed_staff}</p>
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex-1 flex items-center gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Confirmados</p>
+                    <p className="text-2xl font-bold text-green-600">{summary.confirmed_staff}</p>
+                  </div>
+                  <CheckCircle className="w-8 h-8 text-green-500" />
                 </div>
-                <CheckCircle className="w-8 h-8 text-green-500" />
+
+                <div className="flex-1 flex items-center gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Pendentes</p>
+                    <p className="text-2xl font-bold text-yellow-600">{summary.pending_confirmation}</p>
+                  </div>
+                  <Clock className="w-8 h-8 text-yellow-500" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent size="md">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Pendentes</p>
-                  <p className="text-2xl font-bold text-yellow-600">{summary.pending_confirmation}</p>
-                </div>
-                <Clock className="w-8 h-8 text-yellow-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent size="md">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Custo Previsto</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    R$ {summary.total_planned_cost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </p>
-                </div>
-                <DollarSign className="w-8 h-8 text-green-500" />
-              </div>
-            </CardContent>
-          </Card>
+          {/* cost summary removed by request - preserved in DB if needed later */}
         </div>
       )}
 
@@ -303,29 +326,35 @@ export function EventStaffView() {
       {/* Lista de Staff */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            Equipe Alocada
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Equipe Alocada
+            </span>
+            {/* show Add button inside card header when there is at least one member */}
+            {filteredStaff.length > 0 && (
+              <Button onClick={loadSuggestions}>
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar Membro
+              </Button>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent size="md">
           {filteredStaff.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center text-gray-500">
               <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
               <p>Nenhum membro da equipe alocado ainda.</p>
-              <Button 
-                className="mt-4"
-                onClick={loadSuggestions}
-              >
-                Adicionar Primeiro Membro
-              </Button>
+              <div className="mt-4">
+                <Button onClick={loadSuggestions}>Adicionar Primeiro Membro</Button>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
                 {filteredStaff.map((staff) => (
                 <div
                   key={staff.id}
-                  className="flex items-center justify-between border rounded-lg"
+                  className="flex items-center justify-between border rounded-lg p-4"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
@@ -341,13 +370,7 @@ export function EventStaffView() {
                       </Badge>
                     </div>
                     <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
-                      {staff.hourly_rate && (
-                        <span>R$ {staff.hourly_rate}/hora</span>
-                      )}
                       <span>{staff.hours_planned}h planejadas</span>
-                      {staff.planned_cost > 0 && (
-                        <span>Custo: R$ {staff.planned_cost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -356,9 +379,10 @@ export function EventStaffView() {
                         size="sm"
                         onClick={() => handleConfirmStaff(staff.id)}
                         className="bg-green-600 hover:bg-green-700"
+                        disabled={loading}
                       >
                         <CheckCircle className="w-4 h-4 mr-1" />
-                        Confirmar
+                        {loading ? '...' : 'Confirmar'}
                       </Button>
                     )}
                     <Button
@@ -366,8 +390,9 @@ export function EventStaffView() {
                       variant="outline"
                       onClick={() => handleRemoveStaff(staff.id)}
                       className="text-red-600 border-red-200 hover:bg-red-50"
+                      disabled={loading}
                     >
-                      Remover
+                      {loading ? '...' : 'Remover'}
                     </Button>
                   </div>
                 </div>
@@ -385,6 +410,9 @@ export function EventStaffView() {
               <span className="flex items-center gap-2">
                 <Search className="w-5 h-5" />
                 Sugestões de Staff
+                {suggestionsFallback && (
+                  <span className="ml-2 text-xs text-slate-500">(fonte: disponibilidade)</span>
+                )}
               </span>
               <Button
                 variant="outline"
@@ -420,9 +448,6 @@ export function EventStaffView() {
                       </div>
                       <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
                         <span>Nível {suggestion.experience_level}/5</span>
-                        {suggestion.hourly_rate && (
-                          <span>R$ {suggestion.hourly_rate}/hora</span>
-                        )}
                         <span>Score: {suggestion.priority_score}</span>
                       </div>
                     </div>
@@ -487,6 +512,6 @@ export function EventStaffView() {
           <p>{error}</p>
         </div>
       )}
-    </>
+    </div>
   )
 }
