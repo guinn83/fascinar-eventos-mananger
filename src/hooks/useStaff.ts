@@ -238,8 +238,7 @@ export function useStaff() {
         .from('event_staff')
         .update({
           profile_id: finalProfileId,
-          hourly_rate: hourlyRate,
-          updated_at: new Date().toISOString()
+          hourly_rate: hourlyRate
         })
         .eq('id', eventStaffId)
 
@@ -275,8 +274,7 @@ export function useStaff() {
         .update({
           profile_id: profileId,
           hourly_rate: hourlyRate,
-          hours_planned: hoursPlanned || 8.0,
-          updated_at: new Date().toISOString()
+          hours_planned: hoursPlanned || 8.0
         })
         .eq('id', eventStaffId)
 
@@ -344,14 +342,53 @@ export function useStaff() {
     }
   }
 
-  // Adicionar função ao evento — delega para inserir com perfil temporário
+  // Adicionar função ao evento — insere diretamente no DB sem perfil
   const addRoleToEvent = async (
     eventId: string,
     staffRole: StaffRole,
-    personName?: string,
     notes?: string
   ): Promise<boolean> => {
-    return assignStaffToEventWithName(eventId, staffRole, personName || 'Não atribuído', undefined, undefined, undefined, notes)
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Criar um perfil temporário para a função
+      const { data: tempProfile, error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          full_name: 'Não atribuído',
+          role: 'client',
+          email: `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@temp.local`
+        })
+        .select('id')
+        .single()
+
+      if (profileError) {
+        console.error('Erro ao criar perfil temporário:', profileError)
+        throw new Error('Não foi possível criar perfil temporário')
+      }
+
+      const { error } = await supabase
+        .from('event_staff')
+        .insert({
+          event_id: eventId,
+          profile_id: tempProfile.id,
+          staff_role: staffRole,
+          hourly_rate: null,
+          hours_planned: 8.0,
+          notes,
+          confirmed: false
+        })
+
+      if (error) throw error
+      return true
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao adicionar função'
+      setError(message)
+      return false
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Confirmar participação de staff em evento

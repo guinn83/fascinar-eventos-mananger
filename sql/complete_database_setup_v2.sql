@@ -414,7 +414,7 @@ SELECT
   assigner.full_name as assigned_by_name
 FROM event_staff es
 JOIN events e ON e.id = es.event_id
-JOIN profiles p ON p.id = es.profile_id
+LEFT JOIN profiles p ON p.id = es.profile_id
 LEFT JOIN profiles assigner ON assigner.id = es.assigned_by;
 
 -- ==========================================

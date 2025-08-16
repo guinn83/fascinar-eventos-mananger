@@ -53,9 +53,7 @@ export function EventStaffView() {
   const {
     getEventStaff,
     addRoleToEvent,
-    assignPersonToRole,
-    assignStaffToEvent,
-    assignStaffToEventWithName,
+    assignPersonToRoleWithName,
     confirmStaffAssignment,
     removeStaffFromEvent,
     getEventStaffSummary,
@@ -77,8 +75,6 @@ export function EventStaffView() {
   const [assignPersonName, setAssignPersonName] = useState('')
   const [assignProfileId, setAssignProfileId] = useState('')
   const [assignHourlyRate, setAssignHourlyRate] = useState<number | undefined>(undefined)
-  // Fallback for environments where backend requires profile_id on insert
-  const [pendingRoles, setPendingRoles] = useState<{ id: string; role: StaffRole }[]>([])
 
   useEffect(() => {
     if (id) {
@@ -113,52 +109,9 @@ export function EventStaffView() {
       if (success) {
         await loadEventData()
         setShowAddRole(false)
-        return
       }
     } catch (err) {
       console.error('Erro ao adicionar função:', err)
-    }
-
-    // Fallback: criar role pendente localmente para permitir atribuição posterior
-    const tempId = `pending-${Date.now()}`
-    setPendingRoles((p) => [...p, { id: tempId, role }])
-    setShowAddRole(false)
-  }
-
-  const handleAssignPersonToRole = async (
-    eventStaffId: string,
-    profileId?: string,
-    hourlyRate?: number
-  ) => {
-    try {
-      // If this is a pending role (created locally), create a DB record using legacy assignStaffToEvent
-      if (eventStaffId.startsWith('pending-')) {
-        if (!id) return
-        // create in DB using profileId + role
-        const role = selectedRoleForAssignment as StaffRole
-        const success = await assignStaffToEvent(id, profileId || '', role, hourlyRate)
-        if (success) {
-          // remove pending
-          setPendingRoles(pr => pr.filter(p => p.id !== eventStaffId))
-          await loadEventData()
-          setShowAssignPerson(false)
-          setSelectedEventStaffId('')
-        }
-        return
-      }
-
-      const success = await assignPersonToRole(
-        eventStaffId,
-        profileId || '',
-        hourlyRate
-      )
-      if (success) {
-        await loadEventData()
-        setShowAssignPerson(false)
-        setSelectedEventStaffId('')
-      }
-    } catch (err) {
-      console.error('Erro ao atribuir pessoa:', err)
     }
   }
 
@@ -303,7 +256,11 @@ export function EventStaffView() {
             </div>
           ) : (
             <div className="space-y-2">
-                {filteredStaff.map((staff) => (
+                {filteredStaff.map((staff) => {
+                const displayName = (staff.person_name || staff.staff_name || '').toString()
+                const normalized = displayName.trim()
+                const isUnassigned = normalized === '' || normalized.toLowerCase().includes('não atribuído')
+                return (
                 <div
                   key={staff.id}
                   className="border rounded-lg py-2 px-3"
@@ -314,8 +271,8 @@ export function EventStaffView() {
                       <h3 className="text-base font-semibold text-gray-900 truncate">
                         {STAFF_ROLE_LABELS[staff.staff_role]}
                       </h3>
-                      <p className={`text-sm ${staff.person_name === 'Não atribuído' ? 'text-gray-500 italic' : 'text-gray-700'} truncate`}>
-                        {staff.person_name === 'Não atribuído' ? (
+                      <p className={`text-sm ${isUnassigned ? 'text-gray-500 italic' : 'text-gray-700'} truncate`}>
+                        {isUnassigned ? (
                           <span className="inline-flex items-center">
                             <HelpCircle className="w-4 h-4 text-gray-400 mr-2" aria-hidden />
                             Não atribuído
@@ -327,7 +284,7 @@ export function EventStaffView() {
                             ) : (
                               <span aria-label="Aguardando" className="mr-2"><AlertTriangle className="w-4 h-4 text-yellow-500" aria-hidden /></span>
                             )}
-                            {staff.person_name || staff.staff_name || 'Nome não informado'}
+                            {displayName || 'Nome não informado'}
                           </span>
                         )}
                       </p>
@@ -335,29 +292,16 @@ export function EventStaffView() {
 
                     {/* Ações */}
                     <div className="col-span-1 flex items-center gap-2 justify-end">
-                      {/* Botão para atribuir pessoa quando função não tem pessoa */}
-                      {staff.person_name === 'Não atribuído' && (
-                        <Button
-                          onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role })}
-                          className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-600 hover:bg-blue-700"
-                          aria-label={`Atribuir pessoa à função ${STAFF_ROLE_LABELS[staff.staff_role]}`}
-                        >
-                          <Plus className="w-5 h-5 text-white" />
-                        </Button>
-                      )}
-
-                      {/* Botões de ação para quando tem pessoa atribuída */}
+                      {/* Botão para confirmar atribuição */}
                       {
                         (() => {
-                          const hasProfile = !!(staff.profile_id || staff.user_id)
-                          const name = (staff.person_name || '').toString().trim()
-                          const isNamed = name !== '' && name.toLowerCase() !== 'não atribuído'
-                          const showConfirm = isNamed && hasProfile && !staff.confirmed
+                          const hasProfile = !!(staff.profile_id)
+                          const showConfirm = !isUnassigned && hasProfile && !staff.confirmed
                           return showConfirm ? (
                             <Button
                               onClick={() => handleConfirmStaff(staff.id)}
                               className="w-10 h-10 rounded-full flex items-center justify-center bg-green-600 hover:bg-green-700"
-                              aria-label={`Confirmar ${staff.person_name}`}
+                              aria-label={`Confirmar ${displayName}`}
                               disabled={loading}
                             >
                               <CheckCircle className="w-5 h-5 text-white" />
@@ -369,16 +313,14 @@ export function EventStaffView() {
                       {/* Edit / Assign dynamic button */}
                       {
                         (() => {
-                          const hasProfile = !!(staff.profile_id || staff.user_id)
-                          const name = (staff.person_name || '').toString().trim()
-                          const isNamed = name !== '' && name.toLowerCase() !== 'não atribuído'
-                          const isAssigned = isNamed && hasProfile
+                          const hasProfile = !!(staff.profile_id)
+                          const isAssigned = !isUnassigned && hasProfile
 
                           if (!isAssigned) {
                             return (
                               <Button
                                 onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role })}
-                                className="text-green-600 bg-green-700 hover:bg-green-100 px-3 py-1 rounded-md"
+                                className="text-green-600 hover:text-green-700 hover:bg-green-50 px-3 py-1 rounded-md border border-green-200"
                                 aria-label={`Atribuir pessoa à função ${STAFF_ROLE_LABELS[staff.staff_role]}`}
                               >
                                 Atribuir
@@ -386,25 +328,15 @@ export function EventStaffView() {
                             )
                           } else {
                             return (
-                                <Button
-                                    onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role, personName: staff.person_name, profileId: staff.user_id, hourlyRate: staff.hourly_rate })}
-                                    className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200"
-                                    aria-label={`Editar atribuição de ${staff.person_name}`}
-                                >
+                              <Button
+                                onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role, personName: displayName, profileId: staff.profile_id, hourlyRate: staff.hourly_rate })}
+                                className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200"
+                                aria-label={`Editar atribuição de ${displayName}`}
+                              >
                                 <Edit className="w-4 h-4 text-gray-700" />
-                                </Button>
+                              </Button>
                             )
                           }
-
-                          return (
-                            <Button
-                              onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role, personName: staff.person_name, profileId: staff.user_id, hourlyRate: staff.hourly_rate })}
-                              className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200"
-                              aria-label={`Editar atribuição de ${staff.person_name}`}
-                            >
-                              <Edit className="w-4 h-4 text-gray-700" />
-                            </Button>
-                          )
                         })()
                       }
 
@@ -412,7 +344,7 @@ export function EventStaffView() {
                         variant="outline"
                         onClick={() => handleRemoveStaff(staff.id)}
                         className="w-10 h-10 rounded-full flex items-center justify-center text-red-600 border-red-200 hover:bg-red-50"
-                        aria-label={`Remover ${staff.person_name}`}
+                        aria-label={`Remover ${displayName || 'função'}`}
                         disabled={loading}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -421,27 +353,7 @@ export function EventStaffView() {
                     </div>
                   </div>
                 </div>
-              ))}
-
-              {pendingRoles.map((p) => (
-                <div key={p.id} className="border rounded-lg p-4 bg-yellow-50">
-                  <div className="grid grid-cols-4 items-center gap-3">
-                    <div className="col-span-2">
-                      <h3 className="text-base font-semibold text-gray-900 truncate">{STAFF_ROLE_LABELS[p.role]} <span className="text-sm text-yellow-700">(pendente)</span></h3>
-                      <p className="text-sm text-gray-600 truncate">Função criada localmente</p>
-                    </div>
-                    <div className="col-span-1" />
-                    <div className="col-span-1 flex items-center gap-2 justify-end">
-                      <Button onClick={() => openAssignModalFor({ eventStaffId: p.id, role: p.role })} className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-600 hover:bg-blue-700" aria-label={`Atribuir pessoa à função ${STAFF_ROLE_LABELS[p.role]}`}>
-                        <Plus className="w-5 h-5 text-white" />
-                      </Button>
-                      <Button variant="outline" onClick={() => setPendingRoles(pr => pr.filter(x => x.id !== p.id))} className="w-10 h-10 rounded-full flex items-center justify-center text-red-600 border-red-200 hover:bg-red-50" aria-label={`Remover função pendente ${STAFF_ROLE_LABELS[p.role]}`}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              )})}
             </div>
           )}
         </CardContent>
@@ -553,30 +465,22 @@ export function EventStaffView() {
                         return
                       }
 
-                      if (selectedEventStaffId.startsWith('pending-')) {
-                        if (!id) return
-                        const role = selectedRoleForAssignment as StaffRole
-                        const success = await assignStaffToEventWithName(
-                          id,
-                          role,
-                          personName,
-                          profileId || undefined,
-                          hourlyRate
-                        )
+                      // Use assignPersonToRoleWithName que cria perfil temporário se necessário
+                      const success = await assignPersonToRoleWithName(
+                        selectedEventStaffId,
+                        personName,
+                        profileId || undefined,
+                        hourlyRate
+                      )
 
-                        if (success) {
-                          setPendingRoles(pr => pr.filter(p => p.id !== selectedEventStaffId))
-                          await loadEventData()
-                          setShowAssignPerson(false)
-                          setSelectedEventStaffId('')
-                          setSelectedRoleForAssignment('')
-                        }
-                      } else {
-                        if (!profileId) {
-                          alert('Para atribuir a funções existentes, é necessário um profile ID. Para pessoas sem conta, remova a função e crie novamente.')
-                          return
-                        }
-                        handleAssignPersonToRole(selectedEventStaffId, profileId, hourlyRate)
+                      if (success) {
+                        await loadEventData()
+                        setShowAssignPerson(false)
+                        setSelectedEventStaffId('')
+                        setSelectedRoleForAssignment('')
+                        setAssignPersonName('')
+                        setAssignProfileId('')
+                        setAssignHourlyRate(undefined)
                       }
                     }}
                   >
