@@ -41,8 +41,9 @@ export interface DefaultStaffRole {
 export interface EventStaff {
   id: string;
   event_id: string;
-  profile_id: string;
-  staff_role: StaffRole;
+  role_name: string; // Nome da função
+  person_name: string; // Nome da pessoa (sempre preenchido)
+  user_id?: string; // UUID nullable → profiles.user_id (se a pessoa tem conta)
   confirmed: boolean;
   hourly_rate?: number;
   hours_planned: number;
@@ -51,11 +52,15 @@ export interface EventStaff {
   assigned_at: string;
   confirmed_at?: string;
   assigned_by?: string;
+  
+  // Campos para compatibilidade (deprecated)
+  profile_id?: string; // Para compatibilidade com código antigo
+  staff_role?: StaffRole; // Para compatibilidade com código antigo
 }
 
 // Interface estendida com informações do perfil
 export interface EventStaffDetailed extends EventStaff {
-  staff_name: string;
+  staff_name?: string; // Para compatibilidade
   staff_email?: string;
   staff_phone?: string;
   event_title: string;
@@ -63,6 +68,9 @@ export interface EventStaffDetailed extends EventStaff {
   planned_cost: number;
   actual_cost?: number;
   assigned_by_name?: string;
+  
+  // Propriedades da nova estrutura
+  staff_role: StaffRole; // Derivado de role_name
 }
 
 // Interface para sugestões de staff

@@ -7,6 +7,7 @@ import {
   type AvailabilityStatus
 } from '../types/staff'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { pageTokens } from '../components/ui/theme'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
 import { Calendar, Clock, Save, X } from 'lucide-react'
@@ -83,7 +84,7 @@ export function StaffAvailabilityView() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+  <div className={`max-w-4xl mx-auto ${pageTokens.cardGap.sm}`}>
       <div className="flex items-center gap-3">
         <Calendar className="w-8 h-8 text-blue-600" />
         <h1 className="text-3xl font-bold text-gray-900">Minha Disponibilidade</h1>

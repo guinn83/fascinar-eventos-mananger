@@ -34,4 +34,11 @@ export const pageTokens = {
     md: 'px-4 py-4',
     lg: 'px-8 py-8'
   }
+  ,
+  // vertical gap between stacked cards on a page
+  cardGap: {
+    sm: 'space-y-3',
+    md: 'space-y-4',
+    lg: 'space-y-6'
+  }
 }

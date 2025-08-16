@@ -202,6 +202,158 @@ export function useStaff() {
     }
   }
 
+  // Atribuir pessoa a uma função existente criando um perfil temporário quando necessário
+  const assignPersonToRoleWithName = async (
+    eventStaffId: string,
+    personName: string,
+    profileId?: string,
+    hourlyRate?: number
+  ): Promise<boolean> => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      let finalProfileId = profileId
+
+      if (!finalProfileId) {
+        const { data: tempProfile, error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            full_name: personName,
+            role: 'client',
+            email: `temp-${Date.now()}@temp.local`
+          })
+          .select('id')
+          .single()
+
+        if (profileError) {
+          console.error('Erro ao criar perfil temporário:', profileError)
+          throw new Error('Não foi possível criar perfil temporário')
+        }
+
+        finalProfileId = tempProfile.id
+      }
+
+      const { error } = await supabase
+        .from('event_staff')
+        .update({
+          profile_id: finalProfileId,
+          hourly_rate: hourlyRate,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', eventStaffId)
+
+      if (error) throw error
+      return true
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao atribuir pessoa'
+      setError(message)
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Atribuir pessoa a uma função existente (quando já tem profileId)
+  const assignPersonToRole = async (
+    eventStaffId: string,
+    profileId: string,
+    hourlyRate?: number,
+    hoursPlanned?: number
+  ): Promise<boolean> => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      if (!profileId) {
+        setError('profileId é obrigatório para atribuir uma pessoa a uma função existente.')
+        return false
+      }
+
+      const { error } = await supabase
+        .from('event_staff')
+        .update({
+          profile_id: profileId,
+          hourly_rate: hourlyRate,
+          hours_planned: hoursPlanned || 8.0,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', eventStaffId)
+
+      if (error) throw error
+      return true
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao atribuir pessoa'
+      setError(message)
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Atribuir staff a um evento criando perfil temporário quando necessário (inserção)
+  const assignStaffToEventWithName = async (
+    eventId: string,
+    staffRole: StaffRole,
+    personName: string,
+    profileId?: string,
+    hourlyRate?: number,
+    hoursPlanned?: number,
+    notes?: string
+  ): Promise<boolean> => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      let finalProfileId = profileId
+      if (!finalProfileId) {
+        const { data: tempProfile, error: profileError } = await supabase
+          .from('profiles')
+          .insert({ full_name: personName, role: 'client', email: `temp-${Date.now()}@temp.local` })
+          .select('id')
+          .single()
+
+        if (profileError) {
+          console.error('Erro ao criar perfil temporário:', profileError)
+          throw new Error('Não foi possível criar perfil temporário')
+        }
+
+        finalProfileId = tempProfile.id
+      }
+
+      const { error } = await supabase
+        .from('event_staff')
+        .insert({
+          event_id: eventId,
+          profile_id: finalProfileId,
+          staff_role: staffRole,
+          hourly_rate: hourlyRate,
+          hours_planned: hoursPlanned || 8.0,
+          notes,
+          confirmed: false
+        })
+
+      if (error) throw error
+      return true
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao atribuir staff'
+      setError(message)
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Adicionar função ao evento — delega para inserir com perfil temporário
+  const addRoleToEvent = async (
+    eventId: string,
+    staffRole: StaffRole,
+    personName?: string,
+    notes?: string
+  ): Promise<boolean> => {
+    return assignStaffToEventWithName(eventId, staffRole, personName || 'Não atribuído', undefined, undefined, undefined, notes)
+  }
+
   // Confirmar participação de staff em evento
   const confirmStaffAssignment = async (eventStaffId: string): Promise<boolean> => {
     try {
@@ -375,11 +527,15 @@ export function useStaff() {
     getDefaultStaffRoles,
     setDefaultStaffRole,
     
-    // Event staff management
-    getEventStaff,
-    assignStaffToEvent,
-    confirmStaffAssignment,
-    removeStaffFromEvent,
+  // Event staff management
+  getEventStaff,
+  addRoleToEvent,
+  assignPersonToRole,
+  assignPersonToRoleWithName,
+  assignStaffToEvent,
+  assignStaffToEventWithName,
+  confirmStaffAssignment,
+  removeStaffFromEvent,
     
     // Suggestions and availability
     getStaffSuggestions,

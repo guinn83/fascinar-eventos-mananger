@@ -1,9 +1,10 @@
 import React from 'react'
 import { Card, CardContent } from '../components/ui/card'
+import { pageTokens } from '../components/ui/theme'
 
 const DashboardView: React.FC = () => {
   return (
-    <div className="space-y-6">
+  <div className={pageTokens.cardGap.sm}>
       {/* Header */}
       <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl p-8 border border-primary/10">
         <div className="flex items-center justify-between">

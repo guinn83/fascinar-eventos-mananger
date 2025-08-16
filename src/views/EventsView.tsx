@@ -4,6 +4,7 @@ import { useEvents } from '../hooks/useEvents'
 import { useAuthStore } from '../store/authStore'
 import { testSupabaseConnection } from '../utils/testConnection'
 import { Card, CardContent } from '../components/ui/card'
+import { pageTokens } from '../components/ui/theme'
 import { canViewAllEvents } from '../types/user'
 
 // Função para calcular dias até o evento
@@ -69,7 +70,7 @@ const EventsView: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className={pageTokens.cardGap.sm}>
         {/* Header */}
         <Card className="w-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl border border-primary/10">
           <CardContent size="lg">
@@ -112,7 +113,7 @@ const EventsView: React.FC = () => {
 
   if (error) {
     return (
-      <div className="space-y-6">
+      <div className={pageTokens.cardGap.sm}>
         {/* Header */}
         <Card className="w-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl border border-primary/10">
           <CardContent size="lg">

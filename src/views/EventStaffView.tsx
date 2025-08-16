@@ -1,35 +1,20 @@
-import React, { useState, useEffect, type ButtonHTMLAttributes } from 'react'
+import { useState, useEffect, type ButtonHTMLAttributes } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useEvents } from '../hooks/useEvents'
 import { useStaff } from '../hooks/useStaff'
 import { 
   STAFF_ROLE_LABELS, 
-  AVAILABILITY_STATUS_LABELS,
-  AVAILABILITY_STATUS_COLORS,
   DEFAULT_STAFF_TEMPLATES,
   type StaffRole,
   type EventStaffDetailed,
-  type StaffSuggestion,
   type EventStaffSummary
 } from '../types/staff'
+import { pageTokens } from '../components/ui/theme'
 // Update the import path if the card components are located elsewhere, for example:
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 // Or, if you do not have these components, create them or install a UI library (like shadcn/ui or Material UI) and import from there.
 
-// Local Badge fallback when ../components/ui/badge is not available.
-type BadgeProps = React.HTMLAttributes<HTMLSpanElement> & {
-  variant?: 'default' | 'secondary' | 'outline'
-}
-const Badge = ({ children, variant = 'default', className = '', ...props }: BadgeProps) => {
-  const base = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium'
-  const variantClasses: Record<string, string> = {
-    default: 'bg-gray-100 text-gray-800',
-    secondary: 'bg-yellow-100 text-yellow-800',
-    outline: 'border border-gray-200 bg-white text-gray-700'
-  }
-  const classes = `${base} ${variantClasses[variant] ?? ''} ${className}`
-  return <span {...props} className={classes}>{children}</span>
-}
+// badge removed — status is shown as a colored dot next to the person name
 
 // Local fallback Button component for when ../components/ui/button is not available.
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -55,10 +40,10 @@ import {
   Users, 
   Plus, 
   CheckCircle, 
-  Clock, 
-  Search,
-  Filter,
-  AlertCircle
+  Edit,
+  Trash2,
+  AlertTriangle,
+  HelpCircle
 } from 'lucide-react'
 
 export function EventStaffView() {
@@ -67,23 +52,33 @@ export function EventStaffView() {
   const { getEvent } = useEvents()
   const {
     getEventStaff,
-    getStaffSuggestions,
+    addRoleToEvent,
+    assignPersonToRole,
     assignStaffToEvent,
+    assignStaffToEventWithName,
     confirmStaffAssignment,
     removeStaffFromEvent,
     getEventStaffSummary,
     loading,
-    error,
-    getAvailableStaff
+    error
   } = useStaff()
 
   const [event, setEvent] = useState<any>(null)
   const [eventStaff, setEventStaff] = useState<EventStaffDetailed[]>([])
-  const [staffSuggestions, setStaffSuggestions] = useState<StaffSuggestion[]>([])
   const [summary, setSummary] = useState<EventStaffSummary | null>(null)
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const [suggestionsFallback, setSuggestionsFallback] = useState(false)
-  const [selectedRole, setSelectedRole] = useState<StaffRole | 'all'>('all')
+  const [selectedRole, _setSelectedRole] = useState<StaffRole | 'all'>('all')
+  
+  // Novos estados para fluxo de adição de função
+  const [showAddRole, setShowAddRole] = useState(false)
+  const [showAssignPerson, setShowAssignPerson] = useState(false)
+  const [selectedRoleForAssignment, setSelectedRoleForAssignment] = useState<string>('')
+  const [selectedEventStaffId, setSelectedEventStaffId] = useState<string>('')
+  // Controlled inputs for assign/edit modal
+  const [assignPersonName, setAssignPersonName] = useState('')
+  const [assignProfileId, setAssignProfileId] = useState('')
+  const [assignHourlyRate, setAssignHourlyRate] = useState<number | undefined>(undefined)
+  // Fallback for environments where backend requires profile_id on insert
+  const [pendingRoles, setPendingRoles] = useState<{ id: string; role: StaffRole }[]>([])
 
   useEffect(() => {
     if (id) {
@@ -111,62 +106,69 @@ export function EventStaffView() {
     }
   }
 
-  const loadSuggestions = async () => {
+  const handleAddRole = async (role: StaffRole) => {
     if (!id) return
     try {
-      setSuggestionsFallback(false)
-      const suggestions = await getStaffSuggestions(id)
-      if (!suggestions || suggestions.length === 0) {
-        console.info('Nenhuma sugestão retornada para o evento', id)
-        // try fallback to available staff for the event date
-        if (event?.event_date) {
-          const available = await getAvailableStaff(event.event_date, selectedRole === 'all' ? undefined : (selectedRole as StaffRole))
-          if (available && available.length > 0) {
-            setStaffSuggestions(available)
-            setSuggestionsFallback(true)
-            setShowSuggestions(true)
-            return
-          }
+      const success = await addRoleToEvent(id, role)
+      if (success) {
+        await loadEventData()
+        setShowAddRole(false)
+        return
+      }
+    } catch (err) {
+      console.error('Erro ao adicionar função:', err)
+    }
+
+    // Fallback: criar role pendente localmente para permitir atribuição posterior
+    const tempId = `pending-${Date.now()}`
+    setPendingRoles((p) => [...p, { id: tempId, role }])
+    setShowAddRole(false)
+  }
+
+  const handleAssignPersonToRole = async (
+    eventStaffId: string,
+    profileId?: string,
+    hourlyRate?: number
+  ) => {
+    try {
+      // If this is a pending role (created locally), create a DB record using legacy assignStaffToEvent
+      if (eventStaffId.startsWith('pending-')) {
+        if (!id) return
+        // create in DB using profileId + role
+        const role = selectedRoleForAssignment as StaffRole
+        const success = await assignStaffToEvent(id, profileId || '', role, hourlyRate)
+        if (success) {
+          // remove pending
+          setPendingRoles(pr => pr.filter(p => p.id !== eventStaffId))
+          await loadEventData()
+          setShowAssignPerson(false)
+          setSelectedEventStaffId('')
         }
+        return
       }
 
-      setStaffSuggestions(suggestions)
-      setShowSuggestions(true)
-    } catch (err) {
-      console.error('Erro ao carregar sugestões:', err)
-      // try fallback to available staff
-      try {
-        if (event?.event_date) {
-          const available = await getAvailableStaff(event.event_date, selectedRole === 'all' ? undefined : (selectedRole as StaffRole))
-          setStaffSuggestions(available)
-          setSuggestionsFallback(true)
-        } else {
-          setStaffSuggestions([])
-        }
-      } catch (inner) {
-        console.error('Fallback também falhou:', inner)
-        setStaffSuggestions([])
+      const success = await assignPersonToRole(
+        eventStaffId,
+        profileId || '',
+        hourlyRate
+      )
+      if (success) {
+        await loadEventData()
+        setShowAssignPerson(false)
+        setSelectedEventStaffId('')
       }
-      setShowSuggestions(true)
+    } catch (err) {
+      console.error('Erro ao atribuir pessoa:', err)
     }
   }
 
-  const handleAssignStaff = async (
-    profileId: string, 
-    staffRole: StaffRole, 
-    hourlyRate?: number
-  ) => {
-    if (!id) return
-
-    try {
-      const success = await assignStaffToEvent(id, profileId, staffRole, hourlyRate)
-      if (success) {
-        await loadEventData()
-        setShowSuggestions(false)
-      }
-    } catch (err) {
-      console.error('Erro ao atribuir staff:', err)
-    }
+  const openAssignModalFor = (opts: { eventStaffId: string, role: StaffRole, personName?: string, profileId?: string, hourlyRate?: number }) => {
+    setSelectedEventStaffId(opts.eventStaffId)
+    setSelectedRoleForAssignment(opts.role)
+    setAssignPersonName(opts.personName || '')
+    setAssignProfileId(opts.profileId || '')
+    setAssignHourlyRate(opts.hourlyRate)
+    setShowAssignPerson(true)
   }
 
   const handleConfirmStaff = async (eventStaffId: string) => {
@@ -219,10 +221,6 @@ export function EventStaffView() {
     ? eventStaff 
     : eventStaff.filter(s => s.staff_role === selectedRole)
 
-  const filteredSuggestions = selectedRole === 'all'
-    ? staffSuggestions
-    : staffSuggestions.filter(s => s.staff_role === selectedRole)
-
   if (!event) {
     return (
       <div className="max-w-6xl mx-auto">
@@ -235,11 +233,11 @@ export function EventStaffView() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+  <div className={`max-w-6xl mx-auto ${pageTokens.cardGap.sm}`}>
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Equipe</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Equipe Fascinar</h1>
           <p className="text-gray-600 mt-2">{event.title}</p>
           <p className="text-sm text-gray-500">
             {new Date(event.event_date).toLocaleDateString('pt-BR')} • {event.location}
@@ -257,71 +255,25 @@ export function EventStaffView() {
 
       {/* Resumo */}
       {summary && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
           <Card>
             <CardContent size="md">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Users className="w-8 h-8 text-blue-500 mr-4" />
                 <div>
-                  <p className="text-sm text-gray-600">Total</p>
                   <p className="text-2xl font-bold">{summary.total_roles} {summary.total_roles === 1 ? 'profissional' : 'profissionais'}</p>
-                  {/* breakdown small text */}
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 mt-0">
                     {Object.entries(summary.roles_by_type)
                       .filter(([,count]) => count > 0)
                       .map(([role, count]) => `${count} ${STAFF_ROLE_LABELS[role as keyof typeof STAFF_ROLE_LABELS]}`)
                       .join(', ')}
                   </p>
                 </div>
-                <Users className="w-8 h-8 text-blue-500" />
               </div>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardContent size="md">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex-1 flex items-center gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">Confirmados</p>
-                    <p className="text-2xl font-bold text-green-600">{summary.confirmed_staff}</p>
-                  </div>
-                  <CheckCircle className="w-8 h-8 text-green-500" />
-                </div>
-
-                <div className="flex-1 flex items-center gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">Pendentes</p>
-                    <p className="text-2xl font-bold text-yellow-600">{summary.pending_confirmation}</p>
-                  </div>
-                  <Clock className="w-8 h-8 text-yellow-500" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* cost summary removed by request - preserved in DB if needed later */}
         </div>
       )}
-
-      {/* Filtros */}
-      <Card>
-  <CardContent size="md">
-          <div className="flex items-center gap-4">
-            <Filter className="w-5 h-5 text-gray-500" />
-            <select
-              title="Filtrar por função"
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value as StaffRole | 'all')}
-              className="px-3 py-2 border rounded-md"
-            >
-              <option value="all">Todas as Funções</option>
-              {Object.entries(STAFF_ROLE_LABELS).map(([role, label]) => (
-                <option key={role} value={role}>{label}</option>
-              ))}
-            </select>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Lista de Staff */}
       <Card>
@@ -329,13 +281,13 @@ export function EventStaffView() {
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center gap-2">
               <Users className="w-5 h-5" />
-              Equipe Alocada
+              Equipe e Funções
             </span>
             {/* show Add button inside card header when there is at least one member */}
             {filteredStaff.length > 0 && (
-              <Button onClick={loadSuggestions}>
+              <Button onClick={() => setShowAddRole(true)}>
                 <Plus className="w-4 h-4 mr-2" />
-                Adicionar Membro
+                Adicionar Função
               </Button>
             )}
           </CardTitle>
@@ -344,56 +296,149 @@ export function EventStaffView() {
           {filteredStaff.length === 0 ? (
             <div className="text-center text-gray-500">
               <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>Nenhum membro da equipe alocado ainda.</p>
+              <p>Nenhuma função de equipe definida ainda.</p>
               <div className="mt-4">
-                <Button onClick={loadSuggestions}>Adicionar Primeiro Membro</Button>
+                <Button onClick={() => setShowAddRole(true)}>Adicionar Primeira Função</Button>
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-2">
                 {filteredStaff.map((staff) => (
                 <div
                   key={staff.id}
-                  className="flex items-center justify-between border rounded-lg p-4"
+                  className="border rounded-lg py-2 px-3"
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <h3 className="font-semibold">{staff.staff_name || 'Nome não informado'}</h3>
-                        <p className="text-sm text-gray-600">{STAFF_ROLE_LABELS[staff.staff_role]}</p>
-                      </div>
-                      <Badge
-                        variant={staff.confirmed ? 'default' : 'secondary'}
-                        className={staff.confirmed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}
-                      >
-                        {staff.confirmed ? 'Confirmado' : 'Pendente'}
-                      </Badge>
+                  <div className="grid grid-cols-3 items-center gap-3">
+                    {/* Função + Nome - role prominent, name below. Dot indicates status before name */}
+                    <div className="col-span-2">
+                      <h3 className="text-base font-semibold text-gray-900 truncate">
+                        {STAFF_ROLE_LABELS[staff.staff_role]}
+                      </h3>
+                      <p className={`text-sm ${staff.person_name === 'Não atribuído' ? 'text-gray-500 italic' : 'text-gray-700'} truncate`}>
+                        {staff.person_name === 'Não atribuído' ? (
+                          <span className="inline-flex items-center">
+                            <HelpCircle className="w-4 h-4 text-gray-400 mr-2" aria-hidden />
+                            Não atribuído
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center">
+                            {staff.confirmed ? (
+                              <span aria-label="Confirmado" className="mr-2"><CheckCircle className="w-4 h-4 text-green-500" aria-hidden /></span>
+                            ) : (
+                              <span aria-label="Aguardando" className="mr-2"><AlertTriangle className="w-4 h-4 text-yellow-500" aria-hidden /></span>
+                            )}
+                            {staff.person_name || staff.staff_name || 'Nome não informado'}
+                          </span>
+                        )}
+                      </p>
                     </div>
-                    <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
-                      <span>{staff.hours_planned}h planejadas</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {!staff.confirmed && (
-                      <Button
-                        size="sm"
-                        onClick={() => handleConfirmStaff(staff.id)}
-                        className="bg-green-600 hover:bg-green-700"
+
+                    {/* Ações */}
+                    <div className="col-span-1 flex items-center gap-2 justify-end">
+                      {/* Botão para atribuir pessoa quando função não tem pessoa */}
+                      {staff.person_name === 'Não atribuído' && (
+                        <Button
+                          onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role })}
+                          className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-600 hover:bg-blue-700"
+                          aria-label={`Atribuir pessoa à função ${STAFF_ROLE_LABELS[staff.staff_role]}`}
+                        >
+                          <Plus className="w-5 h-5 text-white" />
+                        </Button>
+                      )}
+
+                      {/* Botões de ação para quando tem pessoa atribuída */}
+                      {
+                        (() => {
+                          const hasProfile = !!(staff.profile_id || staff.user_id)
+                          const name = (staff.person_name || '').toString().trim()
+                          const isNamed = name !== '' && name.toLowerCase() !== 'não atribuído'
+                          const showConfirm = isNamed && hasProfile && !staff.confirmed
+                          return showConfirm ? (
+                            <Button
+                              onClick={() => handleConfirmStaff(staff.id)}
+                              className="w-10 h-10 rounded-full flex items-center justify-center bg-green-600 hover:bg-green-700"
+                              aria-label={`Confirmar ${staff.person_name}`}
+                              disabled={loading}
+                            >
+                              <CheckCircle className="w-5 h-5 text-white" />
+                            </Button>
+                          ) : null
+                        })()
+                      }
+
+                      {/* Edit / Assign dynamic button */}
+                      {
+                        (() => {
+                          const hasProfile = !!(staff.profile_id || staff.user_id)
+                          const name = (staff.person_name || '').toString().trim()
+                          const isNamed = name !== '' && name.toLowerCase() !== 'não atribuído'
+                          const isAssigned = isNamed && hasProfile
+
+                          if (!isAssigned) {
+                            return (
+                              <Button
+                                onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role })}
+                                className="text-green-600 bg-green-700 hover:bg-green-100 px-3 py-1 rounded-md"
+                                aria-label={`Atribuir pessoa à função ${STAFF_ROLE_LABELS[staff.staff_role]}`}
+                              >
+                                Atribuir
+                              </Button>
+                            )
+                          } else {
+                            return (
+                                <Button
+                                    onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role, personName: staff.person_name, profileId: staff.user_id, hourlyRate: staff.hourly_rate })}
+                                    className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200"
+                                    aria-label={`Editar atribuição de ${staff.person_name}`}
+                                >
+                                <Edit className="w-4 h-4 text-gray-700" />
+                                </Button>
+                            )
+                          }
+
+                          return (
+                            <Button
+                              onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role, personName: staff.person_name, profileId: staff.user_id, hourlyRate: staff.hourly_rate })}
+                              className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200"
+                              aria-label={`Editar atribuição de ${staff.person_name}`}
+                            >
+                              <Edit className="w-4 h-4 text-gray-700" />
+                            </Button>
+                          )
+                        })()
+                      }
+
+                     <Button
+                        variant="outline"
+                        onClick={() => handleRemoveStaff(staff.id)}
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-red-600 border-red-200 hover:bg-red-50"
+                        aria-label={`Remover ${staff.person_name}`}
                         disabled={loading}
                       >
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        {loading ? '...' : 'Confirmar'}
+                        <Trash2 className="w-4 h-4" />
                       </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleRemoveStaff(staff.id)}
-                      className="text-red-600 border-red-200 hover:bg-red-50"
-                      disabled={loading}
-                    >
-                      {loading ? '...' : 'Remover'}
-                    </Button>
+
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {pendingRoles.map((p) => (
+                <div key={p.id} className="border rounded-lg p-4 bg-yellow-50">
+                  <div className="grid grid-cols-4 items-center gap-3">
+                    <div className="col-span-2">
+                      <h3 className="text-base font-semibold text-gray-900 truncate">{STAFF_ROLE_LABELS[p.role]} <span className="text-sm text-yellow-700">(pendente)</span></h3>
+                      <p className="text-sm text-gray-600 truncate">Função criada localmente</p>
+                    </div>
+                    <div className="col-span-1" />
+                    <div className="col-span-1 flex items-center gap-2 justify-end">
+                      <Button onClick={() => openAssignModalFor({ eventStaffId: p.id, role: p.role })} className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-600 hover:bg-blue-700" aria-label={`Atribuir pessoa à função ${STAFF_ROLE_LABELS[p.role]}`}>
+                        <Plus className="w-5 h-5 text-white" />
+                      </Button>
+                      <Button variant="outline" onClick={() => setPendingRoles(pr => pr.filter(x => x.id !== p.id))} className="w-10 h-10 rounded-full flex items-center justify-center text-red-600 border-red-200 hover:bg-red-50" aria-label={`Remover função pendente ${STAFF_ROLE_LABELS[p.role]}`}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -402,71 +447,146 @@ export function EventStaffView() {
         </CardContent>
       </Card>
 
-      {/* Sugestões de Staff */}
-      {showSuggestions && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <Search className="w-5 h-5" />
-                Sugestões de Staff
-                {suggestionsFallback && (
-                  <span className="ml-2 text-xs text-slate-500">(fonte: disponibilidade)</span>
-                )}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowSuggestions(false)}
-              >
-                Fechar
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent size="md">
-            {filteredSuggestions.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <AlertCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Nenhuma sugestão disponível para esta função.</p>
-              </div>
-            ) : (
+      {/* Modal para adicionar função */}
+      {showAddRole && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Adicionar Nova Função</CardTitle>
+            </CardHeader>
+            <CardContent size="md">
               <div className="space-y-4">
-                {filteredSuggestions.map((suggestion) => (
-                  <div
-                    key={`${suggestion.profile_id}-${suggestion.staff_role}`}
-                    className="flex items-center justify-between border rounded-lg"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <h3 className="font-semibold">{suggestion.full_name}</h3>
-                          <p className="text-sm text-gray-600">{STAFF_ROLE_LABELS[suggestion.staff_role]}</p>
-                        </div>
-                        <Badge className={AVAILABILITY_STATUS_COLORS[suggestion.availability_status]}>
-                          {AVAILABILITY_STATUS_LABELS[suggestion.availability_status]}
-                        </Badge>
-                      </div>
-                      <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
-                        <span>Nível {suggestion.experience_level}/5</span>
-                        <span>Score: {suggestion.priority_score}</span>
-                      </div>
-                    </div>
+                <p className="text-sm text-gray-600">
+                  Selecione uma função para adicionar à equipe do evento:
+                </p>
+                <div className="grid grid-cols-1 gap-2">
+                  {Object.entries(STAFF_ROLE_LABELS).map(([role, label]) => (
                     <Button
-                      onClick={() => handleAssignStaff(
-                        suggestion.profile_id,
-                        suggestion.staff_role,
-                        suggestion.hourly_rate
-                      )}
+                      key={role}
+                      variant="outline"
+                      onClick={() => handleAddRole(role as StaffRole)}
+                      className="justify-start"
                     >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Atribuir
+                      {label}
                     </Button>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <div className="flex justify-end gap-2 mt-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowAddRole(false)}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Modal para atribuir pessoa */}
+      {showAssignPerson && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Atribuir Pessoa à Função</CardTitle>
+            </CardHeader>
+            <CardContent size="md">
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Função: <strong>{STAFF_ROLE_LABELS[selectedRoleForAssignment as keyof typeof STAFF_ROLE_LABELS]}</strong>
+                </p>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Nome da Pessoa</label>
+                    <input
+                      type="text"
+                      placeholder="Digite o nome..."
+                      className="w-full px-3 py-2 border rounded-md"
+                      value={assignPersonName}
+                      onChange={(e) => setAssignPersonName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Profile ID (opcional - apenas para usuários registrados)</label>
+                    <input
+                      type="text"
+                      placeholder="ID do perfil (se houver)"
+                      className="w-full px-3 py-2 border rounded-md"
+                      value={assignProfileId}
+                      onChange={(e) => setAssignProfileId(e.target.value)}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Deixe em branco para pessoas sem conta no sistema</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Valor por Hora (opcional)</label>
+                    <input
+                      type="number"
+                      placeholder="0.00"
+                      step="0.01"
+                      className="w-full px-3 py-2 border rounded-md"
+                      value={assignHourlyRate ?? ''}
+                      onChange={(e) => setAssignHourlyRate(e.target.value ? parseFloat(e.target.value) : undefined)}
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2 mt-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowAssignPerson(false)
+                      setSelectedEventStaffId('')
+                      setSelectedRoleForAssignment('')
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={async () => {
+                      const profileId = assignProfileId?.trim() || ''
+                      const personName = assignPersonName?.trim()
+                      const hourlyRate = assignHourlyRate
+
+                      if (!personName) {
+                        alert('Por favor, digite o nome da pessoa.')
+                        return
+                      }
+
+                      if (selectedEventStaffId.startsWith('pending-')) {
+                        if (!id) return
+                        const role = selectedRoleForAssignment as StaffRole
+                        const success = await assignStaffToEventWithName(
+                          id,
+                          role,
+                          personName,
+                          profileId || undefined,
+                          hourlyRate
+                        )
+
+                        if (success) {
+                          setPendingRoles(pr => pr.filter(p => p.id !== selectedEventStaffId))
+                          await loadEventData()
+                          setShowAssignPerson(false)
+                          setSelectedEventStaffId('')
+                          setSelectedRoleForAssignment('')
+                        }
+                      } else {
+                        if (!profileId) {
+                          alert('Para atribuir a funções existentes, é necessário um profile ID. Para pessoas sem conta, remova a função e crie novamente.')
+                          return
+                        }
+                        handleAssignPersonToRole(selectedEventStaffId, profileId, hourlyRate)
+                      }
+                    }}
+                  >
+                    <Plus className="w-4 h-4 mr-1" /> Atribuir
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Templates Rápidos */}

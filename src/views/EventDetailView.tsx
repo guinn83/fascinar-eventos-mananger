@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent } from '../components/ui/card'
+import { pageTokens } from '../components/ui/theme'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../services/supabase'
 import type { Event } from '../types/event'
@@ -125,7 +126,7 @@ const EventDetailView: React.FC = () => {
 
   return (
     <>
-      <div className="max-w-0xl mx-auto space-y-0">
+  <div className={`max-w-4xl mx-auto ${pageTokens.cardGap.sm}`}>
         
         {/* Header com imagem circular */}
         <div className="text-center space-y-4 mb-8">
@@ -195,7 +196,7 @@ const EventDetailView: React.FC = () => {
         {/* Event Details Card */}
         <Card className="w-full details-card">
           <CardContent size="lg">
-            <div className="space-y-6">
+            <div className={pageTokens.cardGap.sm}>
               {/* Event Description */}
               {event.description && (
                 <div className="space-y-4">

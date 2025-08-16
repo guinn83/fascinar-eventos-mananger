@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Card, CardContent } from '../components/ui/card'
+import { pageTokens } from '../components/ui/theme'
 import { useClients } from '../hooks/useClients'
 import type { Client } from '../types/client'
 
@@ -83,7 +84,7 @@ const ClientsView: React.FC = () => {
 
   return (
     <>
-      <div className="max-w-6xl mx-auto space-y-6">
+  <div className={`max-w-6xl mx-auto ${pageTokens.cardGap.sm}`}>
         
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
