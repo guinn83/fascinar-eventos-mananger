@@ -209,7 +209,7 @@ export function EventStaffView() {
       {/* Resumo */}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-          <Card>
+          <Card className="w-full resume-card">
             <CardContent size="md">
               <div className="flex items-center">
                 <Users className="w-8 h-8 text-blue-500 mr-4" />
@@ -257,9 +257,8 @@ export function EventStaffView() {
           ) : (
             <div className="space-y-2">
                 {filteredStaff.map((staff) => {
-                const displayName = (staff.person_name || staff.staff_name || '').toString()
-                const normalized = displayName.trim()
-                const isUnassigned = normalized === '' || normalized.toLowerCase().includes('não atribuído')
+                const displayName = (staff.staff_name || '').toString().trim()
+                const isUnassigned = displayName === '' || displayName.toLowerCase() === 'não atribuído'
                 return (
                 <div
                   key={staff.id}
@@ -295,8 +294,8 @@ export function EventStaffView() {
                       {/* Botão para confirmar atribuição */}
                       {
                         (() => {
-                          const hasProfile = !!(staff.profile_id)
-                          const showConfirm = !isUnassigned && hasProfile && !staff.confirmed
+                          // Mostrar Confirmar sempre que houver um nome atribuído (com ou sem profile)
+                          const showConfirm = !isUnassigned && !staff.confirmed
                           return showConfirm ? (
                             <Button
                               onClick={() => handleConfirmStaff(staff.id)}
@@ -313,8 +312,7 @@ export function EventStaffView() {
                       {/* Edit / Assign dynamic button */}
                       {
                         (() => {
-                          const hasProfile = !!(staff.profile_id)
-                          const isAssigned = !isUnassigned && hasProfile
+                          const isAssigned = !isUnassigned // Tem nome (com ou sem profile)
 
                           if (!isAssigned) {
                             return (
@@ -361,8 +359,8 @@ export function EventStaffView() {
 
       {/* Modal para adicionar função */}
       {showAddRole && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <Card className="w-full max-w-md mx-4">
             <CardHeader>
               <CardTitle>Adicionar Nova Função</CardTitle>
             </CardHeader>
@@ -399,8 +397,8 @@ export function EventStaffView() {
 
       {/* Modal para atribuir pessoa */}
       {showAssignPerson && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <Card className="w-full max-w-md mx-4">
             <CardHeader>
               <CardTitle>Atribuir Pessoa à Função</CardTitle>
             </CardHeader>

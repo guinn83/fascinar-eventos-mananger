@@ -202,7 +202,7 @@ export function useStaff() {
     }
   }
 
-  // Atribuir pessoa a uma função existente criando um perfil temporário quando necessário
+  // Atribuir pessoa a uma função existente usando person_name ou profile_id
   const assignPersonToRoleWithName = async (
     eventStaffId: string,
     personName: string,
@@ -213,33 +213,27 @@ export function useStaff() {
       setLoading(true)
       setError(null)
 
-      let finalProfileId = profileId
-
-      if (!finalProfileId) {
-        const { data: tempProfile, error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            full_name: personName,
-            role: 'client',
-            email: `temp-${Date.now()}@temp.local`
-          })
-          .select('id')
-          .single()
-
-        if (profileError) {
-          console.error('Erro ao criar perfil temporário:', profileError)
-          throw new Error('Não foi possível criar perfil temporário')
-        }
-
-        finalProfileId = tempProfile.id
+      const updateData: any = {
+        hourly_rate: hourlyRate
       }
+
+      if (profileId) {
+        // Se tem profileId, usar o profile e limpar person_name
+        updateData.profile_id = profileId
+        updateData.person_name = null
+      } else {
+        // Se não tem profileId, usar person_name e limpar profile_id
+        updateData.person_name = personName
+        updateData.profile_id = null
+      }
+
+  // Ao editar a atribuição (nome ou profile), garantir que o status de confirmação seja revogado
+  updateData.confirmed = false
+  updateData.confirmed_at = null
 
       const { error } = await supabase
         .from('event_staff')
-        .update({
-          profile_id: finalProfileId,
-          hourly_rate: hourlyRate
-        })
+        .update(updateData)
         .eq('id', eventStaffId)
 
       if (error) throw error
@@ -275,6 +269,10 @@ export function useStaff() {
           profile_id: profileId,
           hourly_rate: hourlyRate,
           hours_planned: hoursPlanned || 8.0
+          ,
+          // Ao reassociar um profile, revogar confirmação anterior
+          confirmed: false,
+          confirmed_at: null
         })
         .eq('id', eventStaffId)
 
@@ -289,7 +287,7 @@ export function useStaff() {
     }
   }
 
-  // Atribuir staff a um evento criando perfil temporário quando necessário (inserção)
+  // Atribuir staff a um evento criando person_name quando necessário (inserção)
   const assignStaffToEventWithName = async (
     eventId: string,
     staffRole: StaffRole,
@@ -303,33 +301,28 @@ export function useStaff() {
       setLoading(true)
       setError(null)
 
-      let finalProfileId = profileId
-      if (!finalProfileId) {
-        const { data: tempProfile, error: profileError } = await supabase
-          .from('profiles')
-          .insert({ full_name: personName, role: 'client', email: `temp-${Date.now()}@temp.local` })
-          .select('id')
-          .single()
+      const insertData: any = {
+        event_id: eventId,
+        staff_role: staffRole,
+        hourly_rate: hourlyRate,
+        hours_planned: hoursPlanned || 8.0,
+        notes,
+        confirmed: false
+      }
 
-        if (profileError) {
-          console.error('Erro ao criar perfil temporário:', profileError)
-          throw new Error('Não foi possível criar perfil temporário')
-        }
-
-        finalProfileId = tempProfile.id
+      if (profileId) {
+        // Se tem profileId, usar o profile
+        insertData.profile_id = profileId
+        insertData.person_name = null
+      } else {
+        // Se não tem profileId, usar person_name
+        insertData.person_name = personName
+        insertData.profile_id = null
       }
 
       const { error } = await supabase
         .from('event_staff')
-        .insert({
-          event_id: eventId,
-          profile_id: finalProfileId,
-          staff_role: staffRole,
-          hourly_rate: hourlyRate,
-          hours_planned: hoursPlanned || 8.0,
-          notes,
-          confirmed: false
-        })
+        .insert(insertData)
 
       if (error) throw error
       return true
@@ -352,28 +345,12 @@ export function useStaff() {
       setLoading(true)
       setError(null)
 
-      // Criar um perfil temporário para a função
-      const { data: tempProfile, error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          full_name: 'Não atribuído',
-          role: 'client',
-          email: `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@temp.local`
-        })
-        .select('id')
-        .single()
-
-      if (profileError) {
-        console.error('Erro ao criar perfil temporário:', profileError)
-        throw new Error('Não foi possível criar perfil temporário')
-      }
-
       const { error } = await supabase
         .from('event_staff')
         .insert({
           event_id: eventId,
-          profile_id: tempProfile.id,
           staff_role: staffRole,
+          // Não inserir profile_id - deixar NULL inicialmente
           hourly_rate: null,
           hours_planned: 8.0,
           notes,

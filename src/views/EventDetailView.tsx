@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent } from '../components/ui/card'
+import { useStaff } from '../hooks/useStaff'
+import { EventStaffSummary } from '../types/staff'
 import { pageTokens } from '../components/ui/theme'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../services/supabase'
@@ -27,6 +29,8 @@ const EventDetailView: React.FC = () => {
   const [event, setEvent] = useState<Event | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { getEventStaffSummary } = useStaff()
+  const [summary, setSummary] = useState<EventStaffSummary | null>(null)
 
   useEffect(() => {
     if (id) {
@@ -52,6 +56,13 @@ const EventDetailView: React.FC = () => {
       }
 
       setEvent(data)
+      // carregar resumo de staff
+      try {
+        const s = await getEventStaffSummary(eventId)
+        setSummary(s)
+      } catch (err) {
+        console.warn('Não foi possível carregar resumo de staff:', err)
+      }
     } catch (err) {
       console.error('Erro ao buscar evento:', err)
       setError('Erro ao carregar os detalhes do evento')
@@ -244,37 +255,32 @@ const EventDetailView: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Equipe Card (staffCard) */}
+        {/* Equipe Card (staffCard) - usar layout do resume-card */}
         <Card className="w-full staff-card">
           <CardContent size="md">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                <i className="fas fa-user-tie text-primary"></i>
-                Equipe
-              </h3>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg px-3 py-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-purple-700 font-medium">Número de Pessoas</span>
-                      <span className="text-2xl font-bold text-purple-800">
-                        {event.staff}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+            <div className="flex items-center">
+              <svg className="w-8 h-8 text-blue-500 mr-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M16 3.13a4 4 0 010 7.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <div>
+                <p className="text-xl font-bold">{summary ? summary.total_roles : '—'} {summary && summary.total_roles === 1 ? 'profissional' : 'profissionais'}</p>
+                <p className="text-xs text-gray-500 mt-0">
+                  {summary ? Object.entries(summary.roles_by_type).filter(([,c]) => c > 0).map(([role,count]) => `${count} ${role}`).join(', ') : ''}
+                </p>
               </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={() => navigate(`/eventos/${event.id}/staff`)}
-                  className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-colors"
-                >
-                  <i className="fas fa-users"></i>
-                  Gerenciar Equipe
-                </button>
-              </div>
-
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 mt-3">
+              <button
+                onClick={() => navigate(`/eventos/${event.id}/staff`)}
+                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-colors"
+              >
+                <i className="fas fa-users"></i>
+                Gerenciar Equipe
+              </button>
             </div>
           </CardContent>
         </Card>

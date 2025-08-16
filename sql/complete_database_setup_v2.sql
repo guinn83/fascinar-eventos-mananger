@@ -4,7 +4,26 @@
 -- Data: 15/08/2025
 -- Versão: 2.0 (com estrutura unificada e sistema de staff)
 
--- ==========================================
+-- CREATE TABLE IF NOT EXISTS event_staff (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  person_name TEXT, -- Nome da pessoa quando não há profile
+  staff_role staff_role NOT NULL,
+  confirmed BOOLEAN DEFAULT false,
+  hourly_rate DECIMAL(8,2),
+  hours_planned DECIMAL(4,1) DEFAULT 8.0,
+  hours_worked DECIMAL(4,1),
+  notes TEXT,
+  assigned_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  confirmed_at TIMESTAMP WITH TIME ZONE,
+  assigned_by UUID REFERENCES profiles(id),
+  
+  UNIQUE(event_id, profile_id, staff_role),
+  CHECK (hours_planned > 0),
+  CHECK (hours_worked >= 0 OR hours_worked IS NULL),
+  CHECK (profile_id IS NOT NULL OR person_name IS NOT NULL) -- Pelo menos um deve estar preenchido
+);========================
 -- 1. ENUMS E TIPOS PERSONALIZADOS
 -- ==========================================
 
@@ -243,7 +262,8 @@ CREATE TABLE IF NOT EXISTS default_staff_roles (
 CREATE TABLE IF NOT EXISTS event_staff (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  person_name TEXT, -- Nome da pessoa quando não há profile
   staff_role staff_role NOT NULL,
   confirmed BOOLEAN DEFAULT false,
   hourly_rate DECIMAL(8,2),
@@ -256,7 +276,8 @@ CREATE TABLE IF NOT EXISTS event_staff (
   
   UNIQUE(event_id, profile_id, staff_role),
   CHECK (hours_planned > 0),
-  CHECK (hours_worked >= 0 OR hours_worked IS NULL)
+  CHECK (hours_worked >= 0 OR hours_worked IS NULL),
+  CHECK (profile_id IS NOT NULL OR person_name IS NOT NULL) -- Pelo menos um deve estar preenchido
 );
 
 -- Triggers para updated_at nas tabelas de staff
@@ -404,13 +425,23 @@ LEFT JOIN profiles creator ON creator.id = e.created_by_profile_id;
 -- View para staff de eventos com detalhes
 CREATE OR REPLACE VIEW event_staff_details AS
 SELECT 
-  es.*,
+  es.id,
+  es.event_id,
   e.title as event_title,
   e.event_date,
-  p.full_name as staff_name,
+  es.profile_id,
+  COALESCE(p.full_name, es.person_name, 'Não atribuído') as staff_name,
   p.email as staff_email,
   p.phone as staff_phone,
-  (es.hourly_rate * es.hours_planned) as planned_cost,
+  es.staff_role,
+  es.confirmed,
+  es.hourly_rate,
+  es.hours_planned,
+  es.hours_worked,
+  es.assigned_at,
+  es.confirmed_at,
+  es.hourly_rate * es.hours_planned as planned_cost,
+  es.hourly_rate * COALESCE(es.hours_worked, es.hours_planned) as actual_cost,
   assigner.full_name as assigned_by_name
 FROM event_staff es
 JOIN events e ON e.id = es.event_id
