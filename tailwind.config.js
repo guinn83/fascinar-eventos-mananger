@@ -61,11 +61,17 @@ module.exports = {
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui'],
       },
+      backgroundImage: {
+        'gradient-button': 'var(--gradient-button)',
+        'gradient-card': 'var(--gradient-card)',
+        'gradient-page': 'var(--gradient-page)',
+      },
     },
   },
   safelist: [
     'bg-item',
-    'hover:bg-item-hover'
+    'hover:bg-item-hover',
+    'bg-gradient-button'
   ],
   plugins: [],
 }

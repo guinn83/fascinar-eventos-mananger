@@ -44,8 +44,8 @@ export const light = {
   gradients: {
     // Card background gradient (fallback to surface color if not supported)
     card: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0))',
-    // Button gradient for primary/featured buttons
-    button: 'linear-gradient(90deg, rgba(103,126,234,0.12), rgba(118,75,162,0.12))'
+    // Button gradient for primary/featured buttons - subtle overlay over primary color
+    button: 'linear-gradient(180deg, #ffffff1a 0%, #0000001a 100%)'
   ,
   // Page / global background gradient option
   page: 'linear-gradient(180deg, rgba(245,247,250,0.6), rgba(255,255,255,0))'
@@ -59,7 +59,7 @@ export const light = {
     body: '1rem',     // 16px - texto padrão
     small: '0.875rem', // 14px - texto secundário
     xs: '0.75rem',    // 12px - captions, labels
-    
+
   // Button sizes (tokens for easy global control)
   button: '0.875rem',   // 14px - default button font size
   'button-sm': '0.8125rem', // 13px
@@ -115,8 +115,8 @@ export const dark = {
     // Cores da marca: #261323 | #66345A | #C3A0BD | #D39937 | #E5B652
     // Primary colors - mais claros no dark mode
     primary: '#770b5eff',          // blue-800
-    'primary-hover': '#2d1a3fff',  // blue-700
-    'primary-light': '#671eacff',  // blue-500
+    'primary-hover': '#5a0045ff',  // blue-700
+    'primary-light': '#86206eff',  // blue-500
     
     // Background colors - tons escuros
     background: '#261323',       // slate-300
@@ -133,10 +133,10 @@ export const dark = {
     'text-muted': '#94a3b8',    // slate-400
     
     // Status colors - ajustados para dark mode
-    success: '#00b66aff',         // emerald-500
-    warning: '#f59e0b',         // amber-500
-    danger: '#a02c1dff',          // red-500
-    info: '#0ea5e9',           // sky-500
+    success: '#ffa200ff',         // emerald-500
+    warning: '#ff7b00ff',         // amber-500
+    danger: '#b1210eff',          // red-500
+    info: '#7f0ee9ff',           // sky-500
     
   // Border colors
   border: '#412a47ff',         // gray-700
@@ -150,7 +150,7 @@ export const dark = {
   gradients: {
     // Stronger, tinted gradients for dark theme
   card: 'linear-gradient(180deg, #ffffff05, #0000001f)',
-  button: 'linear-gradient(180deg, #764ba21f, #7a29811f)',
+  button: 'linear-gradient(180deg, #ffffff0d 0%, #00000034 100%)',
   page: 'linear-gradient(180deg, #1a0a1266, #26111c)'
   },
   
@@ -196,7 +196,8 @@ export const semanticClasses = {
   'icon-md': 'w-5 h-5',
   'icon-lg': 'w-6 h-6',
   'icon-xl': 'w-8 h-8',
-  
+  'icon-2xl': 'w-15 h-15',
+
   // Common spacing
   'space-section': 'space-y-6',
   'space-card': 'space-y-4',
@@ -228,11 +229,8 @@ export const cardTokens = {
 
   // Cores editáveis para diferentes níveis dentro do card
   colors: {
-    // Cor de fundo do card principal (já definida como background acima)
     card: 'bg-surface',
-    // Cor de fundo dos itens dentro do card (diferente do fundo principal)
     item: 'bg-item',
-    // Cor quando o mouse passa por cima dos itens (apenas a cor, sem prefixo)
     itemHover: 'item-hover'
   }
 }

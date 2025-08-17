@@ -12,34 +12,11 @@ import {
 import { pageTokens, getCardItemClasses } from '../components/ui/theme'
 // Update the import path if the card components are located elsewhere, for example:
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { Button } from '../components/ui/button'
 // Or, if you do not have these components, create them or install a UI library (like shadcn/ui or Material UI) and import from there.
 
 // badge removed — status is shown as a colored dot next to the person name
 
-// Local fallback Button component for when ../components/ui/button is not available.
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'default' | 'outline' | 'secondary' | 'confirm' | 'edit' | 'destructive' | 'danger'
-  size?: 'sm' | 'md' | 'lg'
-}
-  const Button = ({ children, variant = 'default', size = 'md', className = '', ...props }: ButtonProps) => {
-  const base = 'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors'
-  const variantClasses: Record<string, string> = {
-    default: 'px-3 py-2 bg-primary text-white hover:bg-primary/90',
-    outline: 'px-3 py-2 border border-border bg-surface text-text hover:bg-surface-hover',
-    secondary: 'px-2 py-1 bg-warning/10 text-warning hover:bg-warning/20',
-    confirm: 'px-3 py-2 bg-success text-white hover:bg-success/80',
-    edit: 'px-3 py-2 border border-border bg-surface text-text hover:bg-surface-hover',
-    destructive: 'px-3 py-2 bg-danger text-white hover:bg-danger/90',
-    danger: 'px-3 py-2 bg-danger text-white hover:bg-danger/90'
-  }
-  const sizeClasses: Record<string, string> = {
-    sm: 'px-2 py-1 text-xs',
-    md: '',
-    lg: 'px-4 py-3'
-  }
-  const classes = `${base} ${variantClasses[variant] ?? ''} ${sizeClasses[size] ?? ''} ${className}`
-  return <button {...props} className={classes}>{children}</button>
-}
 import { 
   Users, 
   Plus, 
@@ -215,7 +192,7 @@ export function EventStaffView() {
           <Card className="w-full resume-card" strong>
             <CardContent size="md">
               <div className="flex items-center">
-                <Users className="icon-xl text-icon-3 mr-4" />
+                <Users className="icon-2xl text-icon-3 mr-3" />
                 <div>
                   <p className="text-h3 font-bold text-text">{summary.total_roles} {summary.total_roles === 1 ? 'profissional' : 'profissionais'}</p>
                   <p className="text-xs text-text-muted mt-0">
@@ -303,7 +280,8 @@ export function EventStaffView() {
                               <Button
                                 onClick={() => handleConfirmStaff(staff.id)}
                                 variant="confirm"
-                                className="w-10 h-10 rounded-full"
+                                size="icon"
+                                className="rounded-full"
                                 aria-label={`Confirmar ${displayName}`}
                                 disabled={loading}
                               >
@@ -322,7 +300,8 @@ export function EventStaffView() {
                             return (
                               <Button
                                 onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role })}
-                                className="text-success hover:text-success/80 hover:bg-success/10 px-3 py-1 rounded-md border border-border"
+                                variant="outline"
+                                className="text-success hover:text-success/80 hover:bg-success/10"
                                 aria-label={`Atribuir pessoa à função ${STAFF_ROLE_LABELS[staff.staff_role]}`}
                               >
                                 Atribuir
@@ -333,7 +312,8 @@ export function EventStaffView() {
                               <Button
                                 onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role, personName: displayName, profileId: staff.profile_id, hourlyRate: staff.hourly_rate })}
                                 variant="edit"
-                                className="w-10 h-10 rounded-full"
+                                size="icon"
+                                className="rounded-full"
                                 aria-label={`Editar atribuição de ${displayName}`}
                               >
                                 <Edit className="w-6 h-6" />
@@ -345,8 +325,9 @@ export function EventStaffView() {
 
                      <Button
                         variant="destructive"
+                        size="icon"
                         onClick={() => handleRemoveStaff(staff.id)}
-                        className="w-10 h-10 rounded-full"
+                        className="rounded-full"
                         aria-label={`Remover ${displayName || 'função'}`}
                         disabled={loading}
                       >
@@ -458,6 +439,7 @@ export function EventStaffView() {
                     Cancelar
                   </Button>
                   <Button
+                    className="bg-gradient-button"
                     onClick={async () => {
                       const profileId = assignProfileId?.trim() || ''
                       const personName = assignPersonName?.trim()
