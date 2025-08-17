@@ -1,9 +1,12 @@
 /* Import Inter font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* stylelint-disable at-rule-no-unknown */
+/* Tailwind directives are processed by PostCSS/Tailwind; disable stylelint unknown at-rule check for these lines */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+/* stylelint-enable at-rule-no-unknown */
 
 /* Base styles */
 * {
@@ -23,6 +26,13 @@ body {
   min-height: 100vh;
 }
 
+/* Ensure the page background follows the theme variables and fills the full viewport */
+html, body, #root {
+  height: 100%;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
 /* Custom animation delays */
 .animation-delay-100 {
   animation-delay: 0.1s;
@@ -34,6 +44,7 @@ body {
 
 .glass-strong {
   background: rgba(255, 255, 255, 0.15);
+  -webkit-backdrop-filter: blur(30px);
   backdrop-filter: blur(30px);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }

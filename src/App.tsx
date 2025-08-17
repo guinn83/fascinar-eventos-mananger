@@ -23,20 +23,20 @@ function App() {
   // Loading screen with modern design
   if (loading && !initialized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         {/* Loading content */}
         <div className="text-center">
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border border-white/20">
+          <div className="bg-surface/80 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border border-border/40">
             <div className="relative mb-8">
               <div className="w-20 h-20 mx-auto">
                 <div className="absolute inset-0 rounded-full border-4 border-primary animate-spin border-t-transparent"></div>
                 <div className="absolute inset-4 rounded-full bg-primary/20"></div>
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-slate-800 mb-4">
+            <h2 className="text-2xl font-bold text-text mb-4">
               Fascinar Eventos
             </h2>
-            <p className="text-slate-600 font-medium">
+            <p className="text-text-secondary font-medium">
               Carregando sua experiência...
             </p>
             <div className="mt-6 flex justify-center space-x-1">
@@ -56,7 +56,7 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-background">
         <Routes>
           {/* Reset password route - sempre disponível independente do estado de autenticação */}
           <Route path="/reset-password" element={<ResetPasswordView />} />

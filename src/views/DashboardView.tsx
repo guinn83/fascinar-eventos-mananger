@@ -6,7 +6,7 @@ const DashboardView: React.FC = () => {
   return (
   <div className={`bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl p-8 border border-primary/10">
+  <div className="bg-background rounded-3xl p-8 border border-border">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-h1 bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
@@ -17,7 +17,7 @@ const DashboardView: React.FC = () => {
             </p>
           </div>
           <div className="hidden sm:block">
-            <div className="w-16 h-16 bg-gradient-to-r from-primary to-primary-hover rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25">
+            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25">
               <i className="fas fa-chart-line text-white text-2xl"></i>
             </div>
           </div>
@@ -33,7 +33,7 @@ const DashboardView: React.FC = () => {
                 <p className="text-text-secondary text-sm font-medium">Total de Eventos</p>
                 <p className="text-h2 text-text mt-1">12</p>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/25">
                 <i className="fas fa-calendar-alt text-white"></i>
               </div>
             </div>
@@ -47,7 +47,7 @@ const DashboardView: React.FC = () => {
                 <p className="text-text-secondary text-sm font-medium">Eventos Ativos</p>
                 <p className="text-h2 text-text mt-1">8</p>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/25">
+              <div className="w-12 h-12 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/25">
                 <i className="fas fa-play-circle text-white"></i>
               </div>
             </div>
@@ -61,7 +61,7 @@ const DashboardView: React.FC = () => {
                 <p className="text-text-secondary text-sm font-medium">Convidados</p>
                 <p className="text-h2 text-text mt-1">247</p>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25">
+              <div className="w-12 h-12 bg-surface rounded-xl flex items-center justify-center shadow-lg shadow-surface/25">
                 <i className="fas fa-users text-white"></i>
               </div>
             </div>
@@ -75,7 +75,7 @@ const DashboardView: React.FC = () => {
                 <p className="text-text-secondary text-sm font-medium">Receita</p>
                 <p className="text-h2 text-text mt-1">R$ 15.8K</p>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/25">
+              <div className="w-12 h-12 bg-warning rounded-xl flex items-center justify-center shadow-lg shadow-warning/25">
                 <i className="fas fa-dollar-sign text-white"></i>
               </div>
             </div>

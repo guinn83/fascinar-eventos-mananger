@@ -124,7 +124,7 @@ export function StaffAvailabilityView() {
                     {dateObj.toLocaleDateString('pt-BR', { weekday: 'short' })}
                   </div>
                   {hasAvailability && (
-                    <div className="w-2 h-2 bg-green-500 rounded-full mx-auto mt-1"></div>
+                    <div className="w-2 h-2 bg-success rounded-full mx-auto mt-1"></div>
                   )}
                 </button>
               )
@@ -144,7 +144,7 @@ export function StaffAvailabilityView() {
   <CardContent size="md" className="space-y-4">
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text mb-2">
               Status
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -154,8 +154,8 @@ export function StaffAvailabilityView() {
                   onClick={() => setAvailability(status as AvailabilityStatus)}
                   className={`px-3 py-2 rounded-lg border-2 transition-colors ${
                     availability === status
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-border/60'
                   }`}
                 >
                   <Badge className={AVAILABILITY_STATUS_COLORS[status as AvailabilityStatus]}>
@@ -170,7 +170,7 @@ export function StaffAvailabilityView() {
           {availability === 'available' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-text mb-2">
                   Horário de Início
                 </label>
                 <input
@@ -178,11 +178,11 @@ export function StaffAvailabilityView() {
                   title="Horário de início"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-border rounded-md focus:ring-primary/30 focus:border-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-text mb-2">
                   Horário de Término
                 </label>
                 <input
@@ -190,7 +190,7 @@ export function StaffAvailabilityView() {
                   title="Horário de término"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-border rounded-md focus:ring-primary/30 focus:border-primary"
                 />
               </div>
             </div>
@@ -198,7 +198,7 @@ export function StaffAvailabilityView() {
 
           {/* Notas */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text mb-2">
               Observações
             </label>
             <textarea
@@ -206,7 +206,7 @@ export function StaffAvailabilityView() {
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Adicione observações sobre sua disponibilidade..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-border rounded-md focus:ring-primary/30 focus:border-primary"
             />
           </div>
 
@@ -250,8 +250,8 @@ export function StaffAvailabilityView() {
                 >
                   <div className="flex items-center gap-3">
                     <div>
-                      <p className="font-medium">{avail.profiles?.full_name || 'Nome não informado'}</p>
-                      <p className="text-sm text-gray-500">{avail.profiles?.role}</p>
+                      <p className="font-medium text-text">{avail.profiles?.full_name || 'Nome não informado'}</p>
+                      <p className="text-sm text-text-muted">{avail.profiles?.role}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -259,7 +259,7 @@ export function StaffAvailabilityView() {
                       {AVAILABILITY_STATUS_LABELS[avail.status as AvailabilityStatus]}
                     </Badge>
                     {avail.start_time && avail.end_time && (
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-text-muted">
                         {avail.start_time} - {avail.end_time}
                       </span>
                     )}
@@ -273,7 +273,7 @@ export function StaffAvailabilityView() {
 
       {/* Error/Loading States */}
       {error && (
-        <div className="fixed bottom-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg">
+        <div className="fixed bottom-4 right-4 bg-danger text-white p-4 rounded-lg shadow-lg">
           <p>{error}</p>
         </div>
       )}

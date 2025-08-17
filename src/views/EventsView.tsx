@@ -72,16 +72,12 @@ const EventsView: React.FC = () => {
     return (
       <div className={pageTokens.cardGap.sm}>
         {/* Header */}
-        <Card className="w-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl border border-primary/10">
+        <Card className="w-full bg-surface/80 rounded-3xl border border-border/30">
           <CardContent size="lg">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-h1 bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
-                  Eventos
-                </h1>
-                <p className="text-text-secondary mt-2 font-medium">
-                  Carregando seus eventos...
-                </p>
+                <h1 className="text-h1 text-text">Eventos</h1>
+                <p className="text-text-secondary mt-2 font-medium">Carregando seus eventos...</p>
               </div>
             </div>
           </CardContent>
@@ -93,13 +89,13 @@ const EventsView: React.FC = () => {
             <Card key={i} className="animate-pulse">
               <CardContent size="md">
                 <div className="flex items-start gap-6">
-                  <div className="w-32 h-24 bg-gray-300 rounded-xl"></div>
+                  <div className="w-32 h-24 bg-surface rounded-xl"></div>
                   <div className="flex-1 space-y-3">
-                    <div className="h-4 bg-gray-300 rounded w-1/3"></div>
-                    <div className="h-3 bg-gray-300 rounded w-2/3"></div>
+                    <div className="h-4 bg-surface rounded w-1/3"></div>
+                    <div className="h-3 bg-surface rounded w-2/3"></div>
                     <div className="flex gap-4">
-                      <div className="h-3 bg-gray-300 rounded w-20"></div>
-                      <div className="h-3 bg-gray-300 rounded w-20"></div>
+                      <div className="h-3 bg-surface rounded w-20"></div>
+                      <div className="h-3 bg-surface rounded w-20"></div>
                     </div>
                   </div>
                 </div>
@@ -115,27 +111,18 @@ const EventsView: React.FC = () => {
     return (
       <div className={pageTokens.cardGap.sm}>
         {/* Header */}
-        <Card className="w-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl border border-primary/10">
+        <Card className="w-full bg-surface/80 rounded-3xl border border-border/30">
           <CardContent size="lg">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-h1 bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
-                  Eventos
-                </h1>
+                <h1 className="text-h1 text-text">Eventos</h1>
                 <p className="text-text-secondary mt-2 font-medium">
-                  {canViewAll 
-                    ? `Visualizando todos os eventos (${userRole})`
-                    : 'Gerencie seus eventos'
-                  }
+                  {canViewAll ? `Visualizando todos os eventos (${userRole})` : 'Gerencie seus eventos'}
                 </p>
                 {/* Indicador de nível de acesso */}
                 <div className="mt-3 flex items-center gap-2">
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                    userRole === 'admin' 
-                      ? 'bg-danger/10 text-danger' 
-                      : userRole === 'organizer'
-                      ? 'bg-info/10 text-info'
-                      : 'bg-text-muted/10 text-text-muted'
+                    userRole === 'admin' ? 'bg-danger/10 text-danger' : userRole === 'organizer' ? 'bg-info/10 text-info' : 'bg-text-muted/10 text-text-muted'
                   }`}>
                     <i className={`fas ${
                       userRole === 'admin' ? 'fa-crown' 
@@ -188,7 +175,7 @@ const EventsView: React.FC = () => {
                       <li>Recarregue esta página</li>
                     </ol>
                   </div>
-                  <div className="flex gap-3">
+                    <div className="flex gap-3">
                     <button 
                       onClick={() => window.location.reload()}
                       className="bg-warning hover:bg-warning/90 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
@@ -199,7 +186,7 @@ const EventsView: React.FC = () => {
                     <button 
                       onClick={handleTestConnection}
                       disabled={testing}
-                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
+                      className="bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
                     >
                       <i className={`fas ${testing ? 'fa-spinner fa-spin' : 'fa-stethoscope'}`}></i>
                       {testing ? 'Testando...' : 'Diagnosticar'}
@@ -208,7 +195,7 @@ const EventsView: React.FC = () => {
                       href="https://app.supabase.com" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="bg-white border border-amber-300 hover:bg-amber-50 text-amber-700 font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
+                      className="bg-surface border border-warning/40 hover:bg-surface/80 text-warning font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
                     >
                       <i className="fas fa-external-link-alt"></i>
                       Abrir Supabase
@@ -221,7 +208,7 @@ const EventsView: React.FC = () => {
         ) : (
           <Card className="w-full">
             <CardContent size="md">
-              <div className="flex items-start gap-3 text-red-700 mb-4">
+              <div className="flex items-start gap-3 text-danger mb-4">
                 <i className="fas fa-exclamation-triangle"></i>
                 <div className="flex-1">
                   <h3 className="font-semibold">Erro ao carregar eventos</h3>
@@ -232,14 +219,14 @@ const EventsView: React.FC = () => {
                 <button 
                   onClick={handleTestConnection}
                   disabled={testing}
-                  className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
+                  className="bg-danger hover:bg-danger-hover disabled:bg-danger/50 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
                 >
                   <i className={`fas ${testing ? 'fa-spinner fa-spin' : 'fa-stethoscope'}`}></i>
                   {testing ? 'Diagnosticando...' : 'Diagnosticar Problema'}
                 </button>
                 <button 
                   onClick={() => window.location.reload()}
-                  className="bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
+                  className="bg-surface text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
                 >
                   <i className="fas fa-redo"></i>
                   Recarregar
@@ -256,25 +243,25 @@ const EventsView: React.FC = () => {
               <div className="flex items-start gap-3">
                 <i className={`fas ${
                   testResult.success 
-                    ? 'fa-check-circle text-green-600' 
-                    : 'fa-times-circle text-red-600'
+                    ? 'fa-check-circle text-success' 
+                    : 'fa-times-circle text-danger'
                 } text-xl`}></i>
                 <div className="flex-1">
                   <h3 className={`font-bold text-lg mb-2 ${
-                    testResult.success ? 'text-green-800' : 'text-red-800'
+                    testResult.success ? 'text-success' : 'text-danger'
                   }`}>
                     {testResult.success ? '✅ Diagnóstico Completo' : '❌ Problema Identificado'}
                   </h3>
                   <p className={`mb-3 ${
-                    testResult.success ? 'text-green-700' : 'text-red-700'
+                    testResult.success ? 'text-success' : 'text-danger'
                   }`}>
                     {testResult.message || testResult.error}
                   </p>
                   {testResult.user && (
-                    <div className="bg-white rounded-lg px-3 py-2 mb-3">
-                      <h4 className="font-semibold text-sm text-slate-700 mb-1">Informações da Sessão:</h4>
-                      <p className="text-sm text-slate-600">Email: {testResult.user.email}</p>
-                      <p className="text-sm text-slate-600">User ID: {testResult.user.id}</p>
+                    <div className="bg-surface rounded-lg px-3 py-2 mb-3 border border-border">
+                      <h4 className="font-semibold text-sm text-text mb-1">Informações da Sessão:</h4>
+                      <p className="text-sm text-text-secondary">Email: {testResult.user.email}</p>
+                      <p className="text-sm text-text-secondary">User ID: {testResult.user.id}</p>
                     </div>
                   )}
                   {testResult.details && (
@@ -289,7 +276,7 @@ const EventsView: React.FC = () => {
                   )}
                   <button 
                     onClick={() => setTestResult(null)}
-                    className="mt-3 text-sm text-slate-600 hover:text-slate-800 underline"
+                    className="mt-3 text-sm text-text-secondary hover:text-text underline"
                   >
                     Fechar diagnóstico
                   </button>
@@ -330,16 +317,12 @@ const EventsView: React.FC = () => {
           /* Empty state */
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-slate-200/50 border border-white/20 overflow-hidden">
             <div className="flex flex-col items-center justify-center p-12 text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-slate-400 to-slate-500 rounded-3xl flex items-center justify-center shadow-lg shadow-slate-400/25 mb-6">
-                <i className="fas fa-calendar-plus text-white text-2xl"></i>
+              <div className="w-20 h-20 bg-surface/80 rounded-3xl flex items-center justify-center shadow-lg mb-6">
+                <i className="fas fa-calendar-plus text-primary text-2xl"></i>
               </div>
-              <h3 className="text-xl font-bold text-slate-600 mb-2">
-                Nenhum evento encontrado
-              </h3>
-              <p className="text-slate-500 mb-6">
-                Comece criando seu primeiro evento
-              </p>
-              <button className="bg-gradient-to-r from-primary to-primary-hover text-white font-semibold px-6 py-3 rounded-2xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-200 transform hover:scale-[1.02]">
+              <h3 className="text-xl font-bold text-text mb-2">Nenhum evento encontrado</h3>
+              <p className="text-text-secondary mb-6">Comece criando seu primeiro evento</p>
+              <button className="bg-primary text-white font-semibold px-6 py-3 rounded-2xl hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]">
                 <i className="fas fa-plus mr-2"></i>
                 Criar Primeiro Evento
               </button>
@@ -401,12 +384,12 @@ const EventsView: React.FC = () => {
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0 pr-20 md:pr-4">
                           {/* Título */}
-                          <h3 className="text-lg font-bold text-slate-800 mb-0 truncate">
+                          <h3 className="text-lg font-bold text-text mb-0 truncate">
                             {event.title}
                           </h3>
 
                           {/* Data e hora (sem contagem de dias) */}
-                          <div className="flex items-center text-slate-600 text-sm mb-0">
+                          <div className="flex items-center text-text-secondary text-sm mb-0">
                             <i className="fas fa-calendar mr-2"></i>
                             <span className="mr-2">{date}</span>
                             <i className="fas fa-clock mr-2"></i>
@@ -414,7 +397,7 @@ const EventsView: React.FC = () => {
                           </div>
 
                           {/* Localização */}
-                          <div className="flex items-center text-slate-600 text-sm">
+                          <div className="flex items-center text-text-secondary text-sm">
                             <i className="fas fa-map-marker-alt mr-2 flex-shrink-0"></i>
                             <span className="truncate">{event.location}</span>
                           </div>
@@ -423,13 +406,7 @@ const EventsView: React.FC = () => {
                         {/* Status no canto direito - desktop */}
                         <div className="hidden md:flex flex-col items-end ml-4">
                           <span className={`px-1 py-1 rounded-full text-xs font-medium ${
-                            event.status === 'cancelled'
-                              ? 'bg-red-100 text-red-700'
-                              : event.status === 'completed'
-                              ? 'bg-gray-100 text-gray-700'
-                              : status === 'today'
-                              ? 'bg-red-100 text-red-700'
-                              : 'bg-primary/10 text-primary'
+                            event.status === 'cancelled' ? 'bg-danger/10 text-danger' : event.status === 'completed' ? 'bg-surface text-text-secondary' : status === 'today' ? 'bg-danger/10 text-danger' : 'bg-primary/10 text-primary'
                           }`}>
                             {event.status === 'cancelled' ? 'Cancelado' :
                              event.status === 'completed' ? 'Realizado' :
@@ -443,7 +420,7 @@ const EventsView: React.FC = () => {
 
                     {/* Ícone de seta */}
                     <div className="flex-shrink-0">
-                      <i className="fas fa-chevron-right text-slate-400 text-lg"></i>
+                      <i className="fas fa-chevron-right text-text-muted text-lg"></i>
                     </div>
                   </div>
                 </div>
@@ -454,17 +431,17 @@ const EventsView: React.FC = () => {
 
         {/* Card para Adicionar Novo Evento */}
         {events.length > 0 && (
-          <Card className="group bg-white/50 backdrop-blur-sm hover:bg-white/70 rounded-2xl shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-slate-300/50 transition-all duration-300 hover:scale-[1.01] border-2 border-dashed border-slate-300 hover:border-primary cursor-pointer overflow-hidden">
+          <Card className="group bg-surface/50 backdrop-blur-sm hover:bg-surface/70 rounded-2xl shadow-lg transition-all duration-300 hover:scale-[1.01] border-2 border-dashed border-border/40 hover:border-primary cursor-pointer overflow-hidden">
             <CardContent size="md">
               <div className="flex items-center justify-center gap-6">
-                <div className="w-16 h-16 bg-gradient-to-r from-slate-400 to-slate-500 group-hover:from-primary group-hover:to-primary-hover rounded-2xl flex items-center justify-center shadow-lg shadow-slate-400/25 group-hover:shadow-primary/25 transition-all duration-300">
-                  <i className="fas fa-plus text-white text-xl"></i>
+                <div className="w-16 h-16 bg-surface/80 group-hover:bg-primary rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300">
+                  <i className="fas fa-plus text-primary text-xl"></i>
                 </div>
                 <div className="text-left">
-                  <h3 className="text-xl font-bold text-slate-600 group-hover:text-primary transition-colors mb-1">
+                  <h3 className="text-xl font-bold text-text-secondary group-hover:text-primary transition-colors mb-1">
                     Criar Novo Evento
                   </h3>
-                  <p className="text-slate-500 text-sm">
+                  <p className="text-text-secondary text-sm">
                     Clique aqui para adicionar um novo evento ao seu calendário
                   </p>
                 </div>

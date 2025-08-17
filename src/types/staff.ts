@@ -131,10 +131,10 @@ export const AVAILABILITY_STATUS_LABELS: Record<AvailabilityStatus, string> = {
 
 // Cores para status de disponibilidade (para UI)
 export const AVAILABILITY_STATUS_COLORS: Record<AvailabilityStatus, string> = {
-  available: 'text-green-600 bg-green-100',
-  unavailable: 'text-red-600 bg-red-100',
+  available: 'text-success bg-success/10',
+  unavailable: 'text-danger bg-danger/10',
   // 'busy' removed — reuse 'unavailable' styles where appropriate
-  maybe: 'text-yellow-600 bg-yellow-100'
+  maybe: 'text-warning bg-warning/10'
 };
 
 // Templates padrão de staff para diferentes tipos de evento

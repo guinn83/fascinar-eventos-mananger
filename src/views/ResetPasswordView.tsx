@@ -150,21 +150,21 @@ const ResetPasswordView: React.FC = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 px-4 py-8">
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
         <div className="w-full max-w-md">
           <Card className="w-full">
             <CardContent size="lg">
-              <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <div className="w-20 h-20 bg-success rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <i className="fas fa-check text-white text-2xl"></i>
               </div>
-              <h2 className="text-2xl font-bold text-slate-800 mb-4">
+              <h2 className="text-2xl font-bold text-text mb-4">
                 Senha criada!
               </h2>
-              <p className="text-slate-600 mb-6">
+              <p className="text-text-secondary mb-6">
                 Sua senha foi criada com sucesso. Agora você já pode acessar o app normalmente.
               </p>
               <button
-                className="w-full bg-gradient-to-r from-primary to-primary-hover text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg hover:shadow-primary/25 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] mt-4"
+                className="w-full bg-primary text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] mt-4"
                 onClick={() => navigate('/')}
               >
                 Abrir o app
@@ -177,7 +177,7 @@ const ResetPasswordView: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-gradient-to-br from-primary/20 to-purple-400/20 blur-3xl"></div>
@@ -190,13 +190,13 @@ const ResetPasswordView: React.FC = () => {
           <CardContent size="md">
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-gradient-to-r from-primary to-primary-hover rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/25">
+              <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/25">
                 <i className="fas fa-key text-white text-2xl"></i>
               </div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+              <h2 className="text-3xl font-bold text-text">
                 Nova Senha
               </h2>
-              <p className="mt-2 text-slate-600 font-medium">
+              <p className="mt-2 text-text-secondary font-medium">
                 {error ? 'Problema com o link?' : 'Digite sua nova senha'}
               </p>
             </div>
@@ -204,14 +204,14 @@ const ResetPasswordView: React.FC = () => {
             {/* Reset Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm">
+                <div className="bg-danger/10 border border-border text-danger px-4 py-3 rounded-2xl text-sm">
                   {error}
                   {error.includes('expirou') && (
                     <div className="mt-3">
                       <button
                         type="button"
                         onClick={() => navigate('/login')}
-                        className="text-blue-600 hover:text-blue-800 underline text-sm"
+                        className="text-primary hover:text-primary-hover underline text-sm"
                       >
                         Voltar ao login para solicitar novo link
                       </button>
@@ -222,11 +222,11 @@ const ResetPasswordView: React.FC = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label htmlFor="password" className="block text-sm font-semibold text-text mb-2">
                     Nova Senha
                   </label>
                   <div className="relative">
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted">
                       <i className="fas fa-lock text-sm"></i>
                     </div>
                     <input
@@ -235,14 +235,14 @@ const ResetPasswordView: React.FC = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-10 pr-12 py-3 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-slate-400 text-slate-900"
+                      className="w-full pl-10 pr-12 py-3 bg-surface border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-text-muted text-text"
                       placeholder="Mínimo 6 caracteres"
                     />
                     <button
                       type="button"
                       title={showPassword ? "Ocultar senha" : "Mostrar senha"}
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
                     >
                       <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-sm`}></i>
                     </button>
@@ -250,11 +250,11 @@ const ResetPasswordView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label htmlFor="confirmPassword" className="block text-sm font-semibold text-text mb-2">
                     Confirmar Nova Senha
                   </label>
                   <div className="relative">
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted">
                       <i className="fas fa-lock text-sm"></i>
                     </div>
                     <input
@@ -263,14 +263,14 @@ const ResetPasswordView: React.FC = () => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className="w-full pl-10 pr-12 py-3 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-slate-400 text-slate-900"
+                      className="w-full pl-10 pr-12 py-3 bg-surface border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-text-muted text-text"
                       placeholder="Digite a senha novamente"
                     />
                     <button
                       type="button"
                       title={showConfirmPassword ? "Ocultar senha" : "Mostrar senha"}
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
                     >
                       <i className={`fas ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'} text-sm`}></i>
                     </button>
@@ -296,7 +296,7 @@ const ResetPasswordView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => navigate('/')}
-                    className="w-full text-slate-600 hover:text-slate-800 text-sm font-semibold py-2 transition-colors"
+                    className="w-full text-text-secondary hover:text-text text-sm font-semibold py-2 transition-colors"
                   >
                     Voltar para o login
                   </button>

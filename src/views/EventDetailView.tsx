@@ -200,7 +200,7 @@ const EventDetailView: React.FC = () => {
             className="absolute top-6 left-6 p-2 hover:bg-surface/50 rounded-lg transition-colors"
             aria-label="Voltar aos eventos"
           >
-            <i className="fas fa-arrow-left text-slate-600"></i>
+                    <i className="fas fa-arrow-left text-text-secondary"></i>
           </button>
         </div>
 
@@ -211,11 +211,11 @@ const EventDetailView: React.FC = () => {
               {/* Event Description */}
               {event.description && (
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-text flex items-center gap-2">
                     <i className="fas fa-align-left text-primary"></i>
                     Descrição Detalhada
                   </h3>
-                  <p className="text-slate-700 leading-relaxed">
+                  <p className="text-text-secondary leading-relaxed">
                     {event.description}
                   </p>
                 </div>
@@ -224,29 +224,29 @@ const EventDetailView: React.FC = () => {
               {/* Date, Location and Attendees */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-text flex items-center gap-2">
                     <i className="fas fa-calendar text-primary"></i>
-                    Data e Horário: <span className="font-normal text-slate-700">{formatDate(event.event_date)}</span>
+                    Data e Horário: <span className="font-normal text-text-secondary">{formatDate(event.event_date)}</span>
                   </h3>
                   {event.end_date && (
                     <div className="flex items-center gap-3 mt-2">
-                      <i className="fas fa-calendar-check w-4 text-slate-500"></i>
-                      <span className="text-slate-700">Até: {formatDate(event.end_date)}</span>
+                      <i className="fas fa-calendar-check w-4 text-text-muted"></i>
+                      <span className="text-text-secondary">Até: {formatDate(event.end_date)}</span>
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-text flex items-center gap-2">
                     <i className="fas fa-map-marker-alt text-primary"></i>
-                    Local: <span className="font-normal text-slate-700">{event.location || 'Local não informado'}</span>
+                    Local: <span className="font-normal text-text-secondary">{event.location || 'Local não informado'}</span>
                   </h3>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-text flex items-center gap-2">
                     <i className="fas fa-users text-primary"></i>
-                    Número de convidados: <span className="font-normal text-slate-700">{event.attendees}</span>
+                    Número de convidados: <span className="font-normal text-text-secondary">{event.attendees}</span>
                   </h3>
                 </div>
               </div>
@@ -259,24 +259,24 @@ const EventDetailView: React.FC = () => {
         <Card className="w-full staff-card">
           <CardContent size="md">
             <div className="flex items-center">
-              <svg className="w-8 h-8 text-blue-500 mr-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg className="w-8 h-8 text-primary mr-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M23 21v-2a4 4 0 00-3-3.87" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M16 3.13a4 4 0 010 7.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <div>
-                <p className="text-xl font-bold">{summary ? summary.total_roles : '—'} {summary && summary.total_roles === 1 ? 'profissional' : 'profissionais'}</p>
-                <p className="text-xs text-gray-500 mt-0">
+                <p className="text-xl font-bold text-text">{summary ? summary.total_roles : '—'} {summary && summary.total_roles === 1 ? 'profissional' : 'profissionais'}</p>
+                <p className="text-xs text-text-muted mt-0">
                   {summary ? Object.entries(summary.roles_by_type).filter(([,c]) => c > 0).map(([role,count]) => `${count} ${role}`).join(', ') : ''}
                 </p>
               </div>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 mt-3">
+              <div className="flex flex-col sm:flex-row gap-4 mt-3">
               <button
                 onClick={() => navigate(`/eventos/${event.id}/staff`)}
-                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-colors"
+                className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-xl transition-colors"
               >
                 <i className="fas fa-users"></i>
                 Gerenciar Equipe
@@ -289,15 +289,15 @@ const EventDetailView: React.FC = () => {
         <Card className="w-full">
           <CardContent size="md">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-text flex items-center gap-2">
                 <i className="fas fa-dollar-sign text-primary"></i>
                 Informações Financeiras
               </h3>
               <div>
-                <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+        <div className="bg-success/10 border border-border rounded-lg px-3 py-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-green-700 font-medium">Valor do Evento</span>
-                    <span className="text-2xl font-bold text-green-800">
+          <span className="text-success font-medium">Valor do Evento</span>
+          <span className="text-2xl font-bold text-success">
                       {formatCurrency(event.price)}
                     </span>
                   </div>
@@ -319,7 +319,7 @@ const EventDetailView: React.FC = () => {
           
           <button
             onClick={() => window.print()}
-            className="flex items-center justify-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-800 px-6 py-3 rounded-xl transition-colors"
+            className="flex items-center justify-center gap-2 bg-surface hover:bg-surface-hover text-text px-6 py-3 rounded-xl transition-colors"
           >
             <i className="fas fa-print"></i>
             Imprimir

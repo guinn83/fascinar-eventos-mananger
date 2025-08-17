@@ -69,7 +69,7 @@ const SupabaseTest: React.FC = () => {
           <button
             onClick={testConnection}
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+            className="bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
           >
             <i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-play'}`}></i>
             {loading ? 'Testando...' : 'Executar Teste'}
@@ -78,12 +78,12 @@ const SupabaseTest: React.FC = () => {
           {result && (
             <div className="mt-4">
               <Card>
-                <CardContent size="md" className={`${result.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-                  <h3 className={`font-bold mb-2 ${result.success ? 'text-green-800' : 'text-red-800'}`}>
+                <CardContent size="md" className={`${result.success ? 'bg-success/10 border border-success/20' : 'bg-danger/10 border border-danger/20'}`}>
+                  <h3 className={`font-bold mb-2 ${result.success ? 'text-success' : 'text-danger'}`}>
                     {result.success ? '✅ Sucesso!' : '❌ Erro'}
                   </h3>
 
-                  <p className={`mb-3 ${result.success ? 'text-green-700' : 'text-red-700'}`}>
+                  <p className={`mb-3 ${result.success ? 'text-success/90' : 'text-danger/90'}`}>
                     {result.message || result.error}
                   </p>
 

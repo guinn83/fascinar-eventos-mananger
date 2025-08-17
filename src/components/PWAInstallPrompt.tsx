@@ -19,12 +19,12 @@ const PWAInstallPrompt: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 max-w-sm mx-auto">
-      <Card className="bg-white border border-blue-200 rounded-2xl shadow-lg">
+  <Card className="bg-surface border border-border/40 rounded-2xl shadow-lg">
         <CardContent size="md">
           <div className="flex items-start space-x-3">
         <div className="flex-shrink-0">
-          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-            <i className="fas fa-download text-blue-600"></i>
+    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+      <i className="fas fa-download text-primary"></i>
           </div>
         </div>
         
@@ -39,13 +39,13 @@ const PWAInstallPrompt: React.FC = () => {
           <div className="flex space-x-2">
             <button
               onClick={handleInstall}
-              className="flex-1 bg-blue-600 text-white text-xs font-medium py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors"
+       className="flex-1 bg-primary text-white text-xs font-medium py-2 px-3 rounded-lg hover:bg-primary/90 transition-colors"
             >
               Instalar
             </button>
             <button
               onClick={hideInstallPrompt}
-              className="flex-1 bg-gray-100 text-gray-700 text-xs font-medium py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors"
+       className="flex-1 bg-surface text-text-secondary text-xs font-medium py-2 px-3 rounded-lg hover:bg-surface/80 transition-colors"
             >
               Agora não
             </button>
@@ -54,7 +54,7 @@ const PWAInstallPrompt: React.FC = () => {
         
         <button
           onClick={hideInstallPrompt}
-          className="flex-shrink-0 text-gray-400 hover:text-gray-600"
+         className="flex-shrink-0 text-text-secondary hover:text-text"
           title="Fechar"
           aria-label="Fechar prompt de instalação"
         >

@@ -157,9 +157,9 @@ const LoginView: React.FC = () => {
           {step === 'enter-password' && (
             <form onSubmit={handleLogin} className="space-y-6">
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2">Senha</label>
+                <label htmlFor="password" className="block text-sm font-semibold text-text mb-2">Senha</label>
                 <div className="relative">
-                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted">
                     <i className="fas fa-lock text-sm"></i>
                   </div>
                   <input
@@ -168,14 +168,14 @@ const LoginView: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full pl-10 pr-12 py-3 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-slate-400 text-slate-900"
+                    className="w-full pl-10 pr-12 py-3 bg-surface border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-text-muted text-text"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     title={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
                   >
                     <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-sm`}></i>
                   </button>
@@ -201,14 +201,14 @@ const LoginView: React.FC = () => {
           {step === 'forgot-password' && (
             <form onSubmit={handleForgotPassword} className="space-y-6">
               <div>
-                <label htmlFor="email-forgot" className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+                <label htmlFor="email-forgot" className="block text-sm font-semibold text-text mb-2">Email</label>
                 <input
                   id="email-forgot"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-slate-400 text-slate-900"
+                  className="w-full px-4 py-3 bg-surface border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-text-muted text-text"
                   placeholder="seu@email.com"
                 />
               </div>
@@ -222,7 +222,7 @@ const LoginView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setStep('email')}
-                className="w-full text-slate-600 hover:text-slate-800 text-sm font-semibold py-2 transition-colors"
+                className="w-full text-text-secondary hover:text-text text-sm font-semibold py-2 transition-colors"
               >
                 Voltar para o início
               </button>

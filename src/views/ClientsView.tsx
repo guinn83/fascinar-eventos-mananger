@@ -243,7 +243,7 @@ const ClientsView: React.FC = () => {
 
               <form onSubmit={handleCreateClient} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-text mb-2">
                   Nome completo *
                 </label>
                 <input
@@ -251,39 +251,39 @@ const ClientsView: React.FC = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                   placeholder="Digite o nome completo"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-text mb-2">
                   Email
                 </label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                   placeholder="email@exemplo.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-text mb-2">
                   Telefone
                 </label>
                 <input
                   type="text"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                   placeholder="(11) 99999-9999"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-text mb-2">
                   CPF *
                 </label>
                 <input
@@ -291,7 +291,7 @@ const ClientsView: React.FC = () => {
                   required
                   value={formData.cpf}
                   onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                  className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                   placeholder="000.000.000-00"
                 />
               </div>
@@ -335,7 +335,7 @@ const ClientsView: React.FC = () => {
 
               <form onSubmit={handleEditClient} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-text mb-2">
                   Nome completo *
                 </label>
                 <input
@@ -343,7 +343,7 @@ const ClientsView: React.FC = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                   placeholder="Digite o nome completo"
                 />
               </div>
@@ -392,7 +392,7 @@ const ClientsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowEditModal(false)}
-                  className="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 py-3 rounded-lg transition-colors"
+                  className="flex-1 bg-surface/50 hover:bg-surface/70 text-text py-3 rounded-lg transition-colors"
                 >
                   Cancelar
                 </button>
