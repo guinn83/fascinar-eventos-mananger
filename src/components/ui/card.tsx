@@ -49,7 +49,7 @@ export function Card({ children, className = '', size = 'md', padding }: CardPro
 export function CardHeader({ children, className = '', size = 'md' }: CardHeaderProps) {
   const spacing = cardTokens.spacing[size]
   return (
-    <div className={`border-b border-border/60 ${spacing} ${className}`}>
+    <div className={`border-b border-border ${spacing} ${className}`}>
       {children}
     </div>
   )

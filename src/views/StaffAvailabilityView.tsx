@@ -155,7 +155,7 @@ export function StaffAvailabilityView() {
                   className={`px-3 py-2 rounded-lg border-2 transition-colors ${
                     availability === status
                       ? 'border-border bg-primary/10'
-                      : 'border-border hover:border-border/60'
+                        : 'border-border hover:border-border'
                   }`}
                 >
                   <Badge className={AVAILABILITY_STATUS_COLORS[status as AvailabilityStatus]}>

@@ -370,7 +370,7 @@ const EventsView: React.FC = () => {
                         <img
                           src={event.image_url}
                           alt={event.title}
-                          className="w-20 h-20 object-cover rounded-full border-4 border-border/20"
+                          className="w-20 h-20 object-cover rounded-full border-4 border-border"
                         />
                       ) : (
                         <div className="w-20 h-20 bg-surface rounded-full flex items-center justify-center border-4 border-border">
