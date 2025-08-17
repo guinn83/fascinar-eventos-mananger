@@ -4,14 +4,18 @@
 export const light = {
   colors: {
     // Primary colors
-    primary: '#1e40af',          // blue-800
-    'primary-hover': '#1d4ed8',  // blue-700
-    'primary-light': '#3b82f6',  // blue-500
+    primary: '#4f2f6dff',          // blue-800
+    'primary-hover': '#2d1a3fff',  // blue-700
+    'primary-light': '#671eacff',  // blue-500
     
     // Background colors
     background: '#ffffff',
     surface: '#f8fafc',          // slate-50
     'surface-hover': '#f1f5f9',  // slate-100
+    
+    // Item backgrounds for card contents
+    item: '#f1f5f9',             // slate-100 - slightly darker than surface
+    'item-hover': '#e2e8f0',     // slate-200 - darker on hover
     
     // Text colors
     text: '#0f172a',            // slate-900
@@ -21,7 +25,7 @@ export const light = {
     // Status colors
     success: '#059669',         // emerald-600
     warning: '#d97706',         // amber-600
-    danger: '#dc2626',          // red-600
+    danger: '#962340ff',          // red-600
     info: '#0284c7',           // sky-600
     
     // Border colors
@@ -86,15 +90,19 @@ export const light = {
 export const dark = {
   colors: {
     // Primary colors - mais claros no dark mode
-    primary: '#60a5fa',          // blue-400
-    'primary-hover': '#3b82f6',  // blue-500
-    'primary-light': '#93c5fd',  // blue-300
+    primary: '#4f2f6dff',          // blue-800
+    'primary-hover': '#2d1a3fff',  // blue-700
+    'primary-light': '#671eacff',  // blue-500
     
     // Background colors - tons escuros
-    background: '#0f172a',       // slate-900
-    surface: '#1e293b',          // slate-800
-    'surface-hover': '#334155',  // slate-700
+    background: '#110b0fff',       // slate-300
+    surface: '#1f111dff',          // slate-500
+    'surface-hover': '#66345A',  // slate-700
     
+    // Item backgrounds for card contents (dark theme)
+    item: '#301e2cff',             // slightly lighter than surface
+    'item-hover': '#66345A',       // lighter on hover
+
     // Text colors - tons claros
     text: '#f8fafc',            // slate-50
     'text-secondary': '#cbd5e1', // slate-300
@@ -103,12 +111,12 @@ export const dark = {
     // Status colors - ajustados para dark mode
     success: '#10b981',         // emerald-500
     warning: '#f59e0b',         // amber-500
-    danger: '#ef4444',          // red-500
+    danger: '#a01d3dff',          // red-500
     info: '#0ea5e9',           // sky-500
     
     // Border colors
-    border: '#374151',         // gray-700
-    'border-strong': '#4b5563', // gray-600
+    border: '#301e2cff',         // gray-700
+    'border-strong': '#66345A', // gray-600
   },
   
   // Reutilizar do tema claro
@@ -176,7 +184,27 @@ export const cardTokens = {
   },
 
   // title
-  title: 'text-h4 text-text'
+  title: 'text-h4 text-text',
+
+  // Cores editáveis para diferentes níveis dentro do card
+  colors: {
+    // Cor de fundo do card principal (já definida como background acima)
+    card: 'bg-surface',
+    // Cor de fundo dos itens dentro do card (diferente do fundo principal)
+    item: 'bg-item',
+    // Cor quando o mouse passa por cima dos itens (apenas a cor, sem prefixo)
+    itemHover: 'item-hover'
+  }
+}
+
+// Função utilitária para aplicar classes de item
+export const getCardItemClasses = (extraClasses: string = '') => {
+  // Keep the item token dynamic but use a literal hover class so Tailwind's scanner
+  // picks up the `hover:bg-item-hover` class during build/JIT.
+  // Also include a small fallback class `.card-item-hover` which uses the CSS
+  // variable `--color-item-hover` so hover will work immediately in the
+  // browser even if Tailwind needs a rebuild to pick up dynamic classes.
+  return `${cardTokens.colors.item} hover:bg-item-hover card-item-hover ${extraClasses}`
 }
 
 export const uiTokens = {

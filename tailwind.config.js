@@ -32,6 +32,8 @@ module.exports = {
           DEFAULT: 'var(--color-border)',
           strong: 'var(--color-border-strong)',
         },
+        item: 'var(--color-item)',
+        'item-hover': 'var(--color-item-hover)',
       },
       fontSize: {
         h1: ['var(--font-size-h1)', { lineHeight: 'var(--line-height-tight)' }],
@@ -57,5 +59,9 @@ module.exports = {
       },
     },
   },
+  safelist: [
+    'bg-item',
+    'hover:bg-item-hover'
+  ],
   plugins: [],
 }

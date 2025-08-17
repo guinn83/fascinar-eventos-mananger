@@ -3,7 +3,7 @@ import React from 'react'
 interface ButtonProps {
   children: React.ReactNode
   className?: string
-  variant?: 'default' | 'outline' | 'ghost' | 'destructive'
+  variant?: 'default' | 'outline' | 'ghost' | 'destructive' | 'confirm' | 'edit' | 'danger'
   size?: 'default' | 'sm' | 'lg'
   onClick?: () => void
   disabled?: boolean
@@ -23,9 +23,12 @@ export function Button({
 
   const variantClasses = {
     default: 'bg-primary text-white hover:bg-primary/90 focus:ring-primary/40',
-  outline: 'border border-border bg-surface text-text hover:bg-surface-hover focus:ring-primary/40',
+    outline: 'border border-border bg-surface text-text hover:bg-surface-hover focus:ring-primary/40',
     ghost: 'text-text hover:bg-surface-hover focus:ring-primary/40',
-    destructive: 'bg-danger text-white hover:bg-danger/90 focus:ring-danger/40'
+    destructive: 'bg-danger text-white hover:bg-danger/90 focus:ring-danger/40',
+    danger: 'bg-danger text-white hover:bg-danger/90 focus:ring-danger/40',
+    confirm: 'bg-success text-white hover:bg-success/80 focus:ring-primary/40',
+    edit: 'bg-surface text-text hover:bg-surface-hover border border-border focus:ring-primary/40'
   }
   
   const sizeClasses = {

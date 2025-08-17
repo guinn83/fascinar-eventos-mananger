@@ -84,7 +84,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <i className="fas fa-times"></i>
             </button>
-          </div>
+          
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2">
@@ -161,6 +161,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               Sair
             </button>
           </div>
+        </div>
       </aside>
 
       {/* Main Content */}

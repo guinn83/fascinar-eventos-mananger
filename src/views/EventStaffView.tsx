@@ -9,7 +9,7 @@ import {
   type EventStaffDetailed,
   type EventStaffSummary
 } from '../types/staff'
-import { pageTokens } from '../components/ui/theme'
+import { pageTokens, getCardItemClasses } from '../components/ui/theme'
 // Update the import path if the card components are located elsewhere, for example:
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 // Or, if you do not have these components, create them or install a UI library (like shadcn/ui or Material UI) and import from there.
@@ -18,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 
 // Local fallback Button component for when ../components/ui/button is not available.
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'default' | 'outline' | 'secondary'
+  variant?: 'default' | 'outline' | 'secondary' | 'confirm' | 'edit' | 'destructive' | 'danger'
   size?: 'sm' | 'md' | 'lg'
 }
   const Button = ({ children, variant = 'default', size = 'md', className = '', ...props }: ButtonProps) => {
@@ -26,7 +26,11 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   const variantClasses: Record<string, string> = {
     default: 'px-3 py-2 bg-primary text-white hover:bg-primary/90',
     outline: 'px-3 py-2 border border-border bg-surface text-text hover:bg-surface-hover',
-    secondary: 'px-2 py-1 bg-warning/10 text-warning hover:bg-warning/20'
+    secondary: 'px-2 py-1 bg-warning/10 text-warning hover:bg-warning/20',
+    confirm: 'px-3 py-2 bg-success text-white hover:bg-success/80',
+    edit: 'px-3 py-2 border border-border bg-surface text-text hover:bg-surface-hover',
+    destructive: 'px-3 py-2 bg-danger text-white hover:bg-danger/90',
+    danger: 'px-3 py-2 bg-danger text-white hover:bg-danger/90'
   }
   const sizeClasses: Record<string, string> = {
     sm: 'px-2 py-1 text-xs',
@@ -205,7 +209,6 @@ export function EventStaffView() {
           </Button>
         </div>
       </div>
-                                className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-hover hover:bg-surface-hover text-text"
       {/* Resumo */}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
@@ -262,7 +265,7 @@ export function EventStaffView() {
                 return (
                 <div
                   key={staff.id}
-                  className="border border-border rounded-lg py-2 px-3 bg-surface"
+                  className={`border border-border rounded-lg py-2 px-3 ${getCardItemClasses()}`}
                 >
                   <div className="grid grid-cols-3 items-center gap-3">
                     {/* Função + Nome - role prominent, name below. Dot indicates status before name */}
@@ -297,14 +300,15 @@ export function EventStaffView() {
                           // Mostrar Confirmar sempre que houver um nome atribuído (com ou sem profile)
                           const showConfirm = !isUnassigned && !staff.confirmed
                           return showConfirm ? (
-                            <Button
-                              onClick={() => handleConfirmStaff(staff.id)}
-                              className="w-10 h-10 rounded-full flex items-center justify-center bg-success hover:bg-success/80 text-white"
-                              aria-label={`Confirmar ${displayName}`}
-                              disabled={loading}
-                            >
-                              <CheckCircle className="w-5 h-5" />
-                            </Button>
+                              <Button
+                                onClick={() => handleConfirmStaff(staff.id)}
+                                variant="confirm"
+                                className="w-10 h-10 rounded-full"
+                                aria-label={`Confirmar ${displayName}`}
+                                disabled={loading}
+                              >
+                                <CheckCircle className="w-5 h-5" />
+                              </Button>
                           ) : null
                         })()
                       }
@@ -328,7 +332,8 @@ export function EventStaffView() {
                             return (
                               <Button
                                 onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role, personName: displayName, profileId: staff.profile_id, hourlyRate: staff.hourly_rate })}
-                                className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-hover hover:bg-surface-hover text-text"
+                                variant="edit"
+                                className="w-10 h-10 rounded-full"
                                 aria-label={`Editar atribuição de ${displayName}`}
                               >
                                 <Edit className="w-4 h-4" />
@@ -339,9 +344,9 @@ export function EventStaffView() {
                       }
 
                      <Button
-                        variant="outline"
+                        variant="destructive"
                         onClick={() => handleRemoveStaff(staff.id)}
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-danger border border-border hover:bg-danger/10"
+                        className="w-10 h-10 rounded-full"
                         aria-label={`Remover ${displayName || 'função'}`}
                         disabled={loading}
                       >
@@ -360,7 +365,7 @@ export function EventStaffView() {
       {/* Modal para adicionar função */}
       {showAddRole && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-          <Card className="w-full max-w-md mx-4 bg-surface">
+          <Card className="w-full max-w-md mx-4">
             <CardHeader>
               <CardTitle className="text-text">Adicionar Nova Função</CardTitle>
             </CardHeader>
@@ -398,7 +403,7 @@ export function EventStaffView() {
       {/* Modal para atribuir pessoa */}
       {showAssignPerson && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-          <Card className="w-full max-w-md mx-4 bg-surface">
+          <Card className="w-full max-w-md mx-4">
             <CardHeader>
               <CardTitle className="text-text">Atribuir Pessoa à Função</CardTitle>
             </CardHeader>
@@ -413,7 +418,7 @@ export function EventStaffView() {
                     <input
                       type="text"
                       placeholder="Digite o nome..."
-                      className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-text-muted"
+                      className={`w-full px-3 py-2 border border-border rounded-md ${getCardItemClasses()} text-text placeholder-text-muted`}
                       value={assignPersonName}
                       onChange={(e) => setAssignPersonName(e.target.value)}
                     />
@@ -423,7 +428,7 @@ export function EventStaffView() {
                     <input
                       type="text"
                       placeholder="ID do perfil (se houver)"
-                      className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-text-muted"
+                      className={`w-full px-3 py-2 border border-border rounded-md ${getCardItemClasses()} text-text placeholder-text-muted`}
                       value={assignProfileId}
                       onChange={(e) => setAssignProfileId(e.target.value)}
                     />
@@ -435,7 +440,7 @@ export function EventStaffView() {
                       type="number"
                       placeholder="0.00"
                       step="0.01"
-                      className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-text-muted"
+                      className={`w-full px-3 py-2 border border-border rounded-md ${getCardItemClasses()} text-text placeholder-text-muted`}
                       value={assignHourlyRate ?? ''}
                       onChange={(e) => setAssignHourlyRate(e.target.value ? parseFloat(e.target.value) : undefined)}
                     />
@@ -501,7 +506,7 @@ export function EventStaffView() {
             {DEFAULT_STAFF_TEMPLATES.map((template) => (
               <div
                 key={template.id}
-                className="border border-border rounded-lg hover:bg-surface-hover cursor-pointer p-4 bg-surface"
+                className={`border border-border rounded-lg cursor-pointer p-4 ${getCardItemClasses()}`}
                 onClick={() => applyTemplate(template.id)}
               >
                 <h3 className="font-semibold text-text">{template.name}</h3>
@@ -520,7 +525,7 @@ export function EventStaffView() {
       {/* Loading/Error States */}
       {loading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="rounded-lg bg-surface">
+          <Card className="rounded-lg">
             <CardContent size="md">
               <div className="animate-spin w-8 h-8 border-4 border-border border-t-transparent rounded-full mx-auto"></div>
                 <div className="animate-spin w-8 h-8 border-4 border-border border-t-transparent rounded-full mx-auto"></div>
