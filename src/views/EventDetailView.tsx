@@ -212,7 +212,7 @@ const EventDetailView: React.FC = () => {
               {event.description && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-text flex items-center gap-2">
-                    <i className="fas fa-align-left text-primary"></i>
+                    <i className="fas fa-align-left text-icon-2"></i>
                     Descrição Detalhada
                   </h3>
                   <p className="text-text-secondary leading-relaxed">
@@ -225,7 +225,7 @@ const EventDetailView: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold text-text flex items-center gap-2">
-                    <i className="fas fa-calendar text-primary"></i>
+                    <i className="fas fa-calendar text-icon-2"></i>
                     Data e Horário: <span className="font-normal text-text-secondary">{formatDate(event.event_date)}</span>
                   </h3>
                   {event.end_date && (
@@ -238,14 +238,14 @@ const EventDetailView: React.FC = () => {
 
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold text-text flex items-center gap-2">
-                    <i className="fas fa-map-marker-alt text-primary"></i>
+                    <i className="fas fa-map-marker-alt text-icon-2"></i>
                     Local: <span className="font-normal text-text-secondary">{event.location || 'Local não informado'}</span>
                   </h3>
                 </div>
 
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold text-text flex items-center gap-2">
-                    <i className="fas fa-users text-primary"></i>
+                    <i className="fas fa-users text-icon-3"></i>
                     Número de convidados: <span className="font-normal text-text-secondary">{event.attendees}</span>
                   </h3>
                 </div>
@@ -258,8 +258,8 @@ const EventDetailView: React.FC = () => {
         {/* Equipe Card (staffCard) - usar layout do resume-card */}
         <Card className="w-full staff-card">
           <CardContent size="md">
-            <div className="flex items-center">
-              <svg className="w-8 h-8 text-primary mr-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <div className="flex items-center">
+              <svg className="w-8 h-8 text-icon-3 mr-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M23 21v-2a4 4 0 00-3-3.87" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -289,8 +289,8 @@ const EventDetailView: React.FC = () => {
         <Card className="w-full">
           <CardContent size="md">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-text flex items-center gap-2">
-                <i className="fas fa-dollar-sign text-primary"></i>
+                <h3 className="text-lg font-semibold text-text flex items-center gap-2">
+                <i className="fas fa-dollar-sign text-icon-3"></i>
                 Informações Financeiras
               </h3>
               <div>

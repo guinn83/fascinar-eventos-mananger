@@ -32,6 +32,12 @@ export const light = {
   // Border colors
   border: '#e2e8f0',         // slate-200
   'border-strong': '#cbd5e1', // slate-300
+  
+  // Icon color tokens - three semantic options for icons (separate from primary)
+  // Use these in icon elements: `text-icon-1`, `text-icon-2`, `text-icon-3`
+  'icon-1': '#6b7280',   // slate-500 - muted / secondary icon color
+  'icon-2': '#4f2f6d',   // brand tone (compatible with primary but editable)
+  'icon-3': '#d39937',   // accent / highlight (gold)
   },
 
   // Gradients (used by components that opt-in)
@@ -40,6 +46,9 @@ export const light = {
     card: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0))',
     // Button gradient for primary/featured buttons
     button: 'linear-gradient(90deg, rgba(103,126,234,0.12), rgba(118,75,162,0.12))'
+  ,
+  // Page / global background gradient option
+  page: 'linear-gradient(180deg, rgba(245,247,250,0.6), rgba(255,255,255,0))'
   },
   
   fontSizes: {
@@ -50,6 +59,11 @@ export const light = {
     body: '1rem',     // 16px - texto padrão
     small: '0.875rem', // 14px - texto secundário
     xs: '0.75rem',    // 12px - captions, labels
+    
+  // Button sizes (tokens for easy global control)
+  button: '0.875rem',   // 14px - default button font size
+  'button-sm': '0.8125rem', // 13px
+  'button-lg': '1rem',   // 16px
   },
   
   fontWeights: {
@@ -100,7 +114,7 @@ export const dark = {
   colors: {
     // Cores da marca: #261323 | #66345A | #C3A0BD | #D39937 | #E5B652
     // Primary colors - mais claros no dark mode
-    primary: '#7a2981ff',          // blue-800
+    primary: '#770b5eff',          // blue-800
     'primary-hover': '#2d1a3fff',  // blue-700
     'primary-light': '#671eacff',  // blue-500
     
@@ -119,20 +133,25 @@ export const dark = {
     'text-muted': '#94a3b8',    // slate-400
     
     // Status colors - ajustados para dark mode
-    success: '#10b981',         // emerald-500
+    success: '#00b66aff',         // emerald-500
     warning: '#f59e0b',         // amber-500
-    danger: '#a01d3dff',          // red-500
+    danger: '#a02c1dff',          // red-500
     info: '#0ea5e9',           // sky-500
     
   // Border colors
   border: '#412a47ff',         // gray-700
   'border-strong': '#66345A', // gray-600
+  // Icon color tokens - three semantic options for icons (separate from primary)
+  'icon-1': '#94a3b8', // slate-400 - muted icon color for dark
+  'icon-2': '#a74e98ff', // brand tone for dark
+  'icon-3': '#ffae00ff', // accent/gold for dark
   },
 
   gradients: {
     // Stronger, tinted gradients for dark theme
-    card: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12))',
-    button: 'linear-gradient(90deg, rgba(118,75,162,0.12), rgba(122,41,129,0.12))'
+  card: 'linear-gradient(180deg, #ffffff05, #0000001f)',
+  button: 'linear-gradient(180deg, #764ba21f, #7a29811f)',
+  page: 'linear-gradient(180deg, #1a0a1266, #26111c)'
   },
   
   // Reutilizar do tema claro
@@ -240,6 +259,8 @@ export const pageTokens = {
     md: 'px-4 py-4',
     lg: 'px-8 py-8'
   },
+  // Standard header horizontal padding (responsive)
+  headerPadding: 'px-3 md:px-3 lg:px-12',
   // vertical gap between stacked cards on a page
   cardGap: {
     sm: 'space-y-3',

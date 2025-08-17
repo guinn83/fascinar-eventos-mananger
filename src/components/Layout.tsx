@@ -27,11 +27,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
   <header className="md:hidden bg-surface -webkit-backdrop-filter backdrop-blur-lg border-b border-border sticky top-0 z-50">
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className={`flex items-center justify-between ${pageTokens.headerPadding} py-3`}>
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/90 transition-colors"
+              className="p-2 rounded-xl bg-primary/10 text-icon-2 hover:bg-primary/90 transition-colors"
               aria-label="Toggle sidebar"
             >
               <i className="fas fa-bars text-lg"></i>
@@ -42,7 +42,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
             <button
               onClick={handleLogout}
-              className="p-2 rounded-xl text-text-muted hover:text-danger hover:bg-danger/10 transition-colors"
+              className="p-2 rounded-xl text-icon-1 hover:text-danger hover:bg-danger/10 transition-colors"
               aria-label="Logout"
             >
               <i className="fas fa-sign-out-alt text-lg"></i>
@@ -66,7 +66,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-      <div className="flex items-center space-x-3 px-6 py-6 border-b border-border">
+  <div className={`flex items-center space-x-3 ${pageTokens.headerPadding} py-6 border-b border-border`}>
         <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
                   <i className="fas fa-calendar-star text-white text-lg"></i>
                 </div>

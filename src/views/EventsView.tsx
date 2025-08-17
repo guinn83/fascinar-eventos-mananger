@@ -111,9 +111,9 @@ const EventsView: React.FC = () => {
     return (
       <div className={pageTokens.cardGap.sm}>
         {/* Header */}
-  <Card className="w-full bg-surface rounded-3xl border border-border">
+      <Card className="w-full bg-surface rounded-3xl border border-border">
           <CardContent size="lg">
-            <div className="flex items-center justify-between">
+            <div className={`${pageTokens.headerPadding} flex items-center justify-between`}>
               <div>
                 <h1 className="text-h1 text-text">Eventos</h1>
                 <p className="text-text-secondary mt-2 font-medium">
@@ -294,7 +294,7 @@ const EventsView: React.FC = () => {
       {/* Header */}
       <Card className="w-full">
         <CardContent size="lg">
-          <div className="flex flex-col gap-4">
+          <div className={`${pageTokens.headerPadding} flex flex-col gap-4`}>
             <div>
               <h1 className="text-h2 font-bold text-text">
                 Eventos
@@ -317,8 +317,8 @@ const EventsView: React.FC = () => {
           /* Empty state */
             <div className="bg-surface backdrop-blur-sm rounded-2xl border border-border overflow-hidden">
             <div className="flex flex-col items-center justify-center p-12 text-center">
-              <div className="w-20 h-20 bg-surface rounded-3xl flex items-center justify-center mb-6">
-                <i className="fas fa-calendar-plus text-primary text-2xl"></i>
+                <div className="w-20 h-20 bg-surface rounded-3xl flex items-center justify-center mb-6">
+                <i className="fas fa-calendar-plus text-icon-2 text-2xl"></i>
               </div>
               <h3 className="text-xl font-bold text-text mb-2">Nenhum evento encontrado</h3>
               <p className="text-text-secondary mb-6">Comece criando seu primeiro evento</p>
@@ -375,7 +375,7 @@ const EventsView: React.FC = () => {
                         />
                       ) : (
                         <div className="w-20 h-20 bg-surface rounded-full flex items-center justify-center border-4 border-border">
-                          <i className="fas fa-calendar-alt text-primary text-xl"></i>
+                          <i className="fas fa-calendar-alt text-icon-2 text-xl"></i>
                         </div>
                       )}
                     </div>
@@ -436,7 +436,7 @@ const EventsView: React.FC = () => {
             <CardContent size="md">
               <div className="flex items-center justify-center gap-6">
                 <div className="w-16 h-16 bg-surface group-hover:bg-primary rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300">
-                  <i className="fas fa-plus text-primary text-xl"></i>
+                  <i className="fas fa-plus text-icon-2 text-xl"></i>
                 </div>
                 <div className="text-left">
                   <h3 className="text-xl font-bold text-text-secondary group-hover:text-primary transition-colors mb-1">

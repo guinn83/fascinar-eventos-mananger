@@ -220,3 +220,10 @@ html, body, #root {
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+/* Page-level gradient background utility */
+.bg-gradient-page {
+  background-image: var(--gradient-page);
+  background-repeat: no-repeat;
+  background-size: cover;
+}

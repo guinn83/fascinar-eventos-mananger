@@ -37,6 +37,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       root.style.setProperty(`--color-${key}`, value)
     })
 
+    // Backwards-compat: ensure icon tokens exist even if theme missing them
+    if (!(themeData as any).colors['icon-1']) {
+      root.style.setProperty('--color-icon-1', (themeData as any).colors['text'] || '#6b7280')
+      root.style.setProperty('--color-icon-2', (themeData as any).colors['primary'] || '#4f2f6d')
+      root.style.setProperty('--color-icon-3', (themeData as any).colors['primary'] || '#d39937')
+    }
+
     // Aplicar variáveis CSS para typography
     Object.entries(themeData.fontSizes).forEach(([key, value]) => {
       root.style.setProperty(`--font-size-${key}`, value)
@@ -46,6 +53,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     Object.entries(themeData.spacing).forEach(([key, value]) => {
       root.style.setProperty(`--spacing-${key}`, value)
     })
+
+  // ...icon sizes were previously applied here but have been reverted
 
     // Aplicar variáveis CSS para shadows
     Object.entries(themeData.shadows).forEach(([key, value]) => {

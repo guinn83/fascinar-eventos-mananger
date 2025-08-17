@@ -87,7 +87,7 @@ const ClientsView: React.FC = () => {
   <div className={`max-w-6xl mx-auto bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className={`${pageTokens.headerPadding} flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4`}>
           <div>
             <h1 className="text-h1 text-text">Clientes</h1>
             <p className="text-text-secondary mt-1">Gerencie seus clientes e relacionamentos</p>
@@ -130,7 +130,7 @@ const ClientsView: React.FC = () => {
           {filteredClients.length === 0 ? (
             <Card strong>
               <CardContent size="lg" className="text-center">
-              <i className="fas fa-users text-6xl text-text-muted mb-4"></i>
+              <i className="fas fa-users text-6xl text-icon-1 mb-4"></i>
               <h3 className="text-h4 text-text mb-2">
                 {searchTerm ? 'Nenhum cliente encontrado' : 'Nenhum cliente cadastrado'}
               </h3>
@@ -145,7 +145,7 @@ const ClientsView: React.FC = () => {
                   onClick={() => setShowCreateModal(true)}
                   className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl transition-colors"
                 >
-                  <i className="fas fa-plus mr-2"></i>
+                  <i className="fas fa-plus mr-2 text-icon-2"></i>
                   Criar Primeiro Cliente
                 </button>
               )}

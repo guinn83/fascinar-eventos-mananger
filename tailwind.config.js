@@ -34,6 +34,10 @@ module.exports = {
         },
         item: 'var(--color-item)',
         'item-hover': 'var(--color-item-hover)',
+  // Icon semantic colors
+  'icon-1': 'var(--color-icon-1)',
+  'icon-2': 'var(--color-icon-2)',
+  'icon-3': 'var(--color-icon-3)',
       },
       fontSize: {
         h1: ['var(--font-size-h1)', { lineHeight: 'var(--line-height-tight)' }],

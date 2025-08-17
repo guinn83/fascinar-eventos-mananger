@@ -1,4 +1,4 @@
-import { useState, useEffect, type ButtonHTMLAttributes } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useEvents } from '../hooks/useEvents'
 import { useStaff } from '../hooks/useStaff'
@@ -191,8 +191,8 @@ export function EventStaffView() {
 
   return (
   <div className={`max-w-6xl mx-auto bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
-      {/* Header */}
-      <div className="flex justify-between items-start">
+  {/* Header */}
+  <div className={`flex justify-between items-start ${pageTokens.headerPadding}`}>
         <div>
           <h1 className="text-h1 text-text">Equipe Fascinar</h1>
           <p className="text-text-secondary mt-2">{event.title}</p>
@@ -215,7 +215,7 @@ export function EventStaffView() {
           <Card className="w-full resume-card" strong>
             <CardContent size="md">
               <div className="flex items-center">
-                <Users className="icon-xl text-primary mr-4" />
+                <Users className="icon-xl text-icon-3 mr-4" />
                 <div>
                   <p className="text-h3 font-bold text-text">{summary.total_roles} {summary.total_roles === 1 ? 'profissional' : 'profissionais'}</p>
                   <p className="text-xs text-text-muted mt-0">
@@ -235,14 +235,14 @@ export function EventStaffView() {
   <Card strong>
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-text">
-            <span className="flex items-center gap-2">
-              <Users className="icon-md" />
+              <span className="flex items-center gap-2">
+              <Users className="icon-sm" />
               Equipe e Funções
             </span>
             {/* show Add button inside card header when there is at least one member */}
             {filteredStaff.length > 0 && (
               <Button onClick={() => setShowAddRole(true)}>
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-5 h-5 mr-2" />
                 Adicionar Função
               </Button>
             )}
@@ -299,7 +299,7 @@ export function EventStaffView() {
                         (() => {
                           // Mostrar Confirmar sempre que houver um nome atribuído (com ou sem profile)
                           const showConfirm = !isUnassigned && !staff.confirmed
-                          return showConfirm ? (
+                              return showConfirm ? (
                               <Button
                                 onClick={() => handleConfirmStaff(staff.id)}
                                 variant="confirm"
@@ -307,7 +307,7 @@ export function EventStaffView() {
                                 aria-label={`Confirmar ${displayName}`}
                                 disabled={loading}
                               >
-                                <CheckCircle className="w-5 h-5" />
+                                <CheckCircle className="w-6 h-6" />
                               </Button>
                           ) : null
                         })()
@@ -336,7 +336,7 @@ export function EventStaffView() {
                                 className="w-10 h-10 rounded-full"
                                 aria-label={`Editar atribuição de ${displayName}`}
                               >
-                                <Edit className="w-4 h-4" />
+                                <Edit className="w-6 h-6" />
                               </Button>
                             )
                           }
@@ -350,7 +350,7 @@ export function EventStaffView() {
                         aria-label={`Remover ${displayName || 'função'}`}
                         disabled={loading}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-6 h-6" />
                       </Button>
 
                     </div>
@@ -487,7 +487,7 @@ export function EventStaffView() {
                       }
                     }}
                   >
-                    <Plus className="w-4 h-4 mr-1" /> Atribuir
+                    <Plus className="w-5 h-5 mr-1" /> Atribuir
                   </Button>
                 </div>
               </div>
