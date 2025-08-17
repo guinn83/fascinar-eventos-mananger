@@ -3,6 +3,7 @@
 // Design tokens para tema claro e escuro
 export const light = {
   colors: {
+    // Cores da marca: #C3A0BD | #F1E3E9 | #FDF6F9 | #D39937 | #E5B652
     // Primary colors
     primary: '#4f2f6dff',          // blue-800
     'primary-hover': '#2d1a3fff',  // blue-700
@@ -28,9 +29,17 @@ export const light = {
     danger: '#962340ff',          // red-600
     info: '#0284c7',           // sky-600
     
-    // Border colors
-    border: '#e2e8f0',         // slate-200
-    'border-strong': '#cbd5e1', // slate-300
+  // Border colors
+  border: '#e2e8f0',         // slate-200
+  'border-strong': '#cbd5e1', // slate-300
+  },
+
+  // Gradients (used by components that opt-in)
+  gradients: {
+    // Card background gradient (fallback to surface color if not supported)
+    card: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0))',
+    // Button gradient for primary/featured buttons
+    button: 'linear-gradient(90deg, rgba(103,126,234,0.12), rgba(118,75,162,0.12))'
   },
   
   fontSizes: {
@@ -89,19 +98,20 @@ export const light = {
 
 export const dark = {
   colors: {
+    // Cores da marca: #261323 | #66345A | #C3A0BD | #D39937 | #E5B652
     // Primary colors - mais claros no dark mode
-    primary: '#4f2f6dff',          // blue-800
+    primary: '#7a2981ff',          // blue-800
     'primary-hover': '#2d1a3fff',  // blue-700
     'primary-light': '#671eacff',  // blue-500
     
     // Background colors - tons escuros
-    background: '#110b0fff',       // slate-300
-    surface: '#1f111dff',          // slate-500
-    'surface-hover': '#66345A',  // slate-700
+    background: '#261323',       // slate-300
+    surface: '#2e192bff',          // slate-500
+    'surface-hover': '#663462ff',  // slate-700
     
     // Item backgrounds for card contents (dark theme)
-    item: '#301e2cff',             // slightly lighter than surface
-    'item-hover': '#66345A',       // lighter on hover
+    item: '#291626ff',             // slightly lighter than surface
+    'item-hover': '#492b44ff',       // lighter on hover
 
     // Text colors - tons claros
     text: '#f8fafc',            // slate-50
@@ -114,9 +124,15 @@ export const dark = {
     danger: '#a01d3dff',          // red-500
     info: '#0ea5e9',           // sky-500
     
-    // Border colors
-    border: '#301e2cff',         // gray-700
-    'border-strong': '#66345A', // gray-600
+  // Border colors
+  border: '#412a47ff',         // gray-700
+  'border-strong': '#66345A', // gray-600
+  },
+
+  gradients: {
+    // Stronger, tinted gradients for dark theme
+    card: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12))',
+    button: 'linear-gradient(90deg, rgba(118,75,162,0.12), rgba(122,41,129,0.12))'
   },
   
   // Reutilizar do tema claro
@@ -127,11 +143,12 @@ export const dark = {
   iconSizes: { ...light.iconSizes },
   borderRadius: { ...light.borderRadius },
   
-  // Sombras mais sutis no dark mode
+  // Sombras mais sutis no dark modes
   shadows: {
-    sm: '0 1px 2px 0 rgb(0 0 0 / 0.3)',
-    md: '0 4px 6px -1px rgb(0 0 0 / 0.3)',
-    lg: '0 10px 15px -3px rgb(0 0 0 / 0.3)',
+  // Dark mode needs stronger, more visible shadows for depth
+  sm: '0 2px 6px 0 rgb(0 0 0 / 0.5)',
+  md: '0 4px 12px -2px rgb(0 0 0 / 0.5)',
+  lg: '0 8px 24px -4px rgb(0 0 0 / 0.5)',
   }
 }
 
@@ -170,10 +187,14 @@ export const semanticClasses = {
 // Tokens específicos para componentes UI (mantidos da versão anterior)
 export const cardTokens = {
   // container - agora usando variáveis CSS dinâmicas
-  background: 'bg-surface',
+  // Keep surface color as fallback and provide an opt-in gradient utility
+  background: 'bg-surface bg-gradient-card',
   border: 'border border-border',
   radius: 'rounded-2xl',
   shadow: 'shadow-md',
+  // Use theme-aware shadows (these map to CSS variables via tailwind.config)
+  shadowTheme: 'shadow-theme-md',
+  shadowStrong: 'shadow-theme-lg',
 
   // spacing variants — used by CardHeader/CardContent
   spacing: {

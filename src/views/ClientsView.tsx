@@ -101,8 +101,8 @@ const ClientsView: React.FC = () => {
           </button>
         </div>
 
-        {/* Search */}
-        <Card>
+  {/* Search */}
+  <Card strong>
           <CardContent size="md">
             <div className="relative">
               <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-text-muted"></i>
@@ -128,7 +128,7 @@ const ClientsView: React.FC = () => {
   {/* Clients List */}
   <>
           {filteredClients.length === 0 ? (
-            <Card>
+            <Card strong>
               <CardContent size="lg" className="text-center">
               <i className="fas fa-users text-6xl text-text-muted mb-4"></i>
               <h3 className="text-h4 text-text mb-2">
@@ -154,7 +154,7 @@ const ClientsView: React.FC = () => {
           ) : (
             <div className="grid gap-4">
               {filteredClients.map((client) => (
-                <Card key={client.id} className="hover:shadow-xl transition-all duration-300">
+                <Card key={client.id} className="transition-all duration-300" strong>
                   <CardContent size="md">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1 space-y-2">

@@ -21,14 +21,15 @@ export function Button({
 }: ButtonProps) {
   const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus-visible:outline-none focus:ring-2 disabled:opacity-50 disabled:pointer-events-none'
 
-  const variantClasses = {
-    default: 'bg-primary text-white hover:bg-primary/90 focus:ring-primary/40',
+  const variantClasses: Record<string,string> = {
+    default: 'bg-primary text-white hover:bg-primary/90 focus:ring-primary/40 bg-gradient-button',
     outline: 'border border-border bg-surface text-text hover:bg-surface-hover focus:ring-primary/40',
     ghost: 'text-text hover:bg-surface-hover focus:ring-primary/40',
     destructive: 'bg-danger text-white hover:bg-danger/90 focus:ring-danger/40',
     danger: 'bg-danger text-white hover:bg-danger/90 focus:ring-danger/40',
     confirm: 'bg-success text-white hover:bg-success/80 focus:ring-primary/40',
-    edit: 'bg-surface text-text hover:bg-surface-hover border border-border focus:ring-primary/40'
+    edit: 'bg-surface text-text hover:bg-surface-hover border border-border focus:ring-primary/40',
+    gradient: 'bg-gradient-button text-white hover:bg-primary/90 focus:ring-primary/40'
   }
   
   const sizeClasses = {

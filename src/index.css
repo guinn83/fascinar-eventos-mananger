@@ -207,3 +207,16 @@ html, body, #root {
 .card-item-hover:hover {
   background-color: var(--color-item-hover) !important;
 }
+
+/* Gradient utilities applied via theme variables */
+.bg-gradient-card {
+  background-image: var(--gradient-card);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.bg-gradient-button {
+  background-image: var(--gradient-button);
+  background-repeat: no-repeat;
+  background-size: cover;
+}

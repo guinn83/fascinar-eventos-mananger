@@ -8,6 +8,7 @@ interface CardProps {
   className?: string
   size?: Size
   padding?: string // override spacing token
+  strong?: boolean
 }
 
 interface CardHeaderProps {
@@ -27,14 +28,16 @@ interface CardTitleProps {
   className?: string
 }
 
-export function Card({ children, className = '', size = 'md', padding }: CardProps) {
+export function Card({ children, className = '', size = 'md', padding, strong = false }: CardProps) {
   // By default Card doesn't add inner padding so consumers can opt-in with
   // CardHeader/CardContent. If `padding` is provided, we wrap children.
   const shouldWrap = Boolean(padding)
   const spacing = padding ?? cardTokens.spacing[size]
 
+  const shadowClass = strong ? cardTokens.shadowStrong : cardTokens.shadowTheme
+
   return (
-  <div className={`${cardTokens.background} ${cardTokens.radius} ${cardTokens.shadow} ${cardTokens.border} ${className}`}>
+  <div className={`${cardTokens.background} ${cardTokens.radius} ${shadowClass} ${cardTokens.border} ${className}`}>
       {shouldWrap ? (
         <div className={`w-full ${spacing}`}>
           {children}

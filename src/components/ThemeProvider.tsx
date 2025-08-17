@@ -52,6 +52,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       root.style.setProperty(`--shadow-${key}`, value)
     })
 
+    // Aplicar variáveis CSS para gradients (opcionais)
+    if ((themeData as any).gradients) {
+      Object.entries((themeData as any).gradients).forEach(([key, value]) => {
+        root.style.setProperty(`--gradient-${key}`, value as string)
+      })
+    }
+
     // Sincronizar classe dark para Tailwind
     if (theme === 'dark') {
       root.classList.add('dark')
