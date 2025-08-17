@@ -9,7 +9,7 @@ const DashboardView: React.FC = () => {
   <div className="bg-background rounded-3xl p-8 border border-border">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-h1 bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+            <h1 className="text-h1 text-text">
               Dashboard
             </h1>
             <p className="text-text-secondary mt-2 font-medium">
@@ -17,7 +17,7 @@ const DashboardView: React.FC = () => {
             </p>
           </div>
           <div className="hidden sm:block">
-            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25">
+            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
               <i className="fas fa-chart-line text-white text-2xl"></i>
             </div>
           </div>
@@ -33,7 +33,7 @@ const DashboardView: React.FC = () => {
                 <p className="text-text-secondary text-sm font-medium">Total de Eventos</p>
                 <p className="text-h2 text-text mt-1">12</p>
               </div>
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/25">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
                 <i className="fas fa-calendar-alt text-white"></i>
               </div>
             </div>
@@ -47,7 +47,7 @@ const DashboardView: React.FC = () => {
                 <p className="text-text-secondary text-sm font-medium">Eventos Ativos</p>
                 <p className="text-h2 text-text mt-1">8</p>
               </div>
-              <div className="w-12 h-12 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/25">
+              <div className="w-12 h-12 bg-success rounded-xl flex items-center justify-center shadow-lg">
                 <i className="fas fa-play-circle text-white"></i>
               </div>
             </div>
@@ -61,7 +61,7 @@ const DashboardView: React.FC = () => {
                 <p className="text-text-secondary text-sm font-medium">Convidados</p>
                 <p className="text-h2 text-text mt-1">247</p>
               </div>
-              <div className="w-12 h-12 bg-surface rounded-xl flex items-center justify-center shadow-lg shadow-surface/25">
+              <div className="w-12 h-12 bg-surface rounded-xl flex items-center justify-center shadow-lg">
                 <i className="fas fa-users text-white"></i>
               </div>
             </div>
@@ -75,7 +75,7 @@ const DashboardView: React.FC = () => {
                 <p className="text-text-secondary text-sm font-medium">Receita</p>
                 <p className="text-h2 text-text mt-1">R$ 15.8K</p>
               </div>
-              <div className="w-12 h-12 bg-warning rounded-xl flex items-center justify-center shadow-lg shadow-warning/25">
+              <div className="w-12 h-12 bg-warning rounded-xl flex items-center justify-center shadow-lg">
                 <i className="fas fa-dollar-sign text-white"></i>
               </div>
             </div>
@@ -90,7 +90,7 @@ const DashboardView: React.FC = () => {
           <h2 className="text-h3 text-text">Eventos Recentes</h2>
           <a
             href="/eventos"
-            className="text-primary hover:text-primary-hover font-medium text-sm transition-colors"
+            className="text-primary hover:text-primary/90 font-medium text-sm transition-colors"
           >
             Ver todos
           </a>
@@ -100,7 +100,7 @@ const DashboardView: React.FC = () => {
           <Card>
             <CardContent size="md" className="bg-surface-hover rounded-2xl border border-border">
               <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-gradient-to-r from-primary to-primary-hover rounded-2xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center">
                   <i className="fas fa-music text-white text-sm"></i>
                 </div>
                 <div>
@@ -118,7 +118,7 @@ const DashboardView: React.FC = () => {
           <Card>
             <CardContent size="md" className="bg-surface-hover rounded-2xl border border-border">
               <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-gradient-to-r from-info to-info rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-info rounded-xl flex items-center justify-center">
                   <i className="fas fa-graduation-cap text-white text-sm"></i>
                 </div>
                 <div>

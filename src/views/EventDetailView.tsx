@@ -91,8 +91,8 @@ const EventDetailView: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-border mx-auto mb-4"></div>
           <p className="text-text-secondary">Carregando evento...</p>
         </div>
       </div>
@@ -143,7 +143,7 @@ const EventDetailView: React.FC = () => {
         <div className="text-center space-y-4 mb-8">
           {/* Imagem circular do evento */}
           <div className="relative inline-block">
-            <div className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-surface shadow-lg bg-gradient-to-br from-surface to-surface-hover">
+            <div className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-border shadow-lg bg-surface">
               <img
                 src={event.image_url || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&h=400&fit=crop&auto=format'}
                 alt={event.title}
@@ -197,7 +197,7 @@ const EventDetailView: React.FC = () => {
           {/* Botão voltar movido para canto superior esquerdo */}
           <button
             onClick={() => navigate('/eventos')}
-            className="absolute top-6 left-6 p-2 hover:bg-surface/50 rounded-lg transition-colors"
+            className="absolute top-6 left-6 p-2 hover:bg-surface-hover rounded-lg transition-colors"
             aria-label="Voltar aos eventos"
           >
                     <i className="fas fa-arrow-left text-text-secondary"></i>
@@ -276,7 +276,7 @@ const EventDetailView: React.FC = () => {
               <div className="flex flex-col sm:flex-row gap-4 mt-3">
               <button
                 onClick={() => navigate(`/eventos/${event.id}/staff`)}
-                className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-xl transition-colors"
+                className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl transition-colors"
               >
                 <i className="fas fa-users"></i>
                 Gerenciar Equipe

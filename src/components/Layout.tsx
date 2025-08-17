@@ -26,12 +26,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
-  <header className="md:hidden bg-surface/80 -webkit-backdrop-filter backdrop-blur-lg border-b border-border/60 sticky top-0 z-50">
+  <header className="md:hidden bg-surface -webkit-backdrop-filter backdrop-blur-lg border-b border-border sticky top-0 z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+              className="p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/90 transition-colors"
               aria-label="Toggle sidebar"
             >
               <i className="fas fa-bars text-lg"></i>
@@ -40,13 +40,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 Fascinar
               </h1>
           </div>
-          <button
-            onClick={handleLogout}
-            className="p-2 rounded-xl text-slate-500 hover:text-red-500 hover:bg-red-50 transition-colors"
-            aria-label="Logout"
-          >
-            <i className="fas fa-sign-out-alt text-lg"></i>
-          </button>
             <button
               onClick={handleLogout}
               className="p-2 rounded-xl text-text-muted hover:text-danger hover:bg-danger/10 transition-colors"
@@ -67,16 +60,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Sidebar */}
       <aside 
-        className={`fixed top-0 left-0 h-full w-64 bg-surface/90 backdrop-blur-xl shadow-xl border-r border-border/60 z-50 transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`fixed top-0 left-0 h-full w-64 bg-surface backdrop-blur-xl shadow-xl border-r border-border z-50 transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between px-6 py-6 border-b border-slate-200/60">
-            <div className="flex items-center justify-between px-6 py-6 border-b border-border/60">
-            <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+      <div className="flex items-center space-x-3 px-6 py-6 border-b border-border">
+        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
                   <i className="fas fa-calendar-star text-white text-lg"></i>
                 </div>
                 <div>
@@ -88,12 +79,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-                className="md:hidden p-1 rounded-lg text-text-muted hover:text-text-secondary hover:bg-surface/80 transition-colors"
+                className="md:hidden p-1 rounded-lg text-text-muted hover:text-text-secondary hover:bg-surface-hover transition-colors"
               aria-label="Close sidebar"
             >
               <i className="fas fa-times"></i>
             </button>
-          </div>
           </div>
 
           {/* Navigation */}
@@ -102,7 +92,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               onClick={() => handleNavigation('/dashboard')}
               className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 location.pathname === '/dashboard'
-                  ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                  ? 'bg-primary text-white shadow-lg'
                   : 'text-text hover:text-primary hover:bg-primary/10'
               }`}
             >
@@ -114,7 +104,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               onClick={() => handleNavigation('/clientes')}
               className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 location.pathname === '/clientes'
-                  ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                  ? 'bg-primary text-white shadow-lg'
                   : 'text-text hover:text-primary hover:bg-primary/10'
               }`}
             >
@@ -126,7 +116,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               onClick={() => handleNavigation('/eventos')}
               className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 location.pathname === '/eventos'
-                  ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                  ? 'bg-primary text-white shadow-lg'
                   : 'text-text hover:text-primary hover:bg-primary/10'
               }`}
             >
@@ -138,7 +128,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               onClick={() => handleNavigation('/disponibilidade')}
               className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 location.pathname === '/disponibilidade'
-                  ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                  ? 'bg-primary text-white shadow-lg'
                   : 'text-text hover:text-primary hover:bg-primary/10'
               }`}
             >
@@ -148,7 +138,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </nav>
 
           {/* User Section */}
-          <div className="px-4 py-4 border-t border-border/60 flex flex-col gap-0">
+          <div className="px-4 py-4 border-t border-border flex flex-col gap-0">
             <div className="group flex items-center px-2.5 py-0 gap-2 min-w-0 mb-0">
               <i className="fas fa-user-circle text-text text-xl" title="Usuário"></i>
               <span className="truncate text-text text-sm font-medium" title={userProfile?.full_name || user?.email || ''}>
@@ -171,7 +161,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               Sair
             </button>
           </div>
-        </div>
       </aside>
 
       {/* Main Content */}

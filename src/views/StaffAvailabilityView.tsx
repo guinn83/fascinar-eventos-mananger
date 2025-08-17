@@ -178,7 +178,7 @@ export function StaffAvailabilityView() {
                   title="Horário de início"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full px-3 py-2 border border-border rounded-md focus:ring-primary/30 focus:border-primary"
+                    className="w-full px-3 py-2 border border-border rounded-md focus:ring-primary/30 focus:border-border"
                 />
               </div>
               <div>
@@ -190,7 +190,7 @@ export function StaffAvailabilityView() {
                   title="Horário de término"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full px-3 py-2 border border-border rounded-md focus:ring-primary/30 focus:border-primary"
+                    className="w-full px-3 py-2 border border-border rounded-md focus:ring-primary/30 focus:border-border"
                 />
               </div>
             </div>
@@ -206,7 +206,7 @@ export function StaffAvailabilityView() {
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Adicione observações sobre sua disponibilidade..."
-              className="w-full px-3 py-2 border border-border rounded-md focus:ring-primary/30 focus:border-primary"
+                  className="w-full px-3 py-2 border border-border rounded-md focus:ring-primary/30 focus:border-border"
             />
           </div>
 
@@ -244,10 +244,10 @@ export function StaffAvailabilityView() {
           <CardContent size="md">
             <div className="space-y-3">
               {existingAvailability.map((avail) => (
-                <div
-                  key={avail.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
+                  <div
+                    key={avail.id}
+                    className="flex items-center justify-between p-4 border border-border rounded-lg"
+                  >
                   <div className="flex items-center gap-3">
                     <div>
                       <p className="font-medium text-text">{avail.profiles?.full_name || 'Nome não informado'}</p>

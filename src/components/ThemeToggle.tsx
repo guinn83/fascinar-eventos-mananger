@@ -17,7 +17,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
         rounded-lg border border-border transition-all duration-200
         bg-surface hover:bg-surface-hover
         text-text-secondary hover:text-text
-        focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+        focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-2
         ${className}
       `}
       aria-label={`Alternar para tema ${theme === 'light' ? 'escuro' : 'claro'}`}

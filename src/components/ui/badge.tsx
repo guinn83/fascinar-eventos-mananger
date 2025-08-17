@@ -15,7 +15,7 @@ export function Badge({
   
   const variantClasses = {
     default: 'bg-primary/10 text-primary',
-    secondary: 'bg-surface text-text-secondary',
+  secondary: 'bg-surface text-text-secondary',
     destructive: 'bg-danger/10 text-danger',
     outline: 'border border-border text-text-secondary'
   }

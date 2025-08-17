@@ -26,11 +26,11 @@ function App() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         {/* Loading content */}
         <div className="text-center">
-          <div className="bg-surface/80 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border border-border/40">
+          <div className="bg-surface backdrop-blur-xl rounded-3xl p-12 shadow-2xl border border-border">
             <div className="relative mb-8">
               <div className="w-20 h-20 mx-auto">
-                <div className="absolute inset-0 rounded-full border-4 border-primary animate-spin border-t-transparent"></div>
-                <div className="absolute inset-4 rounded-full bg-primary/20"></div>
+                <div className="absolute inset-0 rounded-full border-4 border-border animate-spin border-t-transparent"></div>
+                <div className="absolute inset-4 rounded-full bg-surface"></div>
               </div>
             </div>
             <h2 className="text-2xl font-bold text-text mb-4">

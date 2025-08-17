@@ -69,7 +69,7 @@ const SupabaseTest: React.FC = () => {
           <button
             onClick={testConnection}
             disabled={loading}
-            className="bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+            className="bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
             <i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-play'}`}></i>
             {loading ? 'Testando...' : 'Executar Teste'}
@@ -78,17 +78,17 @@ const SupabaseTest: React.FC = () => {
           {result && (
             <div className="mt-4">
               <Card>
-                <CardContent size="md" className={`${result.success ? 'bg-success/10 border border-success/20' : 'bg-danger/10 border border-danger/20'}`}>
+                <CardContent size="md" className={`${result.success ? 'bg-success/10 border border-border' : 'bg-danger/10 border border-border'}`}>
                   <h3 className={`font-bold mb-2 ${result.success ? 'text-success' : 'text-danger'}`}>
                     {result.success ? '✅ Sucesso!' : '❌ Erro'}
                   </h3>
 
-                  <p className={`mb-3 ${result.success ? 'text-success/90' : 'text-danger/90'}`}>
+                  <p className={`mb-3 ${result.success ? 'text-success' : 'text-danger'}`}>
                     {result.message || result.error}
                   </p>
 
                   {result.user && (
-                    <div className="bg-white p-3 rounded border mb-3">
+                    <div className="bg-surface p-3 rounded border border-border mb-3">
                       <h4 className="font-semibold text-sm">Usuário Autenticado:</h4>
                       <p className="text-sm">Email: {result.user.email}</p>
                       <p className="text-sm">ID: {result.user.id}</p>
@@ -96,9 +96,9 @@ const SupabaseTest: React.FC = () => {
                   )}
 
                   {result.data && (
-                    <div className="bg-white p-3 rounded border mb-3">
+                    <div className="bg-surface p-3 rounded border border-border mb-3">
                       <h4 className="font-semibold text-sm">Dados Retornados:</h4>
-                      <pre className="text-xs mt-1 overflow-auto">
+                      <pre className="text-xs mt-1 overflow-auto bg-surface px-2 py-1 rounded text-text">
                         {JSON.stringify(result.data, null, 2)}
                       </pre>
                     </div>
@@ -109,7 +109,7 @@ const SupabaseTest: React.FC = () => {
                       <summary className="cursor-pointer text-sm font-medium">
                         Detalhes do Erro
                       </summary>
-                      <pre className="mt-2 text-xs bg-white p-3 rounded border overflow-auto">
+                      <pre className="mt-2 text-xs bg-surface p-3 rounded border border-border overflow-auto text-text">
                         {JSON.stringify(result.details, null, 2)}
                       </pre>
                     </details>

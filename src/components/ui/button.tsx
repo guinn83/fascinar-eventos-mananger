@@ -19,13 +19,13 @@ export function Button({
   disabled = false,
   type = 'button'
 }: ButtonProps) {
-  const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none'
-  
+  const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none disabled:opacity-50 disabled:pointer-events-none'
+
   const variantClasses = {
-    default: 'bg-primary text-white hover:bg-primary-hover',
-    outline: 'border border-border bg-surface text-text hover:bg-surface/90',
-    ghost: 'text-text hover:bg-surface/80',
-    destructive: 'bg-danger text-white hover:bg-danger-hover'
+    default: 'bg-primary text-white hover:bg-primary/90 focus:ring-primary/40',
+  outline: 'border border-border bg-surface text-text hover:bg-surface-hover focus:ring-primary/40',
+    ghost: 'text-text hover:bg-surface/80 focus:ring-primary/40',
+    destructive: 'bg-danger text-white hover:bg-danger/90 focus:ring-danger/40'
   }
   
   const sizeClasses = {
@@ -37,7 +37,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+  className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       onClick={onClick}
       disabled={disabled}
     >

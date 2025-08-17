@@ -72,7 +72,7 @@ const EventsView: React.FC = () => {
     return (
       <div className={pageTokens.cardGap.sm}>
         {/* Header */}
-        <Card className="w-full bg-surface/80 rounded-3xl border border-border/30">
+    <Card className="w-full bg-surface rounded-3xl border border-border">
           <CardContent size="lg">
             <div className="flex items-center justify-between">
               <div>
@@ -111,7 +111,7 @@ const EventsView: React.FC = () => {
     return (
       <div className={pageTokens.cardGap.sm}>
         {/* Header */}
-        <Card className="w-full bg-surface/80 rounded-3xl border border-border/30">
+  <Card className="w-full bg-surface rounded-3xl border border-border">
           <CardContent size="lg">
             <div className="flex items-center justify-between">
               <div>
@@ -195,7 +195,7 @@ const EventsView: React.FC = () => {
                       href="https://app.supabase.com" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="bg-surface border border-warning/40 hover:bg-surface/80 text-warning font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
+                      className="bg-surface border border-warning/40 hover:bg-surface-hover text-warning font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
                     >
                       <i className="fas fa-external-link-alt"></i>
                       Abrir Supabase
@@ -269,7 +269,7 @@ const EventsView: React.FC = () => {
                       <summary className="cursor-pointer text-sm font-medium">
                         Ver detalhes técnicos
                       </summary>
-                      <pre className="mt-2 text-xs bg-white px-3 py-2 rounded border overflow-auto">
+                      <pre className="mt-2 text-xs bg-surface px-3 py-2 rounded border overflow-auto">
                         {JSON.stringify(testResult.details, null, 2)}
                       </pre>
                     </details>
@@ -296,14 +296,14 @@ const EventsView: React.FC = () => {
         <CardContent size="lg">
           <div className="flex flex-col gap-4">
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+              <h1 className="text-h2 font-bold text-text">
                 Eventos
               </h1>
-              <p className="text-slate-600 mt-2 font-medium">
+              <p className="text-text-secondary mt-2 font-medium">
                 Gerencie todos os seus eventos
               </p>
             </div>
-            <button className="bg-gradient-to-r from-primary to-primary-hover text-white font-semibold px-6 py-3 rounded-2xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-200 transform hover:scale-[1.02] w-full">
+              <button className="bg-primary text-white font-semibold px-6 py-3 rounded-2xl hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] w-full">
               <i className="fas fa-plus mr-2"></i>
               Novo Evento
             </button>
@@ -315,9 +315,9 @@ const EventsView: React.FC = () => {
       <div className="space-y-4 pb-6 w-full overflow-visible">
         {events.length === 0 ? (
           /* Empty state */
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-slate-200/50 border border-white/20 overflow-hidden">
+            <div className="bg-surface backdrop-blur-sm rounded-2xl shadow-lg border border-border overflow-hidden">
             <div className="flex flex-col items-center justify-center p-12 text-center">
-              <div className="w-20 h-20 bg-surface/80 rounded-3xl flex items-center justify-center shadow-lg mb-6">
+              <div className="w-20 h-20 bg-surface rounded-3xl flex items-center justify-center shadow-lg mb-6">
                 <i className="fas fa-calendar-plus text-primary text-2xl"></i>
               </div>
               <h3 className="text-xl font-bold text-text mb-2">Nenhum evento encontrado</h3>
@@ -348,11 +348,11 @@ const EventsView: React.FC = () => {
                   <div className="absolute top-0 right-1 md:hidden z-10">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-small ${
                       event.status === 'cancelled'
-                        ? 'bg-red-100 text-red-700'
+                        ? 'bg-danger/10 text-danger'
                         : event.status === 'completed'
-                        ? 'bg-red-100 text-red-700'
+                        ? 'bg-danger/10 text-danger'
                         : status === 'today'
-                        ? 'bg-red-100 text-red-700'
+                        ? 'bg-danger/10 text-danger'
                         : 'bg-primary/10 text-primary'
                     }`}>
                       {event.status === 'cancelled' ? 'Cancelado' :
@@ -370,10 +370,10 @@ const EventsView: React.FC = () => {
                         <img
                           src={event.image_url}
                           alt={event.title}
-                          className="w-20 h-20 object-cover rounded-full border-4 border-primary/20"
+                          className="w-20 h-20 object-cover rounded-full border-4 border-border/20"
                         />
                       ) : (
-                        <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/30 rounded-full flex items-center justify-center border-4 border-primary/20">
+                        <div className="w-20 h-20 bg-surface rounded-full flex items-center justify-center border-4 border-border">
                           <i className="fas fa-calendar-alt text-primary text-xl"></i>
                         </div>
                       )}
@@ -431,10 +431,10 @@ const EventsView: React.FC = () => {
 
         {/* Card para Adicionar Novo Evento */}
         {events.length > 0 && (
-          <Card className="group bg-surface/50 backdrop-blur-sm hover:bg-surface/70 rounded-2xl shadow-lg transition-all duration-300 hover:scale-[1.01] border-2 border-dashed border-border/40 hover:border-primary cursor-pointer overflow-hidden">
+          <Card className="group bg-surface backdrop-blur-sm hover:bg-surface-hover rounded-2xl shadow-lg transition-all duration-300 hover:scale-[1.01] border-2 border-dashed border-border hover:border-primary cursor-pointer overflow-hidden">
             <CardContent size="md">
               <div className="flex items-center justify-center gap-6">
-                <div className="w-16 h-16 bg-surface/80 group-hover:bg-primary rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300">
+                <div className="w-16 h-16 bg-surface group-hover:bg-primary rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300">
                   <i className="fas fa-plus text-primary text-xl"></i>
                 </div>
                 <div className="text-left">

@@ -21,10 +21,10 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'default' | 'outline' | 'secondary'
   size?: 'sm' | 'md' | 'lg'
 }
-const Button = ({ children, variant = 'default', size = 'md', className = '', ...props }: ButtonProps) => {
+  const Button = ({ children, variant = 'default', size = 'md', className = '', ...props }: ButtonProps) => {
   const base = 'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors'
   const variantClasses: Record<string, string> = {
-    default: 'px-3 py-2 bg-primary text-white hover:bg-primary-hover',
+    default: 'px-3 py-2 bg-primary text-white hover:bg-primary/90',
     outline: 'px-3 py-2 border border-border bg-surface text-text hover:bg-surface-hover',
     secondary: 'px-2 py-1 bg-warning/10 text-warning hover:bg-warning/20'
   }
@@ -205,7 +205,7 @@ export function EventStaffView() {
           </Button>
         </div>
       </div>
-
+                                className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-hover hover:bg-surface-hover text-text"
       {/* Resumo */}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
@@ -318,7 +318,7 @@ export function EventStaffView() {
                             return (
                               <Button
                                 onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role })}
-                                className="text-success hover:text-success/80 hover:bg-success/10 px-3 py-1 rounded-md border border-success/20"
+                                className="text-success hover:text-success/80 hover:bg-success/10 px-3 py-1 rounded-md border border-border"
                                 aria-label={`Atribuir pessoa à função ${STAFF_ROLE_LABELS[staff.staff_role]}`}
                               >
                                 Atribuir
@@ -328,7 +328,7 @@ export function EventStaffView() {
                             return (
                               <Button
                                 onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role, personName: displayName, profileId: staff.profile_id, hourlyRate: staff.hourly_rate })}
-                                className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-hover hover:bg-border text-text"
+                                className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-hover hover:bg-surface-hover text-text"
                                 aria-label={`Editar atribuição de ${displayName}`}
                               >
                                 <Edit className="w-4 h-4" />
@@ -341,7 +341,7 @@ export function EventStaffView() {
                      <Button
                         variant="outline"
                         onClick={() => handleRemoveStaff(staff.id)}
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-danger border-danger/20 hover:bg-danger/10"
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-danger border border-border hover:bg-danger/10"
                         aria-label={`Remover ${displayName || 'função'}`}
                         disabled={loading}
                       >
@@ -523,6 +523,7 @@ export function EventStaffView() {
           <Card className="rounded-lg bg-surface">
             <CardContent size="md">
               <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+                <div className="animate-spin w-8 h-8 border-4 border-border border-t-transparent rounded-full mx-auto"></div>
               <p className="mt-4 text-center text-text">Carregando...</p>
             </CardContent>
           </Card>
