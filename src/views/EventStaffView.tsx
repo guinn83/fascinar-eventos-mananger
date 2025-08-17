@@ -522,7 +522,7 @@ export function EventStaffView() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <Card className="rounded-lg bg-surface">
             <CardContent size="md">
-              <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+              <div className="animate-spin w-8 h-8 border-4 border-border border-t-transparent rounded-full mx-auto"></div>
                 <div className="animate-spin w-8 h-8 border-4 border-border border-t-transparent rounded-full mx-auto"></div>
               <p className="mt-4 text-center text-text">Carregando...</p>
             </CardContent>

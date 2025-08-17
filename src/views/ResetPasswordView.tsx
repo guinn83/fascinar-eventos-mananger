@@ -235,7 +235,7 @@ const ResetPasswordView: React.FC = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-10 pr-12 py-3 bg-surface border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-text-muted text-text"
+                      className="w-full pl-10 pr-12 py-3 bg-surface border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-border transition-all placeholder:text-text-muted text-text"
                       placeholder="Mínimo 6 caracteres"
                     />
                     <button
@@ -263,7 +263,7 @@ const ResetPasswordView: React.FC = () => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className="w-full pl-10 pr-12 py-3 bg-surface border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-text-muted text-text"
+                      className="w-full pl-10 pr-12 py-3 bg-surface border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-border transition-all placeholder:text-text-muted text-text"
                       placeholder="Digite a senha novamente"
                     />
                     <button

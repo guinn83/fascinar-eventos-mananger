@@ -154,7 +154,7 @@ export function StaffAvailabilityView() {
                   onClick={() => setAvailability(status as AvailabilityStatus)}
                   className={`px-3 py-2 rounded-lg border-2 transition-colors ${
                     availability === status
-                      ? 'border-primary bg-primary/10'
+                      ? 'border-border bg-primary/10'
                       : 'border-border hover:border-border/60'
                   }`}
                 >

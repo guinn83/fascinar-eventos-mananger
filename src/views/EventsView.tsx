@@ -431,7 +431,7 @@ const EventsView: React.FC = () => {
 
         {/* Card para Adicionar Novo Evento */}
         {events.length > 0 && (
-          <Card className="group bg-surface backdrop-blur-sm hover:bg-surface-hover rounded-2xl shadow-lg transition-all duration-300 hover:scale-[1.01] border-2 border-dashed border-border hover:border-primary cursor-pointer overflow-hidden">
+          <Card className="group bg-surface backdrop-blur-sm hover:bg-surface-hover rounded-2xl shadow-lg transition-all duration-300 hover:scale-[1.01] border-2 border-dashed border-border hover:border-border cursor-pointer overflow-hidden">
             <CardContent size="md">
               <div className="flex items-center justify-center gap-6">
                 <div className="w-16 h-16 bg-surface group-hover:bg-primary rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300">

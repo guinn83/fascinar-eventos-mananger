@@ -291,7 +291,7 @@ const ClientsView: React.FC = () => {
                   required
                   value={formData.cpf}
                   onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-border transition-colors"
                   placeholder="000.000.000-00"
                 />
               </div>
@@ -343,7 +343,7 @@ const ClientsView: React.FC = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-border transition-colors"
                   placeholder="Digite o nome completo"
                 />
               </div>
@@ -383,7 +383,7 @@ const ClientsView: React.FC = () => {
                   required
                   value={formData.cpf}
                   onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                  className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-border transition-colors"
                   placeholder="000.000.000-00"
                 />
               </div>
