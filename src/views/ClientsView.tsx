@@ -73,10 +73,10 @@ const ClientsView: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-slate-600">Carregando clientes...</p>
+          <p className="text-text-secondary">Carregando clientes...</p>
         </div>
       </div>
     )
@@ -84,13 +84,13 @@ const ClientsView: React.FC = () => {
 
   return (
     <>
-  <div className={`max-w-6xl mx-auto ${pageTokens.cardGap.sm}`}>
+  <div className={`max-w-6xl mx-auto bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
         
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-800">Clientes</h1>
-            <p className="text-slate-600 mt-1">Gerencie seus clientes e relacionamentos</p>
+            <h1 className="text-h1 text-text">Clientes</h1>
+            <p className="text-text-secondary mt-1">Gerencie seus clientes e relacionamentos</p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
@@ -105,13 +105,13 @@ const ClientsView: React.FC = () => {
         <Card>
           <CardContent size="md">
             <div className="relative">
-              <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+              <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-text-muted"></i>
               <input
                 type="text"
                 placeholder="Buscar clientes por nome, telefone, CPF ou email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                className="w-full pl-12 pr-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors bg-background text-text"
               />
             </div>
           </CardContent>
@@ -119,7 +119,7 @@ const ClientsView: React.FC = () => {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
+          <div className="bg-danger/10 border border-danger/20 text-danger px-4 py-3 rounded-xl">
             <i className="fas fa-exclamation-circle mr-2"></i>
             {error}
           </div>
@@ -130,11 +130,11 @@ const ClientsView: React.FC = () => {
           {filteredClients.length === 0 ? (
             <Card>
               <CardContent size="lg" className="text-center">
-              <i className="fas fa-users text-6xl text-slate-300 mb-4"></i>
-              <h3 className="text-xl font-semibold text-slate-700 mb-2">
+              <i className="fas fa-users text-6xl text-text-muted mb-4"></i>
+              <h3 className="text-h4 text-text mb-2">
                 {searchTerm ? 'Nenhum cliente encontrado' : 'Nenhum cliente cadastrado'}
               </h3>
-              <p className="text-slate-500 mb-6">
+              <p className="text-text-secondary mb-6">
                 {searchTerm 
                   ? 'Tente alterar os termos da busca' 
                   : 'Comece criando seu primeiro cliente'
@@ -159,9 +159,9 @@ const ClientsView: React.FC = () => {
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-3">
-                        <h3 className="text-xl font-semibold text-slate-800">{client.name}</h3>
+                        <h3 className="text-h4 text-text">{client.name}</h3>
                         {client.related_client && (
-                          <span className="bg-accent/20 text-accent-dark px-2 py-1 rounded-lg text-xs font-medium">
+                          <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-xs font-medium">
                             {client.relationship_type}
                           </span>
                         )}
@@ -169,26 +169,26 @@ const ClientsView: React.FC = () => {
                       
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
                         {client.email && (
-                          <div className="flex items-center gap-2 text-slate-600">
+                          <div className="flex items-center gap-2 text-text-secondary">
                             <i className="fas fa-envelope w-4"></i>
                             <span>{client.email}</span>
                           </div>
                         )}
                         {client.phone && (
-                          <div className="flex items-center gap-2 text-slate-600">
+                          <div className="flex items-center gap-2 text-text-secondary">
                             <i className="fas fa-phone w-4"></i>
                             <span>{client.phone}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2 text-slate-600">
+                        <div className="flex items-center gap-2 text-text-secondary">
                           <i className="fas fa-id-card w-4"></i>
                           <span>{client.cpf}</span>
                         </div>
                       </div>
 
                       {client.related_client && (
-                        <div className="bg-slate-50 rounded-lg px-3 py-2 mt-3">
-                          <p className="text-sm text-slate-600">
+                        <div className="bg-surface rounded-lg px-3 py-2 mt-3">
+                          <p className="text-sm text-text-secondary">
                             <strong>Relacionado com:</strong> {client.related_client.name}
                             {client.related_client.phone && ` • ${client.related_client.phone}`}
                           </p>
@@ -199,7 +199,7 @@ const ClientsView: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => openEditModal(client)}
-                        className="p-2 text-slate-600 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                        className="p-2 text-text-secondary hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
                         title="Editar cliente"
                         aria-label="Editar cliente"
                       >
@@ -208,7 +208,7 @@ const ClientsView: React.FC = () => {
                       
                       <button
                         onClick={() => handleDeleteClient(client.id)}
-                        className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-text-secondary hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
                         title="Excluir cliente"
                         aria-label="Excluir cliente"
                       >
@@ -231,13 +231,13 @@ const ClientsView: React.FC = () => {
           <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
             <CardContent size="md">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-slate-800">Novo Cliente</h2>
+                <h2 className="text-2xl font-bold text-text">Novo Cliente</h2>
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-surface-hover rounded-lg transition-colors"
                   aria-label="Fechar modal"
                 >
-                  <i className="fas fa-times text-slate-600"></i>
+                  <i className="fas fa-times text-text-secondary"></i>
                 </button>
               </div>
 
@@ -300,7 +300,7 @@ const ClientsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 py-3 rounded-lg transition-colors"
+                  className="flex-1 bg-surface hover:bg-surface-hover text-text py-3 rounded-lg transition-colors"
                 >
                   Cancelar
                 </button>
@@ -323,13 +323,13 @@ const ClientsView: React.FC = () => {
           <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
             <CardContent size="md">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-slate-800">Editar Cliente</h2>
+                <h2 className="text-2xl font-bold text-text">Editar Cliente</h2>
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-surface-hover rounded-lg transition-colors"
                   aria-label="Fechar modal"
                 >
-                  <i className="fas fa-times text-slate-600"></i>
+                  <i className="fas fa-times text-text-secondary"></i>
                 </button>
               </div>
 

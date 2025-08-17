@@ -90,10 +90,10 @@ const EventDetailView: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-slate-600">Carregando evento...</p>
+          <p className="text-text-secondary">Carregando evento...</p>
         </div>
       </div>
     )
@@ -101,11 +101,11 @@ const EventDetailView: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center max-w-md">
-          <i className="fas fa-exclamation-triangle text-6xl text-red-400 mb-4"></i>
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">Erro</h2>
-          <p className="text-slate-600 mb-6">{error}</p>
+          <i className="fas fa-exclamation-triangle text-6xl text-danger mb-4"></i>
+          <h2 className="text-2xl font-bold text-text mb-2">Erro</h2>
+          <p className="text-text-secondary mb-6">{error}</p>
           <button
             onClick={() => navigate('/eventos')}
             className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl transition-colors"
@@ -119,11 +119,11 @@ const EventDetailView: React.FC = () => {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-accent/5 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center max-w-md">
-          <i className="fas fa-calendar-times text-6xl text-slate-400 mb-4"></i>
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">Evento não encontrado</h2>
-          <p className="text-slate-600 mb-6">O evento que você está procurando não existe ou foi removido.</p>
+          <i className="fas fa-calendar-times text-6xl text-text-muted mb-4"></i>
+          <h2 className="text-2xl font-bold text-text mb-2">Evento não encontrado</h2>
+          <p className="text-text-secondary mb-6">O evento que você está procurando não existe ou foi removido.</p>
           <button
             onClick={() => navigate('/eventos')}
             className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl transition-colors"
@@ -137,13 +137,13 @@ const EventDetailView: React.FC = () => {
 
   return (
     <>
-  <div className={`max-w-4xl mx-auto ${pageTokens.cardGap.sm}`}>
+  <div className={`max-w-4xl mx-auto bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
         
         {/* Header com imagem circular */}
         <div className="text-center space-y-4 mb-8">
           {/* Imagem circular do evento */}
           <div className="relative inline-block">
-            <div className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-white shadow-lg bg-gradient-to-br from-slate-100 to-slate-200">
+            <div className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-surface shadow-lg bg-gradient-to-br from-surface to-surface-hover">
               <img
                 src={event.image_url || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&h=400&fit=crop&auto=format'}
                 alt={event.title}
@@ -166,7 +166,7 @@ const EventDetailView: React.FC = () => {
           
           {/* Título e descrição centralizados */}
           <div>
-            <h1 className="text-3xl font-bold text-slate-800 mb-2">{event.title}</h1>
+            <h1 className="text-3xl font-bold text-text mb-2">{event.title}</h1>
             {/* Status badge abaixo do título */}
             <div className="mb-3">
               {(() => {
@@ -176,11 +176,11 @@ const EventDetailView: React.FC = () => {
                                  status === 'today' ? 'HOJE' :
                                  status === 'future' ? (days === 1 ? 'Amanhã' : `Faltam ${days} dias`) :
                                  'Realizado'
-                const statusColor = event.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                  event.status === 'completed' ? 'bg-gray-100 text-gray-800' :
-                                  status === 'today' ? 'bg-orange-100 text-orange-800' :
-                                  status === 'future' ? 'bg-green-100 text-green-800' :
-                                  'bg-gray-100 text-gray-600'
+                const statusColor = event.status === 'cancelled' ? 'bg-danger/10 text-danger' :
+                                  event.status === 'completed' ? 'bg-text-muted/10 text-text-muted' :
+                                  status === 'today' ? 'bg-warning/10 text-warning' :
+                                  status === 'future' ? 'bg-success/10 text-success' :
+                                  'bg-text-muted/10 text-text-muted'
                 
                 return (
                   <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium shadow-sm ${statusColor}`}>
@@ -190,14 +190,14 @@ const EventDetailView: React.FC = () => {
               })()}
             </div>
             {event.description && (
-              <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed">{event.description}</p>
+              <p className="text-text-secondary max-w-2xl mx-auto leading-relaxed">{event.description}</p>
             )}
           </div>
           
           {/* Botão voltar movido para canto superior esquerdo */}
           <button
             onClick={() => navigate('/eventos')}
-            className="absolute top-6 left-6 p-2 hover:bg-white/50 rounded-lg transition-colors"
+            className="absolute top-6 left-6 p-2 hover:bg-surface/50 rounded-lg transition-colors"
             aria-label="Voltar aos eventos"
           >
             <i className="fas fa-arrow-left text-slate-600"></i>

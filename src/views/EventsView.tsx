@@ -76,10 +76,10 @@ const EventsView: React.FC = () => {
           <CardContent size="lg">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+                <h1 className="text-h1 bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
                   Eventos
                 </h1>
-                <p className="text-slate-600 mt-2 font-medium">
+                <p className="text-text-secondary mt-2 font-medium">
                   Carregando seus eventos...
                 </p>
               </div>
@@ -119,10 +119,10 @@ const EventsView: React.FC = () => {
           <CardContent size="lg">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
+                <h1 className="text-h1 bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
                   Eventos
                 </h1>
-                <p className="text-slate-600 mt-2 font-medium">
+                <p className="text-text-secondary mt-2 font-medium">
                   {canViewAll 
                     ? `Visualizando todos os eventos (${userRole})`
                     : 'Gerencie seus eventos'
@@ -132,10 +132,10 @@ const EventsView: React.FC = () => {
                 <div className="mt-3 flex items-center gap-2">
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                     userRole === 'admin' 
-                      ? 'bg-red-100 text-red-800' 
+                      ? 'bg-danger/10 text-danger' 
                       : userRole === 'organizer'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-gray-100 text-gray-800'
+                      ? 'bg-info/10 text-info'
+                      : 'bg-text-muted/10 text-text-muted'
                   }`}>
                     <i className={`fas ${
                       userRole === 'admin' ? 'fa-crown' 
@@ -147,7 +147,7 @@ const EventsView: React.FC = () => {
                      : 'Cliente'}
                   </span>
                   {canViewAll && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success/10 text-success">
                       <i className="fas fa-globe mr-1"></i>
                       Acesso Total
                     </span>
@@ -164,24 +164,24 @@ const EventsView: React.FC = () => {
             <CardContent size="lg">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-                    <i className="fas fa-database text-amber-600 text-xl"></i>
+                  <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
+                    <i className="fas fa-database text-warning text-xl"></i>
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-amber-800 mb-2">
+                  <h3 className="text-h4 text-warning mb-2">
                     Configuração do Banco de Dados Necessária
                   </h3>
-                  <p className="text-amber-700 mb-4">
+                  <p className="text-text-secondary mb-4">
                     A tabela "events" ainda não foi criada no seu projeto Supabase. 
                     É necessário executar o script SQL para criar a estrutura do banco de dados.
                   </p>
-                  <div className="bg-amber-100 rounded-xl px-3 py-2 mb-4">
-                    <h4 className="font-semibold text-amber-800 mb-2 flex items-center gap-2">
+                  <div className="bg-warning/5 rounded-xl px-3 py-2 mb-4">
+                    <h4 className="font-semibold text-text mb-2 flex items-center gap-2">
                       <i className="fas fa-list-ol"></i>
                       Passos para Configuração:
                     </h4>
-                    <ol className="text-sm text-amber-700 space-y-1 list-decimal list-inside">
+                    <ol className="text-sm text-text-secondary space-y-1 list-decimal list-inside">
                       <li>Acesse o dashboard do Supabase</li>
                       <li>Vá para o <strong>SQL Editor</strong></li>
                       <li>Execute o script do arquivo <code>sql/create_events_table.sql</code></li>
@@ -191,7 +191,7 @@ const EventsView: React.FC = () => {
                   <div className="flex gap-3">
                     <button 
                       onClick={() => window.location.reload()}
-                      className="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
+                      className="bg-warning hover:bg-warning/90 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
                     >
                       <i className="fas fa-redo"></i>
                       Recarregar Página

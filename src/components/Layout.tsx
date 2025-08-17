@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { ThemeToggle } from './ThemeToggle'
 import { pageTokens } from './ui/theme'
 
 interface LayoutProps {
@@ -145,6 +146,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {userProfile?.full_name && userProfile.full_name.trim() !== '' ? userProfile.full_name : user?.email}
               </span>
             </div>
+            
+            {/* Theme Toggle */}
+            <div className="flex items-center justify-between py-2">
+              <span className="text-sm text-slate-700">Tema</span>
+              <ThemeToggle className="h-8 w-8" />
+            </div>
+            
             <button
               onClick={handleLogout}
               className="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 text-slate-700 hover:text-red-500 hover:bg-red-50"

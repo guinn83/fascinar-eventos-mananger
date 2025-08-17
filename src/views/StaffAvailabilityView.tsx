@@ -84,16 +84,16 @@ export function StaffAvailabilityView() {
   }
 
   return (
-  <div className={`max-w-4xl mx-auto ${pageTokens.cardGap.sm}`}>
+  <div className={`max-w-4xl mx-auto bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
       <div className="flex items-center gap-3">
-        <Calendar className="w-8 h-8 text-blue-600" />
-        <h1 className="text-3xl font-bold text-gray-900">Minha Disponibilidade</h1>
+        <Calendar className="w-8 h-8 text-primary" />
+        <h1 className="text-3xl font-bold text-text">Minha Disponibilidade</h1>
       </div>
 
       {/* Seletor de Data */}
       <Card>
         <CardHeader>
-          <CardTitle>Selecionar Data</CardTitle>
+          <CardTitle className="text-text">Selecionar Data</CardTitle>
         </CardHeader>
   <CardContent size="md">
           <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-7 gap-2">
@@ -108,10 +108,10 @@ export function StaffAvailabilityView() {
                   onClick={() => setSelectedDate(date)}
                   className={`px-3 py-2 rounded-lg text-center transition-colors ${
                     isSelected 
-                      ? 'bg-blue-600 text-white' 
+                      ? 'bg-primary text-white' 
                       : hasAvailability
-                      ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-success/10 text-success hover:bg-success/20'
+                      : 'bg-surface text-text-secondary hover:bg-surface-hover'
                   }`}
                 >
                   <div className="text-sm font-medium">

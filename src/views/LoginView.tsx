@@ -90,7 +90,7 @@ const LoginView: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-gradient-to-br from-primary/20 to-purple-400/20 blur-3xl"></div>
@@ -103,10 +103,10 @@ const LoginView: React.FC = () => {
             <div className="w-20 h-20 bg-gradient-to-r from-primary to-primary-hover rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/25">
               <i className="fas fa-calendar-star text-white text-2xl"></i>
             </div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+            <h2 className="text-h2 bg-gradient-to-r from-text to-text-secondary bg-clip-text text-transparent">
               Fascinar Eventos
             </h2>
-            <p className="mt-2 text-slate-600 font-medium">
+            <p className="mt-2 text-text-secondary font-medium">
               {step === 'email' && 'Digite seu email para continuar'}
               {step === 'create-password' && 'Crie sua senha'}
               {step === 'enter-password' && 'Digite sua senha'}
@@ -114,12 +114,12 @@ const LoginView: React.FC = () => {
             </p>
           </div>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm mb-4">
+            <div className="bg-danger/10 border border-danger/20 text-danger px-4 py-3 rounded-2xl text-sm mb-4">
               {error}
             </div>
           )}
           {message && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-2xl text-sm mb-4">
+            <div className="bg-success/10 border border-success/20 text-success px-4 py-3 rounded-2xl text-sm mb-4">
               {message}
             </div>
           )}
@@ -127,9 +127,9 @@ const LoginView: React.FC = () => {
           {step === 'email' && (
             <form onSubmit={handleCheckEmail} className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+                <label htmlFor="email" className="block text-sm font-semibold text-text mb-2">Email</label>
                 <div className="relative">
-                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted">
                     <i className="fas fa-envelope text-sm"></i>
                   </div>
                   <input
@@ -138,7 +138,7 @@ const LoginView: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-slate-400 text-slate-900"
+                    className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder-text-muted text-text"
                     placeholder="seu@email.com"
                   />
                 </div>
