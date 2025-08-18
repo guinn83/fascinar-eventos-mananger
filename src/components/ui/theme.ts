@@ -122,8 +122,8 @@ export const dark = {
     // Background colors - tons escuros
     background: '#261323',       // slate-300
     surface: '#2e192bff',          // slate-500
-    'surface-2': '#055846ff', 
-    'surface-title': '#2e192bff', // slightly lighter / more prominent surface for emphasized cards
+    'surface-2': '#3a1435ff', 
+    'surface-title': '#221220ff', // slightly lighter / more prominent surface for emphasized cards
     'surface-hover': '#663462ff',  // slate-700
     
     // Item backgrounds for card contents (dark theme)
@@ -136,12 +136,12 @@ export const dark = {
     'text-muted': '#e3e5e9ff',    // slate-400
     'icon-1': '#94a3b8', // slate-400 - muted icon color for dark
     'icon-2': '#a74e98ff', // brand tone for dark
-    'icon-3': '#ffd900ff', // accent/gold for dark
+    'icon-3': '#fcce00ff', // accent/gold for dark
 
     // Status colors - ajustados para dark mode
-    success: '#ffa200ff',         // emerald-500
+    success: '#fcce00ff',         // emerald-500
     warning: '#ff7b00ff',         // amber-500
-    danger: '#b1210eff',          // red-500
+    danger: '#b1210effs',          // red-500
     info: '#7f0ee9ff',           // sky-500
     
   // Border colors
@@ -231,7 +231,7 @@ export const cardTokens = {
 
   // header customization tokens
   header: {
-    background: 'bg-surface-title bg-gradient-card',
+    background: 'bg-surface-title',
     border: 'border-b border-border',
     padding: 'px-6 py-4'
   },

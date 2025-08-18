@@ -1,16 +1,28 @@
 // Tipos para o sistema de staff/equipe
 
-export type StaffRole = 
-  | 'cerimonialista'
-  | 'coordenador'
-  | 'planner'
-  | 'assistente'
-  | 'recepcionista'
-  | 'monitora'
-  | 'produtor_camarim'
-  | 'mestre_cerimonia'
-  | 'seguranca'
-  | 'fiscal_limpeza';
+// Single source of truth for staff roles and their display/order.
+// Update this array when adding/removing roles — the `StaffRole` type
+// and ordering logic are derived from it automatically.
+export const STAFF_ROLE_HIERARCHY = [
+  'cerimonialista',
+  'coordenador',
+  'planner',
+  'produtor_camarim',
+  'mestre_cerimonia',
+  'assistente',
+  'recepcionista',
+  'seguranca',
+  'monitora',
+  'fiscal_limpeza'
+] as const
+
+export type StaffRole = typeof STAFF_ROLE_HIERARCHY[number]
+
+// Returns a numeric rank for a role; unknown roles get placed after known ones.
+export const getRoleRank = (role: StaffRole | string) => {
+  const idx = (STAFF_ROLE_HIERARCHY as readonly string[]).indexOf(role as string)
+  return idx === -1 ? STAFF_ROLE_HIERARCHY.length : idx
+}
 
 export type AvailabilityStatus = 'available' | 'unavailable' | 'maybe';
 

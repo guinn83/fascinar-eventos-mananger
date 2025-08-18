@@ -7,7 +7,8 @@ import {
   DEFAULT_STAFF_TEMPLATES,
   type StaffRole,
   type EventStaffDetailed,
-  type EventStaffSummary
+  type EventStaffSummary,
+  getRoleRank
 } from '../types/staff'
 import { pageTokens, getCardItemClasses } from '../components/ui/theme'
 // Update the import path if the card components are located elsewhere, for example:
@@ -151,9 +152,12 @@ export function EventStaffView() {
     }
   }
 
-  const filteredStaff = selectedRole === 'all' 
+  // Sort staff by configured hierarchy. Filter first if a specific role is selected.
+  const filteredStaff = (selectedRole === 'all' 
     ? eventStaff 
-    : eventStaff.filter(s => s.staff_role === selectedRole)
+    : eventStaff.filter(s => s.staff_role === selectedRole))
+    .slice()
+    .sort((a, b) => getRoleRank(a.staff_role) - getRoleRank(b.staff_role))
 
   if (!event) {
     return (
@@ -198,6 +202,7 @@ export function EventStaffView() {
                   <p className="text-xs text-text-muted mt-0">
                     {Object.entries(summary.roles_by_type)
                       .filter(([,count]) => count > 0)
+                      .sort((a, b) => getRoleRank(a[0]) - getRoleRank(b[0]))
                       .map(([role, count]) => `${count} ${STAFF_ROLE_LABELS[role as keyof typeof STAFF_ROLE_LABELS]}`)
                       .join(', ')}
                   </p>
@@ -253,15 +258,15 @@ export function EventStaffView() {
                       <p className={`text-sm ${isUnassigned ? 'text-text-muted italic' : 'text-text-secondary'} truncate`}>
                         {isUnassigned ? (
                           <span className="inline-flex items-center">
-                            <HelpCircle className="w-4 h-4 text-text-muted mr-2" aria-hidden />
+                            <HelpCircle className="w-4 h-4 text-text-muted mr-1.5" aria-hidden />
                             Não atribuído
                           </span>
                         ) : (
                           <span className="inline-flex items-center">
                             {staff.confirmed ? (
-                              <span aria-label="Confirmado" className="mr-2"><CheckCircle className="w-4 h-4 text-success" aria-hidden /></span>
+                              <span aria-label="Confirmado" className="mr-1.5"><CheckCircle className="w-4 h-4 text-success" aria-hidden /></span>
                             ) : (
-                              <span aria-label="Aguardando" className="mr-2"><AlertTriangle className="w-4 h-4 text-warning" aria-hidden /></span>
+                              <span aria-label="Aguardando" className="mr-1.5"><AlertTriangle className="w-4 h-4 text-warning" aria-hidden /></span>
                             )}
                             {displayName || 'Nome não informado'}
                           </span>
