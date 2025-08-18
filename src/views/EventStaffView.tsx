@@ -213,7 +213,7 @@ export function EventStaffView() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-text">
               <span className="flex items-center gap-2">
-              <Users className="icon-sm" />
+              <Users className="icon-sm text-icon-3" />
               Equipe e Funções
             </span>
             {/* show Add button inside card header when there is at least one member */}
@@ -228,7 +228,7 @@ export function EventStaffView() {
         <CardContent size="md">
           {filteredStaff.length === 0 ? (
             <div className="text-center text-text-muted">
-              <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <Users className="w-12 h-12 mx-auto mb-4 opacity-50 text-icon-3" />
               <p>Nenhuma função de equipe definida ainda.</p>
               <div className="mt-4">
                 <Button onClick={() => setShowAddRole(true)}>Adicionar Primeira Função</Button>
@@ -439,7 +439,6 @@ export function EventStaffView() {
                     Cancelar
                   </Button>
                   <Button
-                    className="bg-gradient-button"
                     onClick={async () => {
                       const profileId = assignProfileId?.trim() || ''
                       const personName = assignPersonName?.trim()

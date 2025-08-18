@@ -14,6 +14,9 @@ export default defineConfig({
   },
   server: {
     host: true,
-    allowedHosts: ['fascinar-eventos.loca.lt', '.loca.lt']
+    allowedHosts: ['fascinar-eventos.loca.lt', '.loca.lt'],
+    port: 5173,
+    // Uncomment for HTTPS testing (requires accepting self-signed certificate)
+    //https: true as any
   }
 })
