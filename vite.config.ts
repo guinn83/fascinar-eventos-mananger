@@ -16,7 +16,20 @@ export default defineConfig({
     host: true,
     allowedHosts: ['fascinar-eventos.loca.lt', '.loca.lt'],
     port: 5173,
+    // Improve file-change detection on Windows and networked filesystems (OneDrive)
+    watch: {
+      usePolling: true,
+      interval: 100,
+    },
+    // Force cache busting for development
+    hmr: {
+      overlay: true
+    },
     // Uncomment for HTTPS testing (requires accepting self-signed certificate)
     //https: true as any
+  },
+  // Force cache busting in development
+  define: {
+    __DEV_TIMESTAMP__: JSON.stringify(Date.now())
   }
 })

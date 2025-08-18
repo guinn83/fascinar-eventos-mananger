@@ -189,7 +189,7 @@ export function EventStaffView() {
       {/* Resumo */}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-          <Card className="w-full resume-card" strong>
+          <Card className="w-full resume-card" strong tone="emphasized">
             <CardContent size="md">
               <div className="flex items-center">
                 <Users className="icon-2xl text-icon-3 mr-3" />
@@ -210,7 +210,7 @@ export function EventStaffView() {
 
       {/* Lista de Staff */}
   <Card strong>
-        <CardHeader>
+      <CardHeader>
           <CardTitle className="flex items-center justify-between text-text">
               <span className="flex items-center gap-2">
               <Users className="icon-sm text-icon-3" />

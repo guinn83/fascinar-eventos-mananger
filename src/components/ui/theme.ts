@@ -12,6 +12,8 @@ export const light = {
     // Background colors
     background: '#ffffff',
     surface: '#f8fafc',          // slate-50
+    'surface-2': '#f1f5f9',      // slate-100 - slightly more prominent surface
+    'surface-title': '#e2e8f0', // slate-200 - dedicated title background (UPDATED)
     'surface-hover': '#f1f5f9',  // slate-100
     
     // Item backgrounds for card contents
@@ -44,7 +46,6 @@ export const light = {
   gradients: {
     // Card background gradient (fallback to surface color if not supported)
     card: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0))',
-    // Button gradient for primary/featured buttons - subtle overlay over primary color
     button: 'linear-gradient(180deg, #ffffff1a 0%, #0000001a 100%)'
   ,
   // Page / global background gradient option
@@ -121,6 +122,8 @@ export const dark = {
     // Background colors - tons escuros
     background: '#261323',       // slate-300
     surface: '#2e192bff',          // slate-500
+    'surface-2': '#055846ff', 
+    'surface-title': '#2e192bff', // slightly lighter / more prominent surface for emphasized cards
     'surface-hover': '#663462ff',  // slate-700
     
     // Item backgrounds for card contents (dark theme)
@@ -128,10 +131,13 @@ export const dark = {
     'item-hover': '#492b44ff',       // lighter on hover
 
     // Text colors - tons claros
-    text: '#f8fafc',            // slate-50
-    'text-secondary': '#cbd5e1', // slate-300
-    'text-muted': '#94a3b8',    // slate-400
-    
+    text: '#ffffffff',            // slate-50
+    'text-secondary': '#f1f1f1ff', // slate-300
+    'text-muted': '#e3e5e9ff',    // slate-400
+    'icon-1': '#94a3b8', // slate-400 - muted icon color for dark
+    'icon-2': '#a74e98ff', // brand tone for dark
+    'icon-3': '#ffd900ff', // accent/gold for dark
+
     // Status colors - ajustados para dark mode
     success: '#ffa200ff',         // emerald-500
     warning: '#ff7b00ff',         // amber-500
@@ -141,16 +147,12 @@ export const dark = {
   // Border colors
   border: '#412a47ff',         // gray-700
   'border-strong': '#66345A', // gray-600
-  // Icon color tokens - three semantic options for icons (separate from primary)
-  'icon-1': '#94a3b8', // slate-400 - muted icon color for dark
-  'icon-2': '#a74e98ff', // brand tone for dark
-  'icon-3': '#ffae00ff', // accent/gold for dark
   },
 
   gradients: {
     // Stronger, tinted gradients for dark theme
-  card: 'linear-gradient(180deg, #ffffff05, #0000001f)',
-  button: 'linear-gradient(180deg, #ffffff0d 0%, #00000034 100%)',
+  card: 'linear-gradient(180deg, #ffffff05, #00000028)',
+  button: 'linear-gradient(180deg, #ffffff0d 0%, #00000057 100%)',
   page: 'linear-gradient(180deg, #1a0a1266, #26111c)'
   },
   
@@ -227,9 +229,18 @@ export const cardTokens = {
   // title
   title: 'text-h4 text-text',
 
+  // header customization tokens
+  header: {
+    background: 'bg-surface-title bg-gradient-card',
+    border: 'border-b border-border',
+    padding: 'px-6 py-4'
+  },
+
   // Cores editáveis para diferentes níveis dentro do card
   colors: {
-    card: 'bg-surface',
+  // `card` is the default surface; `cardEmphasized` is a stronger background
+  card: 'bg-surface',
+  cardEmphasized: 'bg-surface-2',
     item: 'bg-item',
     itemHover: 'item-hover'
   }

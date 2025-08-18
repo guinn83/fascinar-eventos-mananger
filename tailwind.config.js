@@ -17,6 +17,8 @@ module.exports = {
         background: 'var(--color-background)',
         surface: {
           DEFAULT: 'var(--color-surface)',
+          2: 'var(--color-surface-2)',
+          title: 'var(--color-surface-title)',
           hover: 'var(--color-surface-hover)',
         },
         text: {
@@ -71,7 +73,11 @@ module.exports = {
   safelist: [
     'bg-item',
     'hover:bg-item-hover',
-    'bg-gradient-button'
+    'bg-gradient-button',
+    'bg-surface-2',
+    'bg-surface-title',
+    'bg-gradient-card',
+    'bg-surface-hover'
   ],
   plugins: [],
 }

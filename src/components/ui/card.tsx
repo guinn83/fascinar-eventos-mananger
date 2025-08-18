@@ -9,6 +9,7 @@ interface CardProps {
   size?: Size
   padding?: string // override spacing token
   strong?: boolean
+  tone?: 'normal' | 'emphasized'
 }
 
 interface CardHeaderProps {
@@ -28,7 +29,7 @@ interface CardTitleProps {
   className?: string
 }
 
-export function Card({ children, className = '', size = 'md', padding, strong = false }: CardProps) {
+export function Card({ children, className = '', size = 'md', padding, strong = false, tone = 'normal' }: CardProps) {
   // By default Card doesn't add inner padding so consumers can opt-in with
   // CardHeader/CardContent. If `padding` is provided, we wrap children.
   const shouldWrap = Boolean(padding)
@@ -36,8 +37,13 @@ export function Card({ children, className = '', size = 'md', padding, strong = 
 
   const shadowClass = strong ? cardTokens.shadowStrong : cardTokens.shadowTheme
 
+  // Always use gradient background, but change base color based on tone
+  const baseColorClass = tone === 'emphasized' ? 'bg-surface-2' : 'bg-surface'
+  const gradientClass = 'bg-gradient-card'
+  const backgroundClass = `${baseColorClass} ${gradientClass}`
+
   return (
-  <div className={`${cardTokens.background} ${cardTokens.radius} ${shadowClass} ${cardTokens.border} ${className}`}>
+  <div className={`${backgroundClass} ${cardTokens.radius} ${shadowClass} ${cardTokens.border} ${className}`}>
       {shouldWrap ? (
         <div className={`w-full ${spacing}`}>
           {children}
@@ -51,8 +57,10 @@ export function Card({ children, className = '', size = 'md', padding, strong = 
 
 export function CardHeader({ children, className = '', size = 'md' }: CardHeaderProps) {
   const spacing = cardTokens.spacing[size]
+  
+  // Use surface-title background with gradient and border
   return (
-    <div className={`border-b border-border ${spacing} ${className}`}>
+    <div className={`${cardTokens.header.background} ${cardTokens.header.border} ${spacing} ${className}`}>
       {children}
     </div>
   )

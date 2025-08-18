@@ -233,3 +233,16 @@ html, body, #root {
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+/* Icon semantic color utilities (map to CSS theme variables) */
+.text-icon-1 { color: var(--color-icon-1) !important; }
+.text-icon-2 { color: var(--color-icon-2) !important; }
+.text-icon-3 { color: var(--color-icon-3) !important; }
+
+/* Fallback utility so bg-surface-2 works immediately with theme variables */
+.bg-surface-2 { background-color: var(--color-surface-2) !important; }
+
+/* Ensure SVG strokes using currentColor follow the icon token */
+.text-icon-1 svg, .text-icon-1 [stroke="currentColor"] { stroke: var(--color-icon-1) !important; }
+.text-icon-2 svg, .text-icon-2 [stroke="currentColor"] { stroke: var(--color-icon-2) !important; }
+.text-icon-3 svg, .text-icon-3 [stroke="currentColor"] { stroke: var(--color-icon-3) !important; }

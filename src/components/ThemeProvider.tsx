@@ -37,11 +37,26 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       root.style.setProperty(`--color-${key}`, value)
     })
 
+    // Runtime debug: verify important surface variable is applied to :root
+    try {
+      const applied = getComputedStyle(root).getPropertyValue('--color-surface-2')
+      // Trim to make logs cleaner
+      const appliedTrim = applied ? applied.trim() : applied
+      console.debug('[ThemeProvider] applied --color-surface-2 =', appliedTrim, 'for theme', theme)
+      if (!appliedTrim) {
+        console.warn('[ThemeProvider] --color-surface-2 not set or empty after applying theme', theme)
+      }
+    } catch (e) {
+      // Defensive: don't break app if getComputedStyle throws (very unlikely)
+      console.error('[ThemeProvider] error reading computed style for --color-surface-2', e)
+    }
+
     // Backwards-compat: ensure icon tokens exist even if theme missing them
     if (!(themeData as any).colors['icon-1']) {
-      root.style.setProperty('--color-icon-1', (themeData as any).colors['text'] || '#6b7280')
-      root.style.setProperty('--color-icon-2', (themeData as any).colors['primary'] || '#4f2f6d')
-      root.style.setProperty('--color-icon-3', (themeData as any).colors['primary'] || '#d39937')
+      // Prefer explicit icon tokens if present, otherwise fallback to sensible colors
+      root.style.setProperty('--color-icon-1', (themeData as any).colors['icon-1'] || (themeData as any).colors['text'] || '#6b7280')
+      root.style.setProperty('--color-icon-2', (themeData as any).colors['icon-2'] || (themeData as any).colors['primary'] || '#4f2f6d')
+      root.style.setProperty('--color-icon-3', (themeData as any).colors['icon-3'] || (themeData as any).colors['primary'] || '#d39937')
     }
 
     // Aplicar variáveis CSS para typography
