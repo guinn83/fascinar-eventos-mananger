@@ -60,7 +60,7 @@ export function EventStaffView() {
   const [assignArrivalTime, setAssignArrivalTime] = useState<string | undefined>(undefined)
 
   // profiles helper
-  const { getOrganizers } = useProfiles()
+  const { getOrganizers, loading: organizersLoading, error: organizersError } = useProfiles()
   const [organizers, setOrganizers] = useState<any[]>([])
 
   useEffect(() => {
@@ -73,7 +73,8 @@ export function EventStaffView() {
         const o = await getOrganizers()
         setOrganizers(o || [])
       } catch (e) {
-        // ignore
+        console.warn('Erro ao buscar organizers:', e)
+        setOrganizers([])
       }
     })()
   }, [id])
@@ -426,34 +427,54 @@ export function EventStaffView() {
                   <div>
                     <label className="block text-sm font-medium mb-2 text-text">Usuários disponíveis (Organizers)</label>
                     <div className="grid grid-cols-2 gap-2 max-h-48 overflow-auto mb-2">
-                      {organizers
-                        .filter((p:any) => p && p.id)
-                        .map((p:any) => {
-                          const assignedIds = new Set(eventStaff.map(s => s.profile_id).filter(Boolean))
-                          const alreadyAssigned = assignedIds.has(p.id)
-                          const insufficientRole = p.max_role ? getRoleRank(p.max_role) > getRoleRank(selectedRoleForAssignment as StaffRole) : false
-                          const disabled = alreadyAssigned || insufficientRole
-                          const reason = alreadyAssigned ? 'Já atribuído a este evento' : (insufficientRole ? `Perfil limitado até ${STAFF_ROLE_LABELS[p.max_role as keyof typeof STAFF_ROLE_LABELS]}` : '')
-                          return (
-                            <button
-                              key={p.id}
-                              className={`text-left p-2 border rounded ${assignProfileId === p.id ? 'border-primary bg-primary/5' : ''} ${disabled ? 'opacity-60 cursor-not-allowed' : 'hover:border-primary hover:bg-primary/5'}`}
-                                  type="button"
-                                  onClick={() => {
-                                    if (disabled) return
-                                    setAssignProfileId(p.id)
-                                    setAssignPersonName(p.full_name || '')
-                                  }}
-                                  aria-label={disabled ? `${p.full_name} indisponível: ${reason}` : `Selecionar ${p.full_name}`}
-                                  tabIndex={disabled ? -1 : 0}
-                                  disabled={disabled}
-                            >
-                              <div className="font-medium text-text">{p.full_name}</div>
-                              <div className="text-xs text-text-muted">{p.max_role ? `até ${STAFF_ROLE_LABELS[p.max_role as keyof typeof STAFF_ROLE_LABELS]}` : 'sem limite'}</div>
-                              {disabled && <div className="text-xxs text-text-muted mt-1">{reason}</div>}
-                            </button>
-                          )
-                        })}
+                      {organizers && organizers.length > 0 ? (
+                        organizers
+                          .filter((p:any) => p && p.id)
+                          .map((p:any) => {
+                            const assignedIds = new Set(eventStaff.map(s => s.profile_id).filter(Boolean))
+                            const alreadyAssigned = assignedIds.has(p.id)
+                            const insufficientRole = p.max_role ? getRoleRank(p.max_role) > getRoleRank(selectedRoleForAssignment as StaffRole) : false
+                            const disabled = alreadyAssigned || insufficientRole
+                            const reason = alreadyAssigned ? 'Já atribuído a este evento' : (insufficientRole ? `Perfil limitado até ${STAFF_ROLE_LABELS[p.max_role as keyof typeof STAFF_ROLE_LABELS]}` : '')
+                            return (
+                              <button
+                                key={p.id}
+                                className={`text-left p-2 border rounded ${assignProfileId === p.id ? 'border-primary bg-primary/5' : ''} ${disabled ? 'opacity-60 cursor-not-allowed' : 'hover:border-primary hover:bg-primary/5'}`}
+                                    type="button"
+                                    onClick={() => {
+                                      if (disabled) return
+                                      setAssignProfileId(p.id)
+                                      setAssignPersonName(p.full_name || '')
+                                    }}
+                                    aria-label={disabled ? `${p.full_name} indisponível: ${reason}` : `Selecionar ${p.full_name}`}
+                                    tabIndex={disabled ? -1 : 0}
+                                    disabled={disabled}
+                              >
+                                <div className="font-medium text-text">{p.full_name}</div>
+                                <div className="text-xs text-text-muted">{p.max_role ? `até ${STAFF_ROLE_LABELS[p.max_role as keyof typeof STAFF_ROLE_LABELS]}` : 'sem limite'}</div>
+                                {disabled && <div className="text-xxs text-text-muted mt-1">{reason}</div>}
+                              </button>
+                            )
+                          })
+                      ) : (
+                        <div className="col-span-2 p-3 text-sm text-text-muted">
+                          {organizersLoading ? (
+                            <div>Carregando usuários...</div>
+                          ) : (
+                            <div>
+                              <div>Nenhum organizer disponível para exibir.</div>
+                              {organizersError ? (
+                                <div className="mt-1 text-xxs text-text-muted">Erro: {organizersError}</div>
+                              ) : (
+                                <div className="mt-1 text-xxs text-text-muted">Possíveis causas: RLS/permissões no banco, usuário não autenticado, ou não existem organizers no DB.</div>
+                              )}
+                              <div className="mt-2">
+                                <Button variant="outline" onClick={async () => { const o = await getOrganizers(); setOrganizers(o || []) }}>Recarregar</Button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <p className="text-xs text-text-muted mt-1">Clique para selecionar um usuário; ou use o campo abaixo para digitar um nome livre.</p>
                     {assignPersonName ? (
