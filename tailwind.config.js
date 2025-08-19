@@ -17,6 +17,8 @@ module.exports = {
         background: 'var(--color-background)',
         surface: {
           DEFAULT: 'var(--color-surface)',
+          2: 'var(--color-surface-2)',
+          title: 'var(--color-surface-title)',
           hover: 'var(--color-surface-hover)',
         },
         text: {
@@ -32,6 +34,12 @@ module.exports = {
           DEFAULT: 'var(--color-border)',
           strong: 'var(--color-border-strong)',
         },
+        item: 'var(--color-item)',
+        'item-hover': 'var(--color-item-hover)',
+  // Icon semantic colors
+  'icon-1': 'var(--color-icon-1)',
+  'icon-2': 'var(--color-icon-2)',
+  'icon-3': 'var(--color-icon-3)',
       },
       fontSize: {
         h1: ['var(--font-size-h1)', { lineHeight: 'var(--line-height-tight)' }],
@@ -55,7 +63,24 @@ module.exports = {
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui'],
       },
+      backgroundImage: {
+        'gradient-button': 'var(--gradient-button)',
+        'gradient-card': 'var(--gradient-card)',
+        'gradient-page': 'var(--gradient-page)',
+      },
     },
   },
+  safelist: [
+    'bg-item',
+    'hover:bg-item-hover',
+    'bg-gradient-button',
+    'bg-surface-2',
+    'bg-surface-title',
+    'bg-gradient-card',
+    'bg-surface-hover',
+    'bg-primary-light',
+    'bg-primary-hover',
+    'bg-none'
+  ],
   plugins: [],
 }

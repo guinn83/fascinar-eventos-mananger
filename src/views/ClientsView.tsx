@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Card, CardContent } from '../components/ui/card'
 import { pageTokens } from '../components/ui/theme'
 import { useClients } from '../hooks/useClients'
+import { Modal } from '../components/ui/Modal'
 import type { Client } from '../types/client'
 
 const ClientsView: React.FC = () => {
@@ -87,7 +88,7 @@ const ClientsView: React.FC = () => {
   <div className={`max-w-6xl mx-auto bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className={`${pageTokens.headerPadding} flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4`}>
           <div>
             <h1 className="text-h1 text-text">Clientes</h1>
             <p className="text-text-secondary mt-1">Gerencie seus clientes e relacionamentos</p>
@@ -101,8 +102,8 @@ const ClientsView: React.FC = () => {
           </button>
         </div>
 
-        {/* Search */}
-        <Card>
+  {/* Search */}
+  <Card strong>
           <CardContent size="md">
             <div className="relative">
               <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-text-muted"></i>
@@ -128,9 +129,9 @@ const ClientsView: React.FC = () => {
   {/* Clients List */}
   <>
           {filteredClients.length === 0 ? (
-            <Card>
+            <Card strong>
               <CardContent size="lg" className="text-center">
-              <i className="fas fa-users text-6xl text-text-muted mb-4"></i>
+              <i className="fas fa-users text-6xl text-icon-1 mb-4"></i>
               <h3 className="text-h4 text-text mb-2">
                 {searchTerm ? 'Nenhum cliente encontrado' : 'Nenhum cliente cadastrado'}
               </h3>
@@ -145,7 +146,7 @@ const ClientsView: React.FC = () => {
                   onClick={() => setShowCreateModal(true)}
                   className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl transition-colors"
                 >
-                  <i className="fas fa-plus mr-2"></i>
+                  <i className="fas fa-plus mr-2 text-icon-2"></i>
                   Criar Primeiro Cliente
                 </button>
               )}
@@ -154,7 +155,7 @@ const ClientsView: React.FC = () => {
           ) : (
             <div className="grid gap-4">
               {filteredClients.map((client) => (
-                <Card key={client.id} className="hover:shadow-xl transition-all duration-300">
+                <Card key={client.id} className="transition-all duration-300" strong>
                   <CardContent size="md">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1 space-y-2">
@@ -227,7 +228,7 @@ const ClientsView: React.FC = () => {
 
       {/* Create Client Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <Modal open={showCreateModal} onClose={() => setShowCreateModal(false)}>
           <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
             <CardContent size="md">
               <div className="flex items-center justify-between mb-6">
@@ -314,12 +315,12 @@ const ClientsView: React.FC = () => {
             </form>
             </CardContent>
           </Card>
-        </div>
+        </Modal>
       )}
 
       {/* Edit Client Modal */}
       {showEditModal && selectedClient && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <Modal open={showEditModal && !!selectedClient} onClose={() => setShowEditModal(false)}>
           <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
             <CardContent size="md">
               <div className="flex items-center justify-between mb-6">
@@ -406,7 +407,7 @@ const ClientsView: React.FC = () => {
             </form>
             </CardContent>
           </Card>
-        </div>
+        </Modal>
       )}
 
     </>

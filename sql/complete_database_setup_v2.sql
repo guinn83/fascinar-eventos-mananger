@@ -122,6 +122,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   phone TEXT NULL,
   bio TEXT NULL,
   role user_role NOT NULL DEFAULT 'client'::user_role,
+  max_role staff_role NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   has_password BOOLEAN NOT NULL DEFAULT false,
@@ -265,6 +266,7 @@ CREATE TABLE IF NOT EXISTS event_staff (
   profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   person_name TEXT, -- Nome da pessoa quando não há profile
   staff_role staff_role NOT NULL,
+  arrival_time TIME,
   confirmed BOOLEAN DEFAULT false,
   hourly_rate DECIMAL(8,2),
   hours_planned DECIMAL(4,1) DEFAULT 8.0,
@@ -436,12 +438,14 @@ SELECT
   es.staff_role,
   es.confirmed,
   es.hourly_rate,
+  es.notes,
+  es.arrival_time,
   es.hours_planned,
   es.hours_worked,
   es.assigned_at,
   es.confirmed_at,
-  es.hourly_rate * es.hours_planned as planned_cost,
-  es.hourly_rate * COALESCE(es.hours_worked, es.hours_planned) as actual_cost,
+  COALESCE(es.hourly_rate,0) * COALESCE(es.hours_planned,0) as planned_cost,
+  COALESCE(es.hourly_rate,0) * COALESCE(es.hours_worked, es.hours_planned,0) as actual_cost,
   assigner.full_name as assigned_by_name
 FROM event_staff es
 JOIN events e ON e.id = es.event_id
@@ -449,6 +453,65 @@ LEFT JOIN profiles p ON p.id = es.profile_id
 LEFT JOIN profiles assigner ON assigner.id = es.assigned_by;
 
 -- ==========================================
+-- 11. HELPERS / TRIGGERS: staff role ranking & validation
+-- These functions enforce that a profile's `max_role` allows assignment to a requested staff_role.
+
+-- Helper to map staff_role to integer rank (lower = higher capability)
+CREATE OR REPLACE FUNCTION get_staff_role_rank(r staff_role)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN CASE r
+    WHEN 'cerimonialista' THEN 0
+    WHEN 'coordenador' THEN 1
+    WHEN 'planner' THEN 2
+    WHEN 'assistente' THEN 3
+    WHEN 'recepcionista' THEN 4
+    WHEN 'monitora' THEN 5
+    WHEN 'produtor_camarim' THEN 6
+    WHEN 'mestre_cerimonia' THEN 7
+    WHEN 'seguranca' THEN 8
+    ELSE 999
+  END;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+-- Trigger function that validates profiles.max_role covers the requested staff_role
+CREATE OR REPLACE FUNCTION validate_event_staff_max_role()
+RETURNS TRIGGER AS $$
+DECLARE
+  prof_max staff_role;
+  prof_max_rank INTEGER;
+  new_rank INTEGER;
+BEGIN
+  -- If no profile assigned, nothing to validate
+  IF NEW.profile_id IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  SELECT max_role INTO prof_max FROM public.profiles WHERE id = NEW.profile_id;
+  IF prof_max IS NULL THEN
+    -- No max_role set, allow
+    RETURN NEW;
+  END IF;
+
+  prof_max_rank := get_staff_role_rank(prof_max);
+  new_rank := get_staff_role_rank(NEW.staff_role);
+
+  -- Allow if profile's max_role rank is <= requested role rank
+  IF prof_max_rank <= new_rank THEN
+    RETURN NEW;
+  ELSE
+    RAISE EXCEPTION 'Profile % max_role (%) insufficient for requested role %', NEW.profile_id, prof_max, NEW.staff_role;
+  END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Attach trigger to event_staff
+DROP TRIGGER IF EXISTS trg_validate_event_staff_max_role ON public.event_staff;
+CREATE TRIGGER trg_validate_event_staff_max_role
+BEFORE INSERT OR UPDATE ON public.event_staff
+FOR EACH ROW EXECUTE FUNCTION validate_event_staff_max_role();
+
 -- 10. FUNÇÕES ÚTEIS
 -- ==========================================
 

@@ -78,14 +78,20 @@ const EventDetailView: React.FC = () => {
     }).format(value)
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
+  
+  // Retorna partes separadas para uso específico na UI (Data e Hora separadas)
+  const formatDateParts = (dateString: string) => {
+    const d = new Date(dateString)
+    const datePart = d.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric',
+      year: 'numeric'
+    })
+    const timePart = d.toLocaleTimeString('pt-BR', {
       hour: '2-digit',
       minute: '2-digit'
     })
+    return { datePart, timePart }
   }
 
   if (loading) {
@@ -206,13 +212,13 @@ const EventDetailView: React.FC = () => {
 
         {/* Event Details Card */}
         <Card className="w-full details-card">
-          <CardContent size="lg">
-            <div className={pageTokens.cardGap.sm}>
+          <CardContent size="md">
+              <div className={pageTokens.cardGap.sm}>
               {/* Event Description */}
               {event.description && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-text flex items-center gap-2">
-                    <i className="fas fa-align-left text-primary"></i>
+                    <i className="fas fa-align-left text-icon-2"></i>
                     Descrição Detalhada
                   </h3>
                   <p className="text-text-secondary leading-relaxed">
@@ -221,33 +227,64 @@ const EventDetailView: React.FC = () => {
                 </div>
               )}
 
-              {/* Date, Location and Attendees */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-text flex items-center gap-2">
-                    <i className="fas fa-calendar text-primary"></i>
-                    Data e Horário: <span className="font-normal text-text-secondary">{formatDate(event.event_date)}</span>
-                  </h3>
-                  {event.end_date && (
-                    <div className="flex items-center gap-3 mt-2">
-                      <i className="fas fa-calendar-check w-4 text-text-muted"></i>
-                      <span className="text-text-secondary">Até: {formatDate(event.end_date)}</span>
+              {/* Date, Time, Location and Attendees */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-1">
+                {/* Data */}
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1">
+                    <div className="w-5 flex items-center justify-center">
+                      <i className="fas fa-calendar text-icon-3" aria-hidden></i>
                     </div>
-                  )}
+                    <div className="flex-1">
+                      {(() => {
+                        const { datePart } = formatDateParts(event.event_date)
+                        return (
+                          <h3 className="text-lg font-semibold text-text">Data: <span className="font-normal text-text-secondary ml-1">{datePart}</span></h3>
+                        )
+                      })()}
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-text flex items-center gap-2">
-                    <i className="fas fa-map-marker-alt text-primary"></i>
-                    Local: <span className="font-normal text-text-secondary">{event.location || 'Local não informado'}</span>
-                  </h3>
+                {/* Hora */}
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1">
+                    <div className="w-5 flex items-center justify-center">
+                      <i className="fas fa-clock text-icon-3" aria-hidden></i>
+                    </div>
+                    <div className="flex-1">
+                      {(() => {
+                        const { timePart } = formatDateParts(event.event_date)
+                        return (
+                          <h3 className="text-lg font-semibold text-text">Hora: <span className="font-normal text-text-secondary ml-1">{timePart}</span></h3>
+                        )
+                      })()}
+                    </div>
+                  </div>
                 </div>
 
+                {/* Local */}
                 <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-text flex items-center gap-2">
-                    <i className="fas fa-users text-primary"></i>
-                    Número de convidados: <span className="font-normal text-text-secondary">{event.attendees}</span>
-                  </h3>
+                  <div className="flex items-center gap-1">
+                    <div className="w-5 flex items-center justify-center">
+                      <i className="fas fa-map-marker-alt text-icon-3" aria-hidden></i>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-text">Local: <span className="font-normal text-text-secondary ml-1">{event.location || 'Local não informado'}</span></h3>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Convidados */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1">
+                    <div className="w-5 flex items-center justify-center">
+                      <i className="fas fa-users text-icon-3" aria-hidden></i>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-text">Número de convidados: <span className="font-normal text-text-secondary ml-1">{event.attendees}</span></h3>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -258,8 +295,8 @@ const EventDetailView: React.FC = () => {
         {/* Equipe Card (staffCard) - usar layout do resume-card */}
         <Card className="w-full staff-card">
           <CardContent size="md">
-            <div className="flex items-center">
-              <svg className="w-8 h-8 text-primary mr-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <div className="flex items-center">
+              <svg className="w-8 h-8 text-icon-3 mr-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M23 21v-2a4 4 0 00-3-3.87" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -289,8 +326,8 @@ const EventDetailView: React.FC = () => {
         <Card className="w-full">
           <CardContent size="md">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-text flex items-center gap-2">
-                <i className="fas fa-dollar-sign text-primary"></i>
+                <h3 className="text-lg font-semibold text-text flex items-center gap-2">
+                <i className="fas fa-dollar-sign text-icon-3"></i>
                 Informações Financeiras
               </h3>
               <div>

@@ -86,7 +86,7 @@ export function StaffAvailabilityView() {
   return (
   <div className={`max-w-4xl mx-auto bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
       <div className="flex items-center gap-3">
-        <Calendar className="w-8 h-8 text-primary" />
+        <Calendar className="w-8 h-8 text-icon-2" />
         <h1 className="text-3xl font-bold text-text">Minha Disponibilidade</h1>
       </div>
 

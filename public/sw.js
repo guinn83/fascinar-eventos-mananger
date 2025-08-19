@@ -1,53 +1,130 @@
 // Service Worker para PWA Fascinar Eventos
 const CACHE_NAME = 'fascinar-eventos-v1'
+
+// URLs essenciais para cache
 const STATIC_CACHE_URLS = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
   '/manifest.json'
+  // Removendo arquivos específicos do Vite que podem variar
+]
+
+// URLs que devem ser sempre buscadas da rede
+const NETWORK_FIRST_URLS = [
+  '/api/',
+  '/auth/',
+  '/supabase/',
+  'supabase.co'
 ]
 
 // Instalar Service Worker
 self.addEventListener('install', (event) => {
+  console.log('[SW] Installing...')
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        return cache.addAll(STATIC_CACHE_URLS)
+        console.log('[SW] Caching essential files')
+        return cache.addAll(STATIC_CACHE_URLS).catch((error) => {
+          console.warn('[SW] Cache addAll failed:', error)
+          // Não falhar se o cache não funcionar
+          return Promise.resolve()
+        })
       })
       .then(() => {
+        console.log('[SW] Skip waiting')
         return self.skipWaiting()
+      })
+      .catch((error) => {
+        console.error('[SW] Install failed:', error)
       })
   )
 })
 
 // Ativar Service Worker
 self.addEventListener('activate', (event) => {
+  console.log('[SW] Activating...')
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
+            console.log('[SW] Deleting old cache:', cache)
             return caches.delete(cache)
           }
         })
       )
     }).then(() => {
+      console.log('[SW] Claiming clients')
       return self.clients.claim()
+    })
+    .catch((error) => {
+      console.error('[SW] Activation failed:', error)
     })
   )
 })
 
 // Interceptar requisições
 self.addEventListener('fetch', (event) => {
+  const { request } = event
+  const url = new URL(request.url)
+
+  // Pular requisições não-HTTP
+  if (!request.url.startsWith('http')) {
+    return
+  }
+
+  // Network first para APIs
+  if (NETWORK_FIRST_URLS.some(pattern => request.url.includes(pattern))) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          // Se conseguiu da rede, retorna
+          if (response.ok) {
+            return response
+          }
+          throw new Error('Network response not ok')
+        })
+        .catch(() => {
+          // Se falhou, tenta o cache
+          return caches.match(request)
+        })
+    )
+    return
+  }
+
+  // Cache first para o resto
   event.respondWith(
-    caches.match(event.request)
+    caches.match(request)
       .then((response) => {
-        return response || fetch(event.request)
+        if (response) {
+          return response
+        }
+        
+        return fetch(request)
+          .then((networkResponse) => {
+            // Só cachear recursos da mesma origem
+            if (networkResponse.ok && url.origin === location.origin) {
+              const responseToCache = networkResponse.clone()
+              caches.open(CACHE_NAME)
+                .then((cache) => {
+                  cache.put(request, responseToCache)
+                })
+                .catch((error) => {
+                  console.warn('[SW] Cache put failed:', error)
+                })
+            }
+            return networkResponse
+          })
+          .catch((error) => {
+            console.warn('[SW] Fetch failed:', error)
+            // Para navegação, retornar a página principal
+            if (request.mode === 'navigate') {
+              return caches.match('/')
+            }
+            throw error
+          })
       })
   )
 })
-
-// Lidar com notificações push (futura implementação)
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'Nova notificação!',

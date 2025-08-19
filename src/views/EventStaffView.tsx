@@ -1,4 +1,4 @@
-import { useState, useEffect, type ButtonHTMLAttributes } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useEvents } from '../hooks/useEvents'
 import { useStaff } from '../hooks/useStaff'
@@ -7,35 +7,19 @@ import {
   DEFAULT_STAFF_TEMPLATES,
   type StaffRole,
   type EventStaffDetailed,
-  type EventStaffSummary
+  type EventStaffSummary,
+  getRoleRank
 } from '../types/staff'
-import { pageTokens } from '../components/ui/theme'
+import { pageTokens, getCardItemClasses } from '../components/ui/theme'
+import { useProfiles } from '../hooks/useProfiles'
 // Update the import path if the card components are located elsewhere, for example:
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { Button } from '../components/ui/button'
+import { Modal } from '../components/ui/Modal'
 // Or, if you do not have these components, create them or install a UI library (like shadcn/ui or Material UI) and import from there.
 
 // badge removed — status is shown as a colored dot next to the person name
 
-// Local fallback Button component for when ../components/ui/button is not available.
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'default' | 'outline' | 'secondary'
-  size?: 'sm' | 'md' | 'lg'
-}
-  const Button = ({ children, variant = 'default', size = 'md', className = '', ...props }: ButtonProps) => {
-  const base = 'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors'
-  const variantClasses: Record<string, string> = {
-    default: 'px-3 py-2 bg-primary text-white hover:bg-primary/90',
-    outline: 'px-3 py-2 border border-border bg-surface text-text hover:bg-surface-hover',
-    secondary: 'px-2 py-1 bg-warning/10 text-warning hover:bg-warning/20'
-  }
-  const sizeClasses: Record<string, string> = {
-    sm: 'px-2 py-1 text-xs',
-    md: '',
-    lg: 'px-4 py-3'
-  }
-  const classes = `${base} ${variantClasses[variant] ?? ''} ${sizeClasses[size] ?? ''} ${className}`
-  return <button {...props} className={classes}>{children}</button>
-}
 import { 
   Users, 
   Plus, 
@@ -52,6 +36,7 @@ export function EventStaffView() {
   const { getEvent } = useEvents()
   const {
     getEventStaff,
+  getEventStaffById,
     addRoleToEvent,
     assignPersonToRoleWithName,
     confirmStaffAssignment,
@@ -74,13 +59,41 @@ export function EventStaffView() {
   // Controlled inputs for assign/edit modal
   const [assignPersonName, setAssignPersonName] = useState('')
   const [assignProfileId, setAssignProfileId] = useState('')
-  const [assignHourlyRate, setAssignHourlyRate] = useState<number | undefined>(undefined)
+  const [assignArrivalTime, setAssignArrivalTime] = useState<string | undefined>(undefined)
+  const [assignNotes, setAssignNotes] = useState<string>('')
+
+  // profiles helper
+  const { getOrganizers, loading: organizersLoading, error: organizersError } = useProfiles()
+  const [organizers, setOrganizers] = useState<any[]>([])
 
   useEffect(() => {
     if (id) {
       loadEventData()
     }
+    // warm fetch organizers
+    ;(async () => {
+      try {
+        const o = await getOrganizers()
+        setOrganizers(o || [])
+      } catch (e) {
+        console.warn('Erro ao buscar organizers:', e)
+        setOrganizers([])
+      }
+    })()
   }, [id])
+
+  // Prevent body scroll when modals are open
+  useEffect(() => {
+    const locked = showAssignPerson || showAddRole
+    if (locked) {
+      // simple approach: hide overflow
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    // cleanup on unmount
+    return () => { document.body.style.overflow = '' }
+  }, [showAssignPerson, showAddRole])
 
   const loadEventData = async () => {
     if (!id) return
@@ -115,12 +128,52 @@ export function EventStaffView() {
     }
   }
 
-  const openAssignModalFor = (opts: { eventStaffId: string, role: StaffRole, personName?: string, profileId?: string, hourlyRate?: number }) => {
+  const openAssignModalFor = async (opts: { eventStaffId: string, role: StaffRole, personName?: string, profileId?: string }) => {
     setSelectedEventStaffId(opts.eventStaffId)
     setSelectedRoleForAssignment(opts.role)
     setAssignPersonName(opts.personName || '')
     setAssignProfileId(opts.profileId || '')
-    setAssignHourlyRate(opts.hourlyRate)
+    // Pre-fill arrival time: 2 hours before event time when event has a time component.
+    const computeDefaultArrival = (): string | undefined => {
+      if (!event?.event_date) return undefined
+      const raw = String(event.event_date)
+      // If the stored date string doesn't include a time (e.g. 'YYYY-MM-DD'), leave undefined
+      if (!raw.includes('T')) return undefined
+      const dt = new Date(raw)
+      if (isNaN(dt.getTime())) return undefined
+      dt.setHours(dt.getHours() - 2)
+      const hh = String(dt.getHours()).padStart(2, '0')
+      const mm = String(dt.getMinutes()).padStart(2, '0')
+      return `${hh}:${mm}`
+    }
+    // Prefer arrival_time from the existing eventStaff record when editing.
+    let existing = eventStaff.find((s:any) => s.id === opts.eventStaffId)
+    // If we don't have the record locally (stale state), fetch the single record to ensure freshest data
+    if (!existing) {
+      try {
+        const fresh = await getEventStaffById(opts.eventStaffId)
+        existing = fresh || undefined
+        // If still not found, fall back to reloading full event data
+        if (!existing) {
+          await loadEventData()
+          existing = eventStaff.find((s:any) => s.id === opts.eventStaffId)
+        }
+      } catch (e) {
+        // keep going — we'll compute defaults below
+        console.warn('Falha ao buscar registro de staff por id:', e)
+      }
+    }
+    if (existing && existing.arrival_time) {
+      // DB may return 'HH:MM:SS' — normalize to 'HH:MM'
+      const parts = String(existing.arrival_time).split(':')
+      const hhmm = parts.length >= 2 ? `${parts[0].padStart(2,'0')}:${parts[1].padStart(2,'0')}` : String(existing.arrival_time)
+      setAssignArrivalTime(hhmm)
+      setAssignNotes(existing.notes || '')
+    } else {
+      // Only set default when DB has no arrival_time
+      setAssignArrivalTime(computeDefaultArrival())
+      setAssignNotes('')
+    }
     setShowAssignPerson(true)
   }
 
@@ -170,9 +223,12 @@ export function EventStaffView() {
     }
   }
 
-  const filteredStaff = selectedRole === 'all' 
+  // Sort staff by configured hierarchy. Filter first if a specific role is selected.
+  const filteredStaff = (selectedRole === 'all' 
     ? eventStaff 
-    : eventStaff.filter(s => s.staff_role === selectedRole)
+    : eventStaff.filter(s => s.staff_role === selectedRole))
+    .slice()
+    .sort((a, b) => getRoleRank(a.staff_role) - getRoleRank(b.staff_role))
 
   if (!event) {
     return (
@@ -187,8 +243,8 @@ export function EventStaffView() {
 
   return (
   <div className={`max-w-6xl mx-auto bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
-      {/* Header */}
-      <div className="flex justify-between items-start">
+  {/* Header */}
+  <div className={`flex justify-between items-start ${pageTokens.headerPadding}`}>
         <div>
           <h1 className="text-h1 text-text">Equipe Fascinar</h1>
           <p className="text-text-secondary mt-2">{event.title}</p>
@@ -205,19 +261,19 @@ export function EventStaffView() {
           </Button>
         </div>
       </div>
-                                className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-hover hover:bg-surface-hover text-text"
       {/* Resumo */}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-          <Card className="w-full resume-card">
+          <Card className="w-full resume-card" strong tone="emphasized">
             <CardContent size="md">
               <div className="flex items-center">
-                <Users className="icon-xl text-primary mr-4" />
+                <Users className="icon-2xl text-icon-3 mr-3" />
                 <div>
                   <p className="text-h3 font-bold text-text">{summary.total_roles} {summary.total_roles === 1 ? 'profissional' : 'profissionais'}</p>
                   <p className="text-xs text-text-muted mt-0">
                     {Object.entries(summary.roles_by_type)
                       .filter(([,count]) => count > 0)
+                      .sort((a, b) => getRoleRank(a[0]) - getRoleRank(b[0]))
                       .map(([role, count]) => `${count} ${STAFF_ROLE_LABELS[role as keyof typeof STAFF_ROLE_LABELS]}`)
                       .join(', ')}
                   </p>
@@ -229,26 +285,28 @@ export function EventStaffView() {
       )}
 
       {/* Lista de Staff */}
-      <Card>
-        <CardHeader>
+  <Card strong>
+      <CardHeader>
           <CardTitle className="flex items-center justify-between text-text">
-            <span className="flex items-center gap-2">
-              <Users className="icon-md" />
+              <span className="flex items-center gap-2">
+              <Users className="icon-sm text-icon-3" />
               Equipe e Funções
             </span>
             {/* show Add button inside card header when there is at least one member */}
             {filteredStaff.length > 0 && (
-              <Button onClick={() => setShowAddRole(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Adicionar Função
-              </Button>
+              <div className="hidden md:flex">
+                <Button onClick={() => setShowAddRole(true)}>
+                  <Plus className="w-5 h-5 mr-2" />
+                  Adicionar Função
+                </Button>
+              </div>
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent size="md">
+  <CardContent size="md">
           {filteredStaff.length === 0 ? (
             <div className="text-center text-text-muted">
-              <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <Users className="w-12 h-12 mx-auto mb-4 opacity-50 text-icon-3" />
               <p>Nenhuma função de equipe definida ainda.</p>
               <div className="mt-4">
                 <Button onClick={() => setShowAddRole(true)}>Adicionar Primeira Função</Button>
@@ -262,7 +320,7 @@ export function EventStaffView() {
                 return (
                 <div
                   key={staff.id}
-                  className="border border-border rounded-lg py-2 px-3 bg-surface"
+                  className={`border border-border rounded-lg py-2 px-3 ${getCardItemClasses()}`}
                 >
                   <div className="grid grid-cols-3 items-center gap-3">
                     {/* Função + Nome - role prominent, name below. Dot indicates status before name */}
@@ -273,15 +331,15 @@ export function EventStaffView() {
                       <p className={`text-sm ${isUnassigned ? 'text-text-muted italic' : 'text-text-secondary'} truncate`}>
                         {isUnassigned ? (
                           <span className="inline-flex items-center">
-                            <HelpCircle className="w-4 h-4 text-text-muted mr-2" aria-hidden />
+                            <HelpCircle className="w-4 h-4 text-text-muted mr-1.5" aria-hidden />
                             Não atribuído
                           </span>
                         ) : (
                           <span className="inline-flex items-center">
                             {staff.confirmed ? (
-                              <span aria-label="Confirmado" className="mr-2"><CheckCircle className="w-4 h-4 text-success" aria-hidden /></span>
+                              <span aria-label="Confirmado" className="mr-1.5"><CheckCircle className="w-4 h-4 text-success" aria-hidden /></span>
                             ) : (
-                              <span aria-label="Aguardando" className="mr-2"><AlertTriangle className="w-4 h-4 text-warning" aria-hidden /></span>
+                              <span aria-label="Aguardando" className="mr-1.5"><AlertTriangle className="w-4 h-4 text-warning" aria-hidden /></span>
                             )}
                             {displayName || 'Nome não informado'}
                           </span>
@@ -296,15 +354,17 @@ export function EventStaffView() {
                         (() => {
                           // Mostrar Confirmar sempre que houver um nome atribuído (com ou sem profile)
                           const showConfirm = !isUnassigned && !staff.confirmed
-                          return showConfirm ? (
-                            <Button
-                              onClick={() => handleConfirmStaff(staff.id)}
-                              className="w-10 h-10 rounded-full flex items-center justify-center bg-success hover:bg-success/80 text-white"
-                              aria-label={`Confirmar ${displayName}`}
-                              disabled={loading}
-                            >
-                              <CheckCircle className="w-5 h-5" />
-                            </Button>
+                              return showConfirm ? (
+                              <Button
+                                onClick={() => handleConfirmStaff(staff.id)}
+                                variant="confirm"
+                                size="icon"
+                                className="rounded-full"
+                                aria-label={`Confirmar ${displayName}`}
+                                disabled={loading}
+                              >
+                                <CheckCircle className="w-6 h-6" />
+                              </Button>
                           ) : null
                         })()
                       }
@@ -318,7 +378,8 @@ export function EventStaffView() {
                             return (
                               <Button
                                 onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role })}
-                                className="text-success hover:text-success/80 hover:bg-success/10 px-3 py-1 rounded-md border border-border"
+                                variant="outline"
+                                className="text-success hover:text-success/80 hover:bg-success/10"
                                 aria-label={`Atribuir pessoa à função ${STAFF_ROLE_LABELS[staff.staff_role]}`}
                               >
                                 Atribuir
@@ -327,11 +388,13 @@ export function EventStaffView() {
                           } else {
                             return (
                               <Button
-                                onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role, personName: displayName, profileId: staff.profile_id, hourlyRate: staff.hourly_rate })}
-                                className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-hover hover:bg-surface-hover text-text"
+                                onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role, personName: displayName, profileId: staff.profile_id })}
+                                variant="edit"
+                                size="icon"
+                                className="rounded-full"
                                 aria-label={`Editar atribuição de ${displayName}`}
                               >
-                                <Edit className="w-4 h-4" />
+                                <Edit className="w-6 h-6" />
                               </Button>
                             )
                           }
@@ -339,13 +402,14 @@ export function EventStaffView() {
                       }
 
                      <Button
-                        variant="outline"
+                        variant="destructive"
+                        size="icon"
                         onClick={() => handleRemoveStaff(staff.id)}
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-danger border border-border hover:bg-danger/10"
+                        className="rounded-full"
                         aria-label={`Remover ${displayName || 'função'}`}
                         disabled={loading}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-6 h-6" />
                       </Button>
 
                     </div>
@@ -354,13 +418,24 @@ export function EventStaffView() {
               )})}
             </div>
           )}
+          {/* Mobile full-width add button */}
+          {filteredStaff.length > 0 && (
+            <div className="mt-4 md:hidden">
+              <button
+                onClick={() => setShowAddRole(true)}
+                className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-xl transition-colors"
+              >
+                <Plus className="w-5 h-5 inline mr-2" /> Adicionar Função
+              </button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
       {/* Modal para adicionar função */}
       {showAddRole && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-          <Card className="w-full max-w-md mx-4 bg-surface">
+          <Card className="w-full max-w-md mx-4">
             <CardHeader>
               <CardTitle className="text-text">Adicionar Nova Função</CardTitle>
             </CardHeader>
@@ -396,100 +471,195 @@ export function EventStaffView() {
       )}
 
       {/* Modal para atribuir pessoa */}
-      {showAssignPerson && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-          <Card className="w-full max-w-md mx-4 bg-surface">
-            <CardHeader>
-              <CardTitle className="text-text">Atribuir Pessoa à Função</CardTitle>
-            </CardHeader>
-            <CardContent size="md">
+      <Modal open={showAssignPerson} onClose={() => setShowAssignPerson(false)}>
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-text">Atribuir Pessoa à Função</CardTitle>
+          </CardHeader>
+          <CardContent size="md">
+            <div className="space-y-4">
+              <p className="text-sm text-text-secondary">
+                Função: <strong className="text-icon-3 text-lg font-semibold">{STAFF_ROLE_LABELS[selectedRoleForAssignment as keyof typeof STAFF_ROLE_LABELS]}</strong>
+              </p>
               <div className="space-y-4">
-                <p className="text-sm text-text-secondary">
-                  Função: <strong>{STAFF_ROLE_LABELS[selectedRoleForAssignment as keyof typeof STAFF_ROLE_LABELS]}</strong>
-                </p>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-text">Nome da Pessoa</label>
-                    <input
-                      type="text"
-                      placeholder="Digite o nome..."
-                      className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-text-muted"
-                      value={assignPersonName}
-                      onChange={(e) => setAssignPersonName(e.target.value)}
-                    />
+                <div>
+                  <label htmlFor="assignPersonName" className="block text-sm font-medium mb-2 text-text">Nome da Pessoa</label>
+                  <input
+                    id="assignPersonName"
+                    type="text"
+                    placeholder="Digite o nome..."
+                    className={`w-full px-3 py-2 border border-border rounded-md ${getCardItemClasses()} text-text placeholder-text-muted`}
+                    value={assignPersonName}
+                    onChange={(e) => {
+                      const v = e.target.value
+                      // If user types a free-text name, clear any selected profile assignment
+                      if (assignProfileId) setAssignProfileId('')
+                      setAssignPersonName(v)
+                    }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-text">Escolha um dos usuários disponíveis</label>
+                  <div className="grid grid-cols-2 gap-2 max-h-48 overflow-auto mb-2">
+                    {organizers && organizers.length > 0 ? (
+                      // Sort organizers: available (not disabled) first, then by role rank (null max_role = highest capability), then by name
+                      organizers
+                        .filter((p:any) => p && p.id)
+                        .slice()
+                        .map((p:any) => {
+                          const assignedIds = new Set(eventStaff.map(s => s.profile_id).filter(Boolean))
+                          const alreadyAssigned = assignedIds.has(p.id)
+                          const insufficientRole = p.max_role ? getRoleRank(p.max_role) > getRoleRank(selectedRoleForAssignment as StaffRole) : false
+                          const disabled = alreadyAssigned || insufficientRole
+                          return { profile: p, disabled, alreadyAssigned }
+                        })
+                        .sort((a: any, b: any) => {
+                          // available first
+                          if (a.disabled !== b.disabled) return a.disabled ? 1 : -1
+                          // rank: null max_role => treat as highest capability (rank -1)
+                          const rankA = a.profile.max_role ? getRoleRank(a.profile.max_role) : -1
+                          const rankB = b.profile.max_role ? getRoleRank(b.profile.max_role) : -1
+                          if (rankA !== rankB) return rankA - rankB
+                          // fallback by name
+                          return (a.profile.full_name || '').localeCompare(b.profile.full_name || '')
+                        })
+                        .map((item:any) => {
+                          const p = item.profile
+                          const alreadyAssigned = item.alreadyAssigned
+                          const disabled = item.disabled
+                          
+                          // smaller, compact button using theme colors
+                          return (
+                            <div key={p.id}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  // if disabled do nothing
+                                  if (disabled) return
+                                  // if clicking the already selected profile, deselect and clear assignment
+                                  if (assignProfileId === p.id) {
+                                    setAssignProfileId('')
+                                    setAssignPersonName('')
+                                    return
+                                  }
+                                  setAssignProfileId(p.id)
+                                  setAssignPersonName(p.full_name || '')
+                                }}
+                                disabled={disabled}
+                                className={
+                                  // styles: unavailable -> muted; available -> primary with hover; selected -> primary-light with thicker border
+                                  `w-full text-left px-2 py-1 rounded-md text-sm transition-colors focus:outline-none focus:ring-1 focus:ring-primary/20 ` +
+                                  (disabled
+                                    ? 'bg-transparent text-text-muted border border-border cursor-not-allowed'
+                                    : (assignProfileId === p.id
+                                        ? 'bg-primary-light bg-gradient-button text-white border-2 border-primary-light shadow-sm'
+                                        : 'bg-primary bg-gradient-button text-white border border-primary hover:bg-primary-hover')
+                                  )
+                                }
+                              >
+                                <div className="flex items-center justify-between w-full">
+                                  <div className={`truncate ${alreadyAssigned ? 'opacity-70' : ''}`}>{p.full_name}</div>
+                                  {alreadyAssigned ? <div className="text-xs opacity-70 ml-2">●</div> : null}
+                                </div>
+                              </button>
+                            </div>
+                          )
+                        })
+                    ) : (
+                      <div className="col-span-2 p-3 text-sm text-text-muted">
+                        {organizersLoading ? (
+                          <div>Carregando usuários...</div>
+                        ) : (
+                          <div>
+                            <div>Nenhum organizer ou admin disponível para exibir.</div>
+                            {organizersError ? (
+                              <div className="mt-1 text-xxs text-text-muted">Erro: {organizersError}</div>
+                            ) : (
+                              <div className="mt-1 text-xxs text-text-muted">Possíveis causas: RLS/permissões no banco, usuário não autenticado, ou não existem organizers/admins no DB.</div>
+                            )}
+                            <div className="mt-2">
+                              <Button variant="outline" onClick={async () => { const o = await getOrganizers(); setOrganizers(o || []) }}>Recarregar</Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-text">Profile ID (opcional - apenas para usuários registrados)</label>
-                    <input
-                      type="text"
-                      placeholder="ID do perfil (se houver)"
-                      className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-text-muted"
-                      value={assignProfileId}
-                      onChange={(e) => setAssignProfileId(e.target.value)}
-                    />
-                    <p className="text-xs text-text-muted mt-1">Deixe em branco para pessoas sem conta no sistema</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-text">Valor por Hora (opcional)</label>
-                    <input
-                      type="number"
-                      placeholder="0.00"
-                      step="0.01"
-                      className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text placeholder-text-muted"
-                      value={assignHourlyRate ?? ''}
-                      onChange={(e) => setAssignHourlyRate(e.target.value ? parseFloat(e.target.value) : undefined)}
+                </div>
+                {/* Profile ID input removed per request — keep hidden input to preserve selected profile id in state */}
+                <input type="hidden" id="assignProfileId" value={assignProfileId} />
+                <div>
+                  <label htmlFor="assignArrivalTime" className="block text-sm font-medium mb-2 text-text">Horário de chegada</label>
+                  <input
+                    id="assignArrivalTime"
+                    type="time"
+                    className={`w-full px-3 py-2 border border-border rounded-md ${getCardItemClasses()} text-text`}
+                    value={assignArrivalTime ?? ''}
+                    onChange={(e) => setAssignArrivalTime(e.target.value || undefined)}
+                  />
+                  <div className="mt-3">
+                    <label htmlFor="assignNotes" className="block text-sm font-medium mb-2 text-text">Observações e instruções</label>
+                    <textarea
+                      id="assignNotes"
+                      rows={4}
+                      className={`w-full px-3 py-2 border border-border rounded-md ${getCardItemClasses()} text-text`}
+                      value={assignNotes}
+                      onChange={(e) => setAssignNotes(e.target.value)}
+                      placeholder=""
                     />
                   </div>
                 </div>
-                <div className="flex justify-end gap-2 mt-6">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
+              </div>
+              <div className="flex justify-end gap-2 mt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowAssignPerson(false)
+                    setSelectedEventStaffId('')
+                    setSelectedRoleForAssignment('')
+                    setAssignArrivalTime(undefined)
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={async () => {
+                    const profileId = assignProfileId?.trim() || ''
+                    const personName = assignPersonName?.trim()
+                    const arrivalTime = assignArrivalTime
+
+                    if (!personName && !profileId) {
+                      alert('Por favor, escolha um usuário ou digite o nome da pessoa.')
+                      return
+                    }
+
+                    const success = await assignPersonToRoleWithName(
+                      selectedEventStaffId,
+                      personName || '',
+                      profileId || undefined,
+                      arrivalTime || undefined,
+                      assignNotes || undefined
+                    )
+
+                    if (success) {
+                      await loadEventData()
                       setShowAssignPerson(false)
                       setSelectedEventStaffId('')
                       setSelectedRoleForAssignment('')
-                    }}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    onClick={async () => {
-                      const profileId = assignProfileId?.trim() || ''
-                      const personName = assignPersonName?.trim()
-                      const hourlyRate = assignHourlyRate
-
-                      if (!personName) {
-                        alert('Por favor, digite o nome da pessoa.')
-                        return
-                      }
-
-                      // Use assignPersonToRoleWithName que cria perfil temporário se necessário
-                      const success = await assignPersonToRoleWithName(
-                        selectedEventStaffId,
-                        personName,
-                        profileId || undefined,
-                        hourlyRate
-                      )
-
-                      if (success) {
-                        await loadEventData()
-                        setShowAssignPerson(false)
-                        setSelectedEventStaffId('')
-                        setSelectedRoleForAssignment('')
-                        setAssignPersonName('')
-                        setAssignProfileId('')
-                        setAssignHourlyRate(undefined)
-                      }
-                    }}
-                  >
-                    <Plus className="w-4 h-4 mr-1" /> Atribuir
-                  </Button>
-                </div>
+                      setAssignPersonName('')
+                      setAssignProfileId('')
+                      setAssignArrivalTime(undefined)
+                      setAssignNotes('')
+                    }
+                  }}
+                >
+                  <Plus className="w-5 h-5 mr-1" /> Atribuir
+                </Button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </div>
+          </CardContent>
+        </Card>
+      </Modal>
 
       {/* Templates Rápidos */}
       <Card>
@@ -501,7 +671,7 @@ export function EventStaffView() {
             {DEFAULT_STAFF_TEMPLATES.map((template) => (
               <div
                 key={template.id}
-                className="border border-border rounded-lg hover:bg-surface-hover cursor-pointer p-4 bg-surface"
+                className={`border border-border rounded-lg cursor-pointer p-4 ${getCardItemClasses()}`}
                 onClick={() => applyTemplate(template.id)}
               >
                 <h3 className="font-semibold text-text">{template.name}</h3>
@@ -519,8 +689,8 @@ export function EventStaffView() {
 
       {/* Loading/Error States */}
       {loading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="rounded-lg bg-surface">
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <Card className="rounded-lg">
             <CardContent size="md">
               <div className="animate-spin w-8 h-8 border-4 border-border border-t-transparent rounded-full mx-auto"></div>
                 <div className="animate-spin w-8 h-8 border-4 border-border border-t-transparent rounded-full mx-auto"></div>

@@ -6,7 +6,7 @@ const DashboardView: React.FC = () => {
   return (
   <div className={`bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
       {/* Header */}
-  <div className="bg-background rounded-3xl p-8 border border-border">
+    <div className={`bg-background rounded-3xl ${pageTokens.headerPadding} border border-border`}>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-h1 text-text">

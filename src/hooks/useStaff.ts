@@ -166,6 +166,30 @@ export function useStaff() {
     }
   }
 
+  // Buscar um registro event_staff detalhado por id (usando view event_staff_details)
+  const getEventStaffById = async (eventStaffId: string): Promise<EventStaffDetailed | null> => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const { data, error } = await supabase
+        .from('event_staff_details')
+        .select('*')
+        .eq('id', eventStaffId)
+        .limit(1)
+        .single()
+
+      if (error) throw error
+      return data || null
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao buscar registro de staff'
+      setError(message)
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Atribuir staff a um evento
   const assignStaffToEvent = async (
     eventId: string,
@@ -207,14 +231,16 @@ export function useStaff() {
     eventStaffId: string,
     personName: string,
     profileId?: string,
-    hourlyRate?: number
+    arrivalTime?: string,
+    notes?: string
   ): Promise<boolean> => {
     try {
       setLoading(true)
       setError(null)
 
       const updateData: any = {
-        hourly_rate: hourlyRate
+        arrival_time: arrivalTime || null,
+        notes: notes || null
       }
 
       if (profileId) {
@@ -231,10 +257,13 @@ export function useStaff() {
   updateData.confirmed = false
   updateData.confirmed_at = null
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('event_staff')
         .update(updateData)
         .eq('id', eventStaffId)
+
+  // Debugging: log response so we can verify arrival_time and notes were written
+  console.log('useStaff.assignPersonToRoleWithName response', { eventStaffId, updateData, data, error })
 
       if (error) throw error
       return true
@@ -251,7 +280,7 @@ export function useStaff() {
   const assignPersonToRole = async (
     eventStaffId: string,
     profileId: string,
-    hourlyRate?: number,
+    arrivalTime?: string,
     hoursPlanned?: number
   ): Promise<boolean> => {
     try {
@@ -263,18 +292,19 @@ export function useStaff() {
         return false
       }
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('event_staff')
         .update({
           profile_id: profileId,
-          hourly_rate: hourlyRate,
-          hours_planned: hoursPlanned || 8.0
-          ,
+          arrival_time: arrivalTime || null,
+          hours_planned: hoursPlanned || 8.0,
           // Ao reassociar um profile, revogar confirmação anterior
           confirmed: false,
           confirmed_at: null
         })
         .eq('id', eventStaffId)
+
+      console.log('useStaff.assignPersonToRole response', { eventStaffId, profileId, arrivalTime, data, error })
 
       if (error) throw error
       return true
@@ -293,9 +323,9 @@ export function useStaff() {
     staffRole: StaffRole,
     personName: string,
     profileId?: string,
-    hourlyRate?: number,
-    hoursPlanned?: number,
-    notes?: string
+    arrivalTime?: string,
+  hoursPlanned?: number,
+  notes?: string
   ): Promise<boolean> => {
     try {
       setLoading(true)
@@ -304,7 +334,7 @@ export function useStaff() {
       const insertData: any = {
         event_id: eventId,
         staff_role: staffRole,
-        hourly_rate: hourlyRate,
+        arrival_time: arrivalTime || null,
         hours_planned: hoursPlanned || 8.0,
         notes,
         confirmed: false
@@ -320,9 +350,11 @@ export function useStaff() {
         insertData.profile_id = null
       }
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('event_staff')
         .insert(insertData)
+
+      console.log('useStaff.assignStaffToEventWithName response', { insertData, data, error })
 
       if (error) throw error
       return true
@@ -543,6 +575,7 @@ export function useStaff() {
     
   // Event staff management
   getEventStaff,
+  getEventStaffById,
   addRoleToEvent,
   assignPersonToRole,
   assignPersonToRoleWithName,

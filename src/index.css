@@ -42,6 +42,18 @@ html, body, #root {
   animation-delay: 0.2s;
 }
 
+/* Button gradient overlay - preserves primary color */
+.bg-gradient-button {
+  background: var(--color-primary);
+  background-image: var(--gradient-button);
+}
+
+/* Fallback for hover states on gradient buttons */
+.bg-gradient-button:hover {
+  background: var(--color-primary-hover);
+  background-image: var(--gradient-button);
+}
+
 .glass-strong {
   background: rgba(255, 255, 255, 0.15);
   -webkit-backdrop-filter: blur(30px);
@@ -202,3 +214,35 @@ html, body, #root {
 .particle:nth-child(6) { top: 70%; left: 5%; width: 3px; height: 3px; animation-delay: -3s; }
 .particle:nth-child(7) { top: 30%; left: 60%; width: 5px; height: 5px; animation-delay: -5s; }
 .particle:nth-child(8) { top: 90%; left: 40%; width: 4px; height: 4px; animation-delay: -7s; }
+
+/* Fallback hover for card items using CSS variable so hover works without Tailwind rebuild */
+.card-item-hover:hover {
+  background-color: var(--color-item-hover) !important;
+}
+
+/* Gradient utilities applied via theme variables */
+.bg-gradient-card {
+  background-image: var(--gradient-card);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Page-level gradient background utility */
+.bg-gradient-page {
+  background-image: var(--gradient-page);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Icon semantic color utilities (map to CSS theme variables) */
+.text-icon-1 { color: var(--color-icon-1) !important; }
+.text-icon-2 { color: var(--color-icon-2) !important; }
+.text-icon-3 { color: var(--color-icon-3) !important; }
+
+/* Fallback utility so bg-surface-2 works immediately with theme variables */
+.bg-surface-2 { background-color: var(--color-surface-2) !important; }
+
+/* Ensure SVG strokes using currentColor follow the icon token */
+.text-icon-1 svg, .text-icon-1 [stroke="currentColor"] { stroke: var(--color-icon-1) !important; }
+.text-icon-2 svg, .text-icon-2 [stroke="currentColor"] { stroke: var(--color-icon-2) !important; }
+.text-icon-3 svg, .text-icon-3 [stroke="currentColor"] { stroke: var(--color-icon-3) !important; }

@@ -8,12 +8,13 @@ interface CardProps {
   className?: string
   size?: Size
   padding?: string // override spacing token
+  strong?: boolean
+  tone?: 'normal' | 'emphasized'
 }
 
 interface CardHeaderProps {
   children: React.ReactNode
   className?: string
-  size?: Size
 }
 
 interface CardContentProps {
@@ -27,14 +28,21 @@ interface CardTitleProps {
   className?: string
 }
 
-export function Card({ children, className = '', size = 'md', padding }: CardProps) {
+export function Card({ children, className = '', size = 'md', padding, strong = false, tone = 'normal' }: CardProps) {
   // By default Card doesn't add inner padding so consumers can opt-in with
   // CardHeader/CardContent. If `padding` is provided, we wrap children.
   const shouldWrap = Boolean(padding)
   const spacing = padding ?? cardTokens.spacing[size]
 
+  const shadowClass = strong ? cardTokens.shadowStrong : cardTokens.shadowTheme
+
+  // Always use gradient background, but change base color based on tone
+  const baseColorClass = tone === 'emphasized' ? 'bg-surface-2' : 'bg-surface'
+  const gradientClass = 'bg-gradient-card'
+  const backgroundClass = `${baseColorClass} ${gradientClass}`
+
   return (
-  <div className={`${cardTokens.background} ${cardTokens.radius} ${cardTokens.shadow} ${cardTokens.border} ${className}`}>
+  <div className={`${backgroundClass} ${cardTokens.radius} ${shadowClass} ${cardTokens.border} ${className}`}>
       {shouldWrap ? (
         <div className={`w-full ${spacing}`}>
           {children}
@@ -46,10 +54,14 @@ export function Card({ children, className = '', size = 'md', padding }: CardPro
   )
 }
 
-export function CardHeader({ children, className = '', size = 'md' }: CardHeaderProps) {
-  const spacing = cardTokens.spacing[size]
+export function CardHeader({ children, className = '' }: CardHeaderProps) {
+  // prefer an explicit header padding token so classes are literal for Tailwind
+  const headerPadding = cardTokens.header.padding
+
+  // Use surface-title background with gradient and border and match the card's top radius
+  const headerRadius = cardTokens.header.radius ?? ''
   return (
-    <div className={`border-b border-border ${spacing} ${className}`}>
+    <div className={`${cardTokens.header.background} ${cardTokens.header.border} ${headerPadding} ${headerRadius} ${className}`}>
       {children}
     </div>
   )

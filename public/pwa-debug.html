@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Debug - Fascinar Eventos</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status-ok { color: #22c55e; }
+        .status-error { color: #ef4444; }
+        .status-warning { color: #f59e0b; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        pre {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 PWA Debug - Fascinar Eventos</h1>
+    
+    <div class="debug-card">
+        <h2>📋 PWA Install Criteria</h2>
+        <div id="criteria-results"></div>
+        <button onclick="checkCriteria()">Verificar Critérios</button>
+    </div>
+
+    <div class="debug-card">
+        <h2>🔧 Service Worker Status</h2>
+        <div id="sw-results"></div>
+        <button onclick="checkServiceWorker()">Verificar SW</button>
+    </div>
+
+    <div class="debug-card">
+        <h2>📱 Manifest</h2>
+        <div id="manifest-results"></div>
+        <button onclick="checkManifest()">Verificar Manifest</button>
+    </div>
+
+    <div class="debug-card">
+        <h2>🎛️ PWA Actions</h2>
+        <button onclick="simulateEngagement()">Simular User Engagement</button>
+        <button onclick="clearPWAData()">Limpar Dados PWA</button>
+        <button onclick="forceInstall()">Forçar Instalação</button>
+        <button onclick="goToApp()">Ir para App</button>
+    </div>
+
+    <div class="debug-card">
+        <h2>📊 Current Status</h2>
+        <div id="status-results"></div>
+        <button onclick="updateStatus()">Atualizar Status</button>
+    </div>
+
+    <script>
+        // Check PWA install criteria
+        function checkCriteria() {
+            const criteria = {
+                https: location.protocol === 'https:' || location.hostname === 'localhost',
+                manifest: !!document.querySelector('link[rel="manifest"]'),
+                serviceWorker: 'serviceWorker' in navigator,
+                userEngaged: localStorage.getItem('user-engaged') === 'true',
+                timeSpent: localStorage.getItem('engagement-time-met') === 'true',
+                notInstalled: !window.matchMedia('(display-mode: standalone)').matches,
+                beforeInstallPrompt: !!window.deferredPrompt
+            };
+
+            const results = Object.entries(criteria).map(([key, value]) => {
+                const status = value ? '✅' : '❌';
+                const className = value ? 'status-ok' : 'status-error';
+                return `<div class="${className}">${status} ${key}: ${value}</div>`;
+            }).join('');
+
+            document.getElementById('criteria-results').innerHTML = results;
+        }
+
+        // Check Service Worker
+        async function checkServiceWorker() {
+            let html = '';
+            
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    const data = {
+                        registered: !!registration,
+                        controlling: !!navigator.serviceWorker.controller,
+                        scope: registration?.scope || 'N/A',
+                        state: registration?.active?.state || 'N/A'
+                    };
+                    
+                    html = Object.entries(data).map(([key, value]) => {
+                        const status = (key === 'registered' || key === 'controlling') ? (value ? '✅' : '❌') : '📋';
+                        return `<div>${status} ${key}: ${value}</div>`;
+                    }).join('');
+                } catch (error) {
+                    html = `<div class="status-error">❌ Error: ${error.message}</div>`;
+                }
+            } else {
+                html = '<div class="status-error">❌ Service Worker not supported</div>';
+            }
+            
+            document.getElementById('sw-results').innerHTML = html;
+        }
+
+        // Check Manifest
+        async function checkManifest() {
+            const manifestLink = document.querySelector('link[rel="manifest"]');
+            let html = '';
+            
+            if (manifestLink) {
+                try {
+                    const response = await fetch(manifestLink.href);
+                    const manifest = await response.json();
+                    
+                    const requiredFields = ['name', 'start_url', 'display', 'icons'];
+                    const missingFields = requiredFields.filter(field => !manifest[field]);
+                    
+                    if (missingFields.length === 0) {
+                        html = '<div class="status-ok">✅ Manifest tem todos os campos obrigatórios</div>';
+                    } else {
+                        html = `<div class="status-error">❌ Campos faltando: ${missingFields.join(', ')}</div>`;
+                    }
+                    
+                    html += `<pre>${JSON.stringify(manifest, null, 2)}</pre>`;
+                } catch (error) {
+                    html = `<div class="status-error">❌ Erro ao carregar manifest: ${error.message}</div>`;
+                }
+            } else {
+                html = '<div class="status-error">❌ Manifest não encontrado</div>';
+            }
+            
+            document.getElementById('manifest-results').innerHTML = html;
+        }
+
+        // Simulate user engagement
+        function simulateEngagement() {
+            localStorage.setItem('user-engaged', 'true');
+            localStorage.setItem('engagement-time-met', 'true');
+            localStorage.setItem('session-start', (Date.now() - 60000).toString());
+            alert('✅ User engagement simulado! Vá para o app e veja se o prompt aparece.');
+        }
+
+        // Clear PWA data
+        function clearPWAData() {
+            const keys = [
+                'pwa-install-dismissed',
+                'user-engaged', 
+                'engagement-time-met',
+                'session-start',
+                'last-interaction'
+            ];
+            
+            keys.forEach(key => localStorage.removeItem(key));
+            alert('🧹 Dados PWA limpos!');
+            updateStatus();
+        }
+
+        // Force install prompt
+        function forceInstall() {
+            if (window.deferredPrompt) {
+                window.deferredPrompt.prompt();
+                alert('📲 Prompt de instalação disparado!');
+            } else {
+                alert('❌ Nenhum prompt de instalação disponível');
+            }
+        }
+
+        // Go to main app
+        function goToApp() {
+            window.open('http://localhost:5174/', '_blank');
+        }
+
+        // Update current status
+        function updateStatus() {
+            const status = {
+                'Current URL': location.href,
+                'Display Mode': window.matchMedia('(display-mode: standalone)').matches ? 'Standalone (PWA)' : 'Browser',
+                'User Engaged': localStorage.getItem('user-engaged') || 'false',
+                'Time Requirement': localStorage.getItem('engagement-time-met') || 'false',
+                'Install Dismissed': localStorage.getItem('pwa-install-dismissed') ? 'Yes' : 'No',
+                'Session Start': localStorage.getItem('session-start') ? new Date(parseInt(localStorage.getItem('session-start'))).toLocaleString() : 'Not set'
+            };
+
+            const html = Object.entries(status).map(([key, value]) => {
+                return `<div>📋 ${key}: <strong>${value}</strong></div>`;
+            }).join('');
+
+            document.getElementById('status-results').innerHTML = html;
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            checkCriteria();
+            checkServiceWorker();
+            updateStatus();
+            
+            // Make functions global for console access
+            window.checkCriteria = checkCriteria;
+            window.checkServiceWorker = checkServiceWorker;
+            window.checkManifest = checkManifest;
+            window.simulateEngagement = simulateEngagement;
+            window.clearPWAData = clearPWAData;
+            window.forceInstall = forceInstall;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+/* Debug CSS - Force CSS variable updates */
+:root {
+  /* Force browser to re-evaluate CSS variables */
+  --dev-timestamp: '__DEV_TIMESTAMP__';
+}
+
+/* Force re-render quando surface-title muda */
+.bg-surface-title {
+  background-color: var(--color-surface-title) !important;
+  /* Add animation to force repaint */
+  animation: cssForceUpdate 0.1s ease-in-out;
+}
+
+@keyframes cssForceUpdate {
+  0% { opacity: 0.999; }
+  100% { opacity: 1; }
+}
+
+/* Debug info */
+body::before {
+  content: "CSS Updated: " attr(data-css-version);
+  position: fixed;
+  top: 0;
+  right: 0;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 4px 8px;
+  font-size: 10px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.7;
+}

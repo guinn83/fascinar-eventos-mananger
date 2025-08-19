@@ -106,16 +106,62 @@ export const usePWAWindowManager = () => {
 
 // Hook para detectar se o app foi instalado como PWA
 export const usePWADetection = () => {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-  const isInStandaloneMode = (window.navigator as any).standalone === true
+  // Verificações de segurança
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    return {
+      isPWA: false,
+      isStandalone: false,
+      isIOS: false,
+      canInstall: false,
+      debugInfo: { error: 'Browser environment not available' }
+    }
+  }
+
+  let isStandalone = false
+  let isIOS = false
+  let isInStandaloneMode = false
+
+  try {
+    isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    isInStandaloneMode = (window.navigator as any).standalone === true
+  } catch (error) {
+    console.warn('[PWA Detection] Error detecting PWA status:', error)
+  }
+
   const isPWA = isStandalone || (isIOS && isInStandaloneMode)
+
+  // Debug PWA detection
+  const debugInfo = {
+    userAgent: navigator.userAgent,
+    isStandalone,
+    isIOS,
+    isInStandaloneMode,
+    isPWA,
+    hasServiceWorker: 'serviceWorker' in navigator,
+    isSecureContext: window.isSecureContext,
+    displayMode: (() => {
+      try {
+        return window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 
+               window.matchMedia('(display-mode: fullscreen)').matches ? 'fullscreen' :
+               window.matchMedia('(display-mode: minimal-ui)').matches ? 'minimal-ui' : 'browser'
+      } catch {
+        return 'unknown'
+      }
+    })()
+  }
+
+  // Log debug info in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[PWA Detection]', debugInfo)
+  }
 
   return {
     isPWA,
     isStandalone,
     isIOS,
-    canInstall: !isPWA && 'serviceWorker' in navigator
+    canInstall: !isPWA && 'serviceWorker' in navigator,
+    debugInfo
   }
 }
 
@@ -123,44 +169,101 @@ export const usePWADetection = () => {
 export const usePWAInstall = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
+  const [isPromptDismissed, setIsPromptDismissed] = useState(false)
 
   useEffect(() => {
-    const handler = (e: any) => {
-      e.preventDefault()
-      setDeferredPrompt(e)
-      setShowInstallPrompt(true)
+    // Verificações de segurança
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return
     }
 
-    window.addEventListener('beforeinstallprompt', handler)
+    try {
+      // Verificar se o usuário já rejeitou o prompt
+      const dismissedTime = localStorage.getItem('pwa-install-dismissed')
+      const now = Date.now()
+      const oneWeek = 7 * 24 * 60 * 60 * 1000 // 1 semana em millisegundos
+      
+      if (dismissedTime && (now - parseInt(dismissedTime)) < oneWeek) {
+        setIsPromptDismissed(true)
+        return
+      }
 
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handler)
+      const handler = (e: any) => {
+        try {
+          e.preventDefault()
+          setDeferredPrompt(e)
+          if (!isPromptDismissed) {
+            setShowInstallPrompt(true)
+          }
+        } catch (error) {
+          console.warn('[PWA Install] Error handling beforeinstallprompt:', error)
+        }
+      }
+
+      window.addEventListener('beforeinstallprompt', handler)
+
+      return () => {
+        window.removeEventListener('beforeinstallprompt', handler)
+      }
+    } catch (error) {
+      console.warn('[PWA Install] Error setting up install prompt:', error)
     }
-  }, [])
+  }, [isPromptDismissed])
 
   const installPWA = async () => {
-    if (!deferredPrompt) return false
+    if (!deferredPrompt) {
+      console.warn('[PWA Install] No deferred prompt available')
+      return false
+    }
 
-    deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
-    
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null)
-      setShowInstallPrompt(false)
-      return true
+    try {
+      deferredPrompt.prompt()
+      const { outcome } = await deferredPrompt.userChoice
+      
+      console.log('[PWA Install] User choice:', outcome)
+      
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null)
+        setShowInstallPrompt(false)
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem('pwa-install-dismissed')
+        }
+        console.log('[PWA Install] Installation accepted')
+        return true
+      } else {
+        // Se o usuário rejeitou, lembrar por 1 semana
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('pwa-install-dismissed', Date.now().toString())
+        }
+        setIsPromptDismissed(true)
+        setShowInstallPrompt(false)
+        console.log('[PWA Install] Installation dismissed')
+      }
+    } catch (error) {
+      console.error('[PWA Install] Error during installation:', error)
     }
     
     return false
   }
 
   const hideInstallPrompt = () => {
-    setShowInstallPrompt(false)
+    try {
+      // Salvar que o usuário dispensou o prompt por 1 semana
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('pwa-install-dismissed', Date.now().toString())
+      }
+      setIsPromptDismissed(true)
+      setShowInstallPrompt(false)
+    } catch (error) {
+      console.warn('[PWA Install] Error hiding install prompt:', error)
+    }
   }
 
   return {
     canInstall: !!deferredPrompt,
-    showInstallPrompt,
+    showInstallPrompt: showInstallPrompt && !isPromptDismissed,
     installPWA,
-    hideInstallPrompt
+    hideInstallPrompt,
+    isPromptDismissed
   }
 }

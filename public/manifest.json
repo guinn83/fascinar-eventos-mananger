@@ -1,7 +1,7 @@
 {
   "name": "Fascinar Eventos - Gerenciador",
   "short_name": "Fascinar Eventos",
-  "description": "Sistema de gerenciamento de eventos",
+  "description": "Sistema completo de gerenciamento de eventos com funcionalidades offline, gestão de staff, clientes e planejamento de eventos",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -9,7 +9,10 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "id": "/",
-  "categories": ["business", "productivity"],
+  "categories": ["business", "productivity", "utilities"],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
   "protocol_handlers": [
     {
       "protocol": "web+fascinar",

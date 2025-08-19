@@ -12,6 +12,7 @@ import { StaffAvailabilityView } from './views/StaffAvailabilityView'
 import ClientsView from './views/ClientsView'
 import SupabaseTest from './components/SupabaseTest'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
+import { TestCard } from './TestCard'
 
 function App() {
   const { user, loading, initialized, initializeAuth } = useAuthStore()
@@ -70,6 +71,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/dashboard" element={<DashboardView />} />
+                  <Route path="/test" element={<TestCard />} />
                   <Route path="/clientes" element={<ClientsView />} />
                   <Route path="/eventos" element={<EventsView />} />
                   <Route path="/eventos/:id" element={<EventDetailView />} />
