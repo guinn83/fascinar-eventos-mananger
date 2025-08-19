@@ -438,6 +438,7 @@ SELECT
   es.staff_role,
   es.confirmed,
   es.hourly_rate,
+  es.notes,
   es.arrival_time,
   es.hours_planned,
   es.hours_worked,

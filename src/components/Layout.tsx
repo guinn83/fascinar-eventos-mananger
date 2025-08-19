@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { ThemeToggle } from './ThemeToggle'
 import { pageTokens } from './ui/theme'
+import { Modal } from './ui/Modal'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -51,12 +52,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </header>
 
       {/* Sidebar Overlay (Mobile) */}
-      {sidebarOpen && (
-        <div 
-          className="md:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={() => setSidebarOpen(false)}
-        ></div>
-      )}
+      <Modal open={sidebarOpen} onClose={() => setSidebarOpen(false)} backdropClassName="md:hidden bg-black/50 z-40" className="p-0">
+        <div />
+      </Modal>
 
       {/* Sidebar */}
       <aside 

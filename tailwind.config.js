@@ -77,7 +77,10 @@ module.exports = {
     'bg-surface-2',
     'bg-surface-title',
     'bg-gradient-card',
-    'bg-surface-hover'
+    'bg-surface-hover',
+    'bg-primary-light',
+    'bg-primary-hover',
+    'bg-none'
   ],
   plugins: [],
 }

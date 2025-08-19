@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Card, CardContent } from '../components/ui/card'
 import { pageTokens } from '../components/ui/theme'
 import { useClients } from '../hooks/useClients'
+import { Modal } from '../components/ui/Modal'
 import type { Client } from '../types/client'
 
 const ClientsView: React.FC = () => {
@@ -227,7 +228,7 @@ const ClientsView: React.FC = () => {
 
       {/* Create Client Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <Modal open={showCreateModal} onClose={() => setShowCreateModal(false)}>
           <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
             <CardContent size="md">
               <div className="flex items-center justify-between mb-6">
@@ -314,12 +315,12 @@ const ClientsView: React.FC = () => {
             </form>
             </CardContent>
           </Card>
-        </div>
+        </Modal>
       )}
 
       {/* Edit Client Modal */}
       {showEditModal && selectedClient && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <Modal open={showEditModal && !!selectedClient} onClose={() => setShowEditModal(false)}>
           <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
             <CardContent size="md">
               <div className="flex items-center justify-between mb-6">
@@ -406,7 +407,7 @@ const ClientsView: React.FC = () => {
             </form>
             </CardContent>
           </Card>
-        </div>
+        </Modal>
       )}
 
     </>

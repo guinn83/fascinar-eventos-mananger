@@ -13,13 +13,13 @@ export function useProfiles() {
       const { data, error } = await supabase
         .from('profiles')
         .select('id, full_name, role, max_role')
-        .eq('role', 'organizer')
+        .in('role', ['organizer', 'admin'])
         .order('full_name', { ascending: true })
 
       if (error) throw error
       return data || []
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao buscar organizers')
+      setError(err instanceof Error ? err.message : 'Erro ao buscar organizers e admins')
       return []
     } finally {
       setLoading(false)

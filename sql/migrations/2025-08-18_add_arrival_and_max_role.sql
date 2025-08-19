@@ -9,8 +9,9 @@ ALTER TABLE public.profiles
 ALTER TABLE public.event_staff
   ADD COLUMN IF NOT EXISTS arrival_time TIME NULL;
 
--- Update view event_staff_details to include arrival_time and guard cost calculations
-CREATE OR REPLACE VIEW event_staff_details AS
+-- Drop existing view first to avoid column renaming conflicts
+DROP VIEW IF EXISTS event_staff_details CASCADE;
+CREATE VIEW event_staff_details AS
 SELECT 
   es.id,
   es.event_id,
@@ -23,6 +24,7 @@ SELECT
   es.staff_role,
   es.confirmed,
   es.hourly_rate,
+  es.notes,
   es.arrival_time,
   es.hours_planned,
   es.hours_worked,

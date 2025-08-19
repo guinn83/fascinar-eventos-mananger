@@ -15,7 +15,6 @@ interface CardProps {
 interface CardHeaderProps {
   children: React.ReactNode
   className?: string
-  size?: Size
 }
 
 interface CardContentProps {
@@ -55,12 +54,14 @@ export function Card({ children, className = '', size = 'md', padding, strong = 
   )
 }
 
-export function CardHeader({ children, className = '', size = 'md' }: CardHeaderProps) {
-  const spacing = cardTokens.spacing[size]
-  
-  // Use surface-title background with gradient and border
+export function CardHeader({ children, className = '' }: CardHeaderProps) {
+  // prefer an explicit header padding token so classes are literal for Tailwind
+  const headerPadding = cardTokens.header.padding
+
+  // Use surface-title background with gradient and border and match the card's top radius
+  const headerRadius = cardTokens.header.radius ?? ''
   return (
-    <div className={`${cardTokens.header.background} ${cardTokens.header.border} ${spacing} ${className}`}>
+    <div className={`${cardTokens.header.background} ${cardTokens.header.border} ${headerPadding} ${headerRadius} ${className}`}>
       {children}
     </div>
   )
