@@ -11,6 +11,7 @@ import {
   getRoleRank
 } from '../types/staff'
 import { pageTokens, getCardItemClasses } from '../components/ui/theme'
+import { useProfiles } from '../hooks/useProfiles'
 // Update the import path if the card components are located elsewhere, for example:
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
@@ -56,12 +57,25 @@ export function EventStaffView() {
   // Controlled inputs for assign/edit modal
   const [assignPersonName, setAssignPersonName] = useState('')
   const [assignProfileId, setAssignProfileId] = useState('')
-  const [assignHourlyRate, setAssignHourlyRate] = useState<number | undefined>(undefined)
+  const [assignArrivalTime, setAssignArrivalTime] = useState<string | undefined>(undefined)
+
+  // profiles helper
+  const { getOrganizers } = useProfiles()
+  const [organizers, setOrganizers] = useState<any[]>([])
 
   useEffect(() => {
     if (id) {
       loadEventData()
     }
+    // warm fetch organizers
+    ;(async () => {
+      try {
+        const o = await getOrganizers()
+        setOrganizers(o || [])
+      } catch (e) {
+        // ignore
+      }
+    })()
   }, [id])
 
   const loadEventData = async () => {
@@ -97,12 +111,11 @@ export function EventStaffView() {
     }
   }
 
-  const openAssignModalFor = (opts: { eventStaffId: string, role: StaffRole, personName?: string, profileId?: string, hourlyRate?: number }) => {
+  const openAssignModalFor = (opts: { eventStaffId: string, role: StaffRole, personName?: string, profileId?: string }) => {
     setSelectedEventStaffId(opts.eventStaffId)
     setSelectedRoleForAssignment(opts.role)
     setAssignPersonName(opts.personName || '')
     setAssignProfileId(opts.profileId || '')
-    setAssignHourlyRate(opts.hourlyRate)
     setShowAssignPerson(true)
   }
 
@@ -315,7 +328,7 @@ export function EventStaffView() {
                           } else {
                             return (
                               <Button
-                                onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role, personName: displayName, profileId: staff.profile_id, hourlyRate: staff.hourly_rate })}
+                                onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role, personName: displayName, profileId: staff.profile_id })}
                                 variant="edit"
                                 size="icon"
                                 className="rounded-full"
@@ -400,8 +413,9 @@ export function EventStaffView() {
                 </p>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-text">Nome da Pessoa</label>
+                    <label htmlFor="assignPersonName" className="block text-sm font-medium mb-2 text-text">Nome da Pessoa</label>
                     <input
+                      id="assignPersonName"
                       type="text"
                       placeholder="Digite o nome..."
                       className={`w-full px-3 py-2 border border-border rounded-md ${getCardItemClasses()} text-text placeholder-text-muted`}
@@ -410,25 +424,56 @@ export function EventStaffView() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-text">Profile ID (opcional - apenas para usuários registrados)</label>
-                    <input
-                      type="text"
-                      placeholder="ID do perfil (se houver)"
-                      className={`w-full px-3 py-2 border border-border rounded-md ${getCardItemClasses()} text-text placeholder-text-muted`}
-                      value={assignProfileId}
-                      onChange={(e) => setAssignProfileId(e.target.value)}
-                    />
-                    <p className="text-xs text-text-muted mt-1">Deixe em branco para pessoas sem conta no sistema</p>
+                    <label className="block text-sm font-medium mb-2 text-text">Usuários disponíveis (Organizers)</label>
+                    <div className="grid grid-cols-2 gap-2 max-h-48 overflow-auto mb-2">
+                      {organizers
+                        .filter((p:any) => p && p.id)
+                        .map((p:any) => {
+                          const assignedIds = new Set(eventStaff.map(s => s.profile_id).filter(Boolean))
+                          const alreadyAssigned = assignedIds.has(p.id)
+                          const insufficientRole = p.max_role ? getRoleRank(p.max_role) > getRoleRank(selectedRoleForAssignment as StaffRole) : false
+                          const disabled = alreadyAssigned || insufficientRole
+                          const reason = alreadyAssigned ? 'Já atribuído a este evento' : (insufficientRole ? `Perfil limitado até ${STAFF_ROLE_LABELS[p.max_role as keyof typeof STAFF_ROLE_LABELS]}` : '')
+                          return (
+                            <button
+                              key={p.id}
+                              className={`text-left p-2 border rounded ${assignProfileId === p.id ? 'border-primary bg-primary/5' : ''} ${disabled ? 'opacity-60 cursor-not-allowed' : 'hover:border-primary hover:bg-primary/5'}`}
+                                  type="button"
+                                  onClick={() => {
+                                    if (disabled) return
+                                    setAssignProfileId(p.id)
+                                    setAssignPersonName(p.full_name || '')
+                                  }}
+                                  aria-label={disabled ? `${p.full_name} indisponível: ${reason}` : `Selecionar ${p.full_name}`}
+                                  tabIndex={disabled ? -1 : 0}
+                                  disabled={disabled}
+                            >
+                              <div className="font-medium text-text">{p.full_name}</div>
+                              <div className="text-xs text-text-muted">{p.max_role ? `até ${STAFF_ROLE_LABELS[p.max_role as keyof typeof STAFF_ROLE_LABELS]}` : 'sem limite'}</div>
+                              {disabled && <div className="text-xxs text-text-muted mt-1">{reason}</div>}
+                            </button>
+                          )
+                        })}
+                    </div>
+                    <p className="text-xs text-text-muted mt-1">Clique para selecionar um usuário; ou use o campo abaixo para digitar um nome livre.</p>
+                    {assignPersonName ? (
+                      <div className="mt-2">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-surface text-text text-sm">
+                          Selecionado: <span className="font-medium ml-2">{assignPersonName}</span>
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
+                  {/* Profile ID input removed per request — keep hidden input to preserve selected profile id in state */}
+                  <input type="hidden" id="assignProfileId" value={assignProfileId} />
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-text">Valor por Hora (opcional)</label>
+                    <label htmlFor="assignArrivalTime" className="block text-sm font-medium mb-2 text-text">Horário de chegada (opcional)</label>
                     <input
-                      type="number"
-                      placeholder="0.00"
-                      step="0.01"
-                      className={`w-full px-3 py-2 border border-border rounded-md ${getCardItemClasses()} text-text placeholder-text-muted`}
-                      value={assignHourlyRate ?? ''}
-                      onChange={(e) => setAssignHourlyRate(e.target.value ? parseFloat(e.target.value) : undefined)}
+                      id="assignArrivalTime"
+                      type="time"
+                      className={`w-full px-3 py-2 border border-border rounded-md ${getCardItemClasses()} text-text`}
+                      value={assignArrivalTime ?? ''}
+                      onChange={(e) => setAssignArrivalTime(e.target.value || undefined)}
                     />
                   </div>
                 </div>
@@ -447,19 +492,18 @@ export function EventStaffView() {
                     onClick={async () => {
                       const profileId = assignProfileId?.trim() || ''
                       const personName = assignPersonName?.trim()
-                      const hourlyRate = assignHourlyRate
+                      const arrivalTime = assignArrivalTime
 
-                      if (!personName) {
-                        alert('Por favor, digite o nome da pessoa.')
+                      if (!personName && !profileId) {
+                        alert('Por favor, escolha um usuário ou digite o nome da pessoa.')
                         return
                       }
 
-                      // Use assignPersonToRoleWithName que cria perfil temporário se necessário
                       const success = await assignPersonToRoleWithName(
                         selectedEventStaffId,
-                        personName,
+                        personName || '',
                         profileId || undefined,
-                        hourlyRate
+                        arrivalTime || undefined
                       )
 
                       if (success) {
@@ -469,7 +513,7 @@ export function EventStaffView() {
                         setSelectedRoleForAssignment('')
                         setAssignPersonName('')
                         setAssignProfileId('')
-                        setAssignHourlyRate(undefined)
+                        setAssignArrivalTime(undefined)
                       }
                     }}
                   >

@@ -64,6 +64,7 @@ export interface EventStaff {
   assigned_at: string;
   confirmed_at?: string;
   assigned_by?: string;
+  arrival_time?: string; // HH:mm, optional arrival time for the person
   
   // Campos para compatibilidade (deprecated)
   profile_id?: string; // Para compatibilidade com código antigo
@@ -83,6 +84,7 @@ export interface EventStaffDetailed extends EventStaff {
   
   // Propriedades da nova estrutura
   staff_role: StaffRole; // Derivado de role_name
+  arrival_time?: string; // HH:mm
 }
 
 // Interface para sugestões de staff

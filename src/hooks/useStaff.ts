@@ -207,14 +207,14 @@ export function useStaff() {
     eventStaffId: string,
     personName: string,
     profileId?: string,
-    hourlyRate?: number
+    arrivalTime?: string
   ): Promise<boolean> => {
     try {
       setLoading(true)
       setError(null)
 
       const updateData: any = {
-        hourly_rate: hourlyRate
+        arrival_time: arrivalTime || null
       }
 
       if (profileId) {
@@ -251,7 +251,7 @@ export function useStaff() {
   const assignPersonToRole = async (
     eventStaffId: string,
     profileId: string,
-    hourlyRate?: number,
+    arrivalTime?: string,
     hoursPlanned?: number
   ): Promise<boolean> => {
     try {
@@ -267,9 +267,8 @@ export function useStaff() {
         .from('event_staff')
         .update({
           profile_id: profileId,
-          hourly_rate: hourlyRate,
-          hours_planned: hoursPlanned || 8.0
-          ,
+          arrival_time: arrivalTime || null,
+          hours_planned: hoursPlanned || 8.0,
           // Ao reassociar um profile, revogar confirmação anterior
           confirmed: false,
           confirmed_at: null
@@ -293,7 +292,7 @@ export function useStaff() {
     staffRole: StaffRole,
     personName: string,
     profileId?: string,
-    hourlyRate?: number,
+    arrivalTime?: string,
     hoursPlanned?: number,
     notes?: string
   ): Promise<boolean> => {
@@ -304,7 +303,7 @@ export function useStaff() {
       const insertData: any = {
         event_id: eventId,
         staff_role: staffRole,
-        hourly_rate: hourlyRate,
+        arrival_time: arrivalTime || null,
         hours_planned: hoursPlanned || 8.0,
         notes,
         confirmed: false
