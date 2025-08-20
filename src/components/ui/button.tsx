@@ -25,8 +25,9 @@ export function Button({
     default: 'bg-gradient-button text-white hover:bg-primary/90 focus:ring-primary/40',
     outline: 'border border-border bg-surface text-text hover:bg-surface-hover focus:ring-primary/40',
     ghost: 'text-text hover:bg-surface-hover focus:ring-primary/40',
-    destructive: 'bg-danger text-white hover:bg-danger/90 focus:ring-danger/40',
-    danger: 'bg-danger text-white hover:bg-danger/90 focus:ring-danger/40',
+  // apply gradient overlay to dangerous variants so they match other buttons visually
+  destructive: 'bg-danger bg-gradient-danger text-white hover:bg-danger/90 focus:ring-danger/40',
+  danger: 'bg-danger bg-gradient-danger text-white hover:bg-danger/90 focus:ring-danger/40',
     confirm: 'bg-success text-white hover:bg-success/80 focus:ring-primary/40',
     edit: 'bg-surface text-text hover:bg-surface-hover border border-border focus:ring-primary/40'
   }

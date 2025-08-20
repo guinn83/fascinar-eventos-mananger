@@ -140,10 +140,10 @@ export const dark = {
     'icon-3': '#fcce00ff', // accent/gold for dark
 
     // Status colors - ajustados para dark mode
-    success: '#d68b00ff',         // emerald-500
+    success: '#fcce00ff',         // emerald-500
     warning: '#ff7b00ff',         // amber-500
     danger:  '#7c062aff',          // red-500
-    info: '#7f0ee9ff',           // sky-500
+    info: '#ddb0d7ff',           // sky-500
     
   // Border colors
   border: '#412a47ff',         // gray-700
@@ -199,7 +199,7 @@ export const semanticClasses = {
   'icon-md': 'w-4 h-4',
   'icon-lg': 'w-5 h-5',
   'icon-xl': 'w-7 h-7',
-  'icon-2xl': 'w-15 h-15',
+  'icon-2xl': 'w-10 h-10',
 
   // Common spacing
   'space-section': 'space-y-6',
@@ -269,7 +269,7 @@ export const uiTokens = {
 export const pageTokens = {
   // options: sm | md | lg — maps to Tailwind padding utilities
   container: {
-    sm: 'px-4 py-4',
+    sm: 'px-2 py-2',
     md: 'px-4 py-4',
     lg: 'px-8 py-8'
   },
