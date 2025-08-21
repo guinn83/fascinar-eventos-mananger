@@ -21,14 +21,14 @@ export function Button({
 }: ButtonProps) {
   const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus-visible:outline-none focus:ring-2 disabled:opacity-50 disabled:pointer-events-none'
 
+  // variant -> base classes (background color, text, focus)
   const variantClasses: Record<string,string> = {
-    default: 'bg-gradient-button text-white hover:bg-primary/90 focus:ring-primary/40',
+  default: 'text-white focus:ring-primary/40',
     outline: 'border border-border bg-surface text-text hover:bg-surface-hover focus:ring-primary/40',
     ghost: 'text-text hover:bg-surface-hover focus:ring-primary/40',
-  // apply gradient overlay to dangerous variants so they match other buttons visually
-  destructive: 'bg-danger bg-gradient-danger text-white hover:bg-danger/90 focus:ring-danger/40',
-  danger: 'bg-danger bg-gradient-danger text-white hover:bg-danger/90 focus:ring-danger/40',
-    confirm: 'bg-success text-white hover:bg-success/80 focus:ring-primary/40',
+  destructive: 'text-white focus:ring-danger/40',
+  danger: 'text-white focus:ring-danger/40',
+  confirm: 'bg-success text-white focus:ring-primary/40',
     edit: 'bg-surface text-text hover:bg-surface-hover border border-border focus:ring-primary/40'
   }
   
@@ -39,12 +39,25 @@ export function Button({
     icon: 'h-10 w-10 p-2.5'
   }
   
+  const driven = variant === 'default' || variant === 'destructive' || variant === 'danger' || variant === 'confirm'
+
+  // Map variant -> helper class that sets gradient variables (defined in index.css)
+  const variantClassMap: Record<string, string> = {
+    default: 'btn-variant-default',
+    destructive: 'btn-variant-destructive',
+    danger: 'btn-variant-danger',
+    confirm: 'btn-variant-confirm',
+    edit: 'btn-variant-edit',
+    outline: 'btn-variant-outline',
+    ghost: 'btn-variant-ghost'
+  }
+
   return (
     <button
       type={type}
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       onClick={onClick}
       disabled={disabled}
+      className={`${baseClasses} ${driven ? `bg-gradient-driven ${variantClassMap[variant]}` : ''} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
     >
       {children}
     </button>
