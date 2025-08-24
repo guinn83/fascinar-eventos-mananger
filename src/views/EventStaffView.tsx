@@ -474,8 +474,7 @@ export function EventStaffView() {
                             return (
                               <Button
                                 onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role })}
-                                variant="outline"
-                                className="text-success hover:text-success/80 hover:bg-success/10"
+                                variant="default"
                                 aria-label={`Atribuir pessoa à função ${STAFF_ROLE_LABELS[staff.staff_role]}`}
                               >
                                 Atribuir
