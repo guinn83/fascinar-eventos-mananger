@@ -3,13 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useEvents } from '../hooks/useEvents'
 import { useStaff } from '../hooks/useStaff'
 import { 
-  STAFF_ROLE_LABELS, 
-  DEFAULT_STAFF_TEMPLATES,
+  STAFF_ROLE_LABELS,
   type StaffRole,
   type EventStaffDetailed,
   type EventStaffSummary,
   getRoleRank
 } from '../types/staff'
+import { DEFAULT_STAFF_TEMPLATES } from '../config/staffTemplates'
+import { summarizeTemplate, formatRolesByType } from '../utils/staffUtils'
 import { pageTokens, getCardItemClasses } from '../components/ui/theme'
 import { useProfiles } from '../hooks/useProfiles'
 // Update the import path if the card components are located elsewhere, for example:
@@ -61,6 +62,9 @@ export function EventStaffView() {
   const [assignProfileId, setAssignProfileId] = useState('')
   const [assignArrivalTime, setAssignArrivalTime] = useState<string | undefined>(undefined)
   const [assignNotes, setAssignNotes] = useState<string>('')
+
+  // state for clearing all roles
+  const [clearingAll, setClearingAll] = useState(false)
 
   // profiles helper
   const { getOrganizers, loading: organizersLoading, error: organizersError } = useProfiles()
@@ -204,6 +208,28 @@ export function EventStaffView() {
     }
   }
 
+  const handleClearAllRoles = async () => {
+    if (!id) return
+    if (!eventStaff || eventStaff.length === 0) return
+    if (!confirm('Remover todas as funções deste evento? Esta ação não pode ser desfeita.')) return
+    setClearingAll(true)
+    try {
+      const ops = eventStaff.map(s => removeStaffFromEvent(s.id).catch(e => ({ ok: false, error: String(e) })))
+      const results = await Promise.all(ops)
+      const anyFailed = results.some(r => r === false || (r && (r as any).ok === false))
+      if (anyFailed) {
+        console.error('handleClearAllRoles results:', results)
+        alert('Algumas remoções falharam. Verifique o console para detalhes.')
+      }
+      await loadEventData()
+    } catch (err) {
+      console.error('Erro ao limpar funções:', err)
+      alert('Erro ao limpar funções. Verifique o console para mais detalhes.')
+    } finally {
+      setClearingAll(false)
+    }
+  }
+
   const applyTemplate = async (templateId: string) => {
     if (!id) return
 
@@ -211,15 +237,72 @@ export function EventStaffView() {
     if (!template) return
 
     try {
-      for (const role of template.default_roles) {
-        for (let i = 0; i < role.quantity; i++) {
-          // Criar placeholder para o role (sem atribuir pessoa específica ainda)
-          // Isso pode ser implementado como uma função separada
+  console.log('applyTemplate start', { templateId, eventId: id, template })
+  // Fetch the freshest staff list for the event to reconcile counts
+      const current = await getEventStaff(id)
+      const byRole: Record<string, EventStaffDetailed[]> = {}
+      for (const s of current) {
+        const role = s.staff_role || (s as any).role_name || 'unknown'
+        if (!byRole[role]) byRole[role] = []
+        byRole[role].push(s)
+      }
+
+      const ops: Promise<any>[] = []
+
+      // Handle roles defined in template
+      for (const tplRole of template.default_roles) {
+        const roleKeyRaw = tplRole.staff_role
+        const roleKey = String(roleKeyRaw).trim()
+        const desired = tplRole.quantity || 0
+        const existing = byRole[roleKey] || []
+        const currentCount = existing.length
+
+  // Debug log: show counts and planned actions
+  console.log('applyTemplate: role', { role: roleKey, desired, currentCount })
+
+        if (currentCount < desired) {
+          const toAdd = desired - currentCount
+          console.log('applyTemplate: will add', { role: roleKey, toAdd })
+          for (let i = 0; i < toAdd; i++) {
+            ops.push(addRoleToEvent(id, roleKey as StaffRole))
+          }
+        } else if (currentCount > desired) {
+          // remove excess roles: prefer unconfirmed ones
+          let removable = existing.filter(r => !r.confirmed)
+          // if not enough unconfirmed, include confirmed as last resort (avoid if possible)
+          if (removable.length < (currentCount - desired)) {
+            const needed = (currentCount - desired) - removable.length
+            const confirmedOnes = existing.filter(r => r.confirmed).slice(0, needed)
+            removable = removable.concat(confirmedOnes)
+          }
+          // remove the oldest removable entries first
+          removable = removable.sort((a,b) => {
+            const ta = new Date(a.assigned_at || '').getTime() || 0
+            const tb = new Date(b.assigned_at || '').getTime() || 0
+            return ta - tb
+          }).slice(0, currentCount - desired)
+          console.log('applyTemplate: will remove', { role: roleKey, removeIds: removable.map(r => r.id) })
+          for (const rem of removable) {
+            ops.push(removeStaffFromEvent(rem.id))
+          }
         }
       }
-      await loadEventData()
+
+      // Handle roles present in current but not in template -> remove extras (prefer unconfirmed)
+      const templateRoles = new Set(template.default_roles.map(r => r.staff_role))
+      for (const [role, list] of Object.entries(byRole)) {
+        if (!templateRoles.has(role as any)) {
+          // remove all unconfirmed instances for roles not in template
+          const toRemove = list.filter(r => !r.confirmed)
+          for (const rem of toRemove) ops.push(removeStaffFromEvent(rem.id))
+        }
+      }
+
+  const results = await Promise.all(ops.map(p => p.catch(e => ({ ok: false, error: String(e) }))))
+  console.log('applyTemplate ops results', results)
+  await loadEventData()
     } catch (err) {
-      console.error('Erro ao aplicar template:', err)
+  console.error('Erro ao aplicar template:', err)
     }
   }
 
@@ -242,49 +325,62 @@ export function EventStaffView() {
   }
 
   return (
-  <div className={`max-w-6xl mx-auto bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
+    <div className={`max-w-6xl mx-auto bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
   {/* Header */}
-  <div className={`flex justify-between items-start ${pageTokens.headerPadding}`}>
-        <div>
-          <h1 className="text-h1 text-text">Equipe Fascinar</h1>
-          <p className="text-text-secondary mt-2">{event.title}</p>
-          <p className="text-small text-text-muted">
-            {new Date(event.event_date).toLocaleDateString('pt-BR')} • {event.location}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => navigate(`/eventos/${id}`)}
-          >
-            Voltar ao Evento
-          </Button>
-        </div>
-      </div>
-      {/* Resumo */}
-      {summary && (
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-          <Card className="w-full resume-card" strong tone="emphasized">
-            <CardContent size="md">
-              <div className="flex items-center">
-                <Users className="icon-2xl text-icon-3 mr-3" />
-                <div>
-                  <p className="text-h3 font-bold text-text">{summary.total_roles} {summary.total_roles === 1 ? 'profissional' : 'profissionais'}</p>
-                  <p className="text-xs text-text-muted mt-0">
-                    {Object.entries(summary.roles_by_type)
-                      .filter(([,count]) => count > 0)
-                      .sort((a, b) => getRoleRank(a[0]) - getRoleRank(b[0]))
-                      .map(([role, count]) => `${count} ${STAFF_ROLE_LABELS[role as keyof typeof STAFF_ROLE_LABELS]}`)
-                      .join(', ')}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+  <div className={`${pageTokens.headerPadding}`}>
+    <div className="flex items-center justify-between">
+  <h1 className="text-h3 md:text-h1 font-bold text-text">Equipe Fascinar</h1>
+      <Button
+        variant="outline"
+        onClick={() => navigate(`/eventos/${id}`)}
+      >
+        Voltar ao Evento
+      </Button>
+    </div>
+    <div className="mt-4 space-y-1">
+  <p className="text-h4 md:text-h3 text-text font-bold truncate">{event?.title}</p>
+      <p className="text-small text-text-muted truncate">
+        {(() => {
+          try {
+            const parts: string[] = []
+            const raw = event?.event_date
+            if (raw) {
+              const d = new Date(raw)
+              if (!isNaN(d.getTime())) {
+                parts.push(d.toLocaleDateString('pt-BR'))
+                const time = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                if (time) parts.push(time)
+              }
+            }
+            if (event?.location) parts.push(String(event.location))
+            return parts.join(' • ')
+          } catch {
+            return ''
+          }
+        })()}
+      </p>
+    </div>
+  </div>
+  {/* Resumo */}
+  {summary && (
+    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+      <Card className="w-full resume-card" strong tone="emphasized">
+        <CardContent size="md">
+          <div className="flex items-center">
+            <Users className="icon-2xl text-icon-3 mr-3" />
+            <div>
+              <p className="text-h3 font-bold text-text">{summary.total_roles} {summary.total_roles === 1 ? 'profissional' : 'profissionais'}</p>
+              <p className="text-xs text-text-muted mt-0">
+                {formatRolesByType(summary.roles_by_type)}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )}
 
-      {/* Lista de Staff */}
+  {/* Lista de Staff */}
   <Card strong>
       <CardHeader>
           <CardTitle className="flex items-center justify-between text-text">
@@ -378,8 +474,7 @@ export function EventStaffView() {
                             return (
                               <Button
                                 onClick={() => openAssignModalFor({ eventStaffId: staff.id, role: staff.staff_role })}
-                                variant="outline"
-                                className="text-success hover:text-success/80 hover:bg-success/10"
+                                variant="default"
                                 aria-label={`Atribuir pessoa à função ${STAFF_ROLE_LABELS[staff.staff_role]}`}
                               >
                                 Atribuir
@@ -401,7 +496,7 @@ export function EventStaffView() {
                         })()
                       }
 
-                     <Button
+                      <Button
                         variant="destructive"
                         size="icon"
                         onClick={() => handleRemoveStaff(staff.id)}
@@ -420,13 +515,21 @@ export function EventStaffView() {
           )}
           {/* Mobile full-width add button */}
           {filteredStaff.length > 0 && (
-            <div className="mt-4 md:hidden">
-              <button
+            <div className="mt-4 md:hidden flex gap-2">
+              <Button
                 onClick={() => setShowAddRole(true)}
-                className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-xl transition-colors"
+                className="flex-1 justify-center py-3"
               >
                 <Plus className="w-5 h-5 inline mr-2" /> Adicionar Função
-              </button>
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleClearAllRoles}
+                disabled={clearingAll}
+                className="flex-1 justify-center py-3 bg-danger bg-gradient-button"
+              >
+                {clearingAll ? 'Limpando...' : (<><Trash2 className="w-5 h-5 inline mr-2" /> Limpar</>)}
+              </Button>
             </div>
           )}
         </CardContent>
@@ -668,21 +771,23 @@ export function EventStaffView() {
         </CardHeader>
         <CardContent size="md">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {DEFAULT_STAFF_TEMPLATES.map((template) => (
-              <div
-                key={template.id}
-                className={`border border-border rounded-lg cursor-pointer p-4 ${getCardItemClasses()}`}
-                onClick={() => applyTemplate(template.id)}
-              >
-                <h3 className="font-semibold text-text">{template.name}</h3>
-                <p className="text-sm text-text-secondary mt-1">{template.description}</p>
-                <div className="mt-3">
-                  <p className="text-xs text-text-muted">
-                    {template.default_roles.length} funções
-                  </p>
+            {DEFAULT_STAFF_TEMPLATES.map((template) => {
+              const { total, breakdown } = summarizeTemplate(template)
+              return (
+                <div
+                  key={template.id}
+                  className={`border border-border rounded-lg cursor-pointer p-3 ${getCardItemClasses()}`}
+                  onClick={() => applyTemplate(template.id)}
+                >
+                  <h3 className="font-semibold border-border bg-surface px-2 rounded text-info">{template.name}</h3>
+                  {/* <p className="text-sm text-text-secondary mt-1">{template.description}</p> */}
+                  <div className="mt-3">
+                    <p className="text-sm text-text">{total} {total === 1 ? 'profissional' : 'profissionais'}</p>
+                    <p className="text-xs text-text-muted mt-1">{breakdown}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </CardContent>
       </Card>

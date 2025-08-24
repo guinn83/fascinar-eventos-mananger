@@ -37,6 +37,55 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       root.style.setProperty(`--color-${key}`, value)
     })
 
+    // Compute and set "hover" color tokens for any base color that lacks a hover token.
+    // This avoids relying on CSS color-mix and ensures older browsers receive a sensible hover.
+    const hasHoverToken = (k: string) => Object.prototype.hasOwnProperty.call((themeData as any).colors, `${k}-hover`)
+
+    const hexToRgb = (hex: string) => {
+      // Accept #RRGGBB or #RRGGBBAA
+      if (!hex) return null
+      const cleaned = hex.replace('#', '')
+      const hasAlpha = cleaned.length === 8
+      const r = parseInt(cleaned.substring(0, 2), 16)
+      const g = parseInt(cleaned.substring(2, 4), 16)
+      const b = parseInt(cleaned.substring(4, 6), 16)
+      const a = hasAlpha ? parseInt(cleaned.substring(6, 8), 16) / 255 : 1
+      return { r, g, b, a }
+    }
+
+    const rgbToHex = (r: number, g: number, b: number, a?: number) => {
+      const toHex = (n: number) => {
+        const v = Math.max(0, Math.min(255, Math.round(n)))
+        return v.toString(16).padStart(2, '0')
+      }
+      if (typeof a === 'number') {
+        const aa = Math.max(0, Math.min(1, a))
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}${toHex(Math.round(aa * 255))}`
+      }
+      return `#${toHex(r)}${toHex(g)}${toHex(b)}`
+    }
+
+    const darken = (hex: string, amount = 0.18) => {
+      const rgb = hexToRgb(hex)
+      if (!rgb) return hex
+      const r = Math.round(rgb.r * (1 - amount))
+      const g = Math.round(rgb.g * (1 - amount))
+      const b = Math.round(rgb.b * (1 - amount))
+      return rgbToHex(r, g, b, rgb.a)
+    }
+
+    // For each base color token, if <token>-hover does not exist, compute a darker variant and set it.
+    Object.keys((themeData as any).colors).forEach((key) => {
+      // only compute for base tokens (no '-' in key or keys not already hover tokens)
+      if (key.endsWith('-hover')) return
+      const hoverKey = `${key}-hover`
+      if (!hasHoverToken(key)) {
+        const base = (themeData as any).colors[key]
+  const computed = darken(base, 0.18)
+  if (computed) root.style.setProperty(`--color-${hoverKey}`, computed)
+      }
+    })
+
     // Runtime debug: verify important surface variable is applied to :root
     try {
       const applied = getComputedStyle(root).getPropertyValue('--color-surface-2')

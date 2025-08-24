@@ -44,15 +44,84 @@ html, body, #root {
 
 /* Button gradient overlay - preserves primary color */
 .bg-gradient-button {
-  background: var(--color-primary);
+  background-color: var(--color-primary);
   background-image: var(--gradient-button);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-blend-mode: overlay;
 }
 
 /* Fallback for hover states on gradient buttons */
 .bg-gradient-button:hover {
-  background: var(--color-primary-hover);
+  background-color: var(--color-primary-hover);
   background-image: var(--gradient-button);
 }
+
+/* Danger-specific gradient overlay - preserves danger color */
+.bg-gradient-danger {
+  background-color: var(--color-danger);
+  /* subtle light/dark overlay to give a gradient feel while keeping danger hue */
+  background-image: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.06) 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-blend-mode: overlay;
+}
+
+.bg-gradient-danger:hover {
+  background-color: var(--color-danger-hover);
+  background-image: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.06) 100%);
+}
+
+/* Generic, variable-driven gradient overlay: components set --color-base and --color-base-hover */
+.bg-gradient-driven {
+  background-color: var(--color-base, var(--color-primary));
+  background-image: var(--gradient-button);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-blend-mode: overlay;
+}
+
+.bg-gradient-driven:hover {
+  /* Prefer explicit --color-base-hover if provided; otherwise fall back to --color-base.
+     Avoid color-mix for older browsers by using explicit hover tokens set in variant classes. */
+  background-color: var(--color-base-hover, var(--color-base));
+  background-image: var(--gradient-button);
+}
+
+/* Per-variant helper classes that set CSS variables consumed by .bg-gradient-driven.
+  Note: they intentionally set --color-base-hover using explicit theme hover tokens to support older browsers.
+  You can still override hover per-variant by defining --color-base-hover in the class if needed. */
+.btn-variant-default { 
+  --color-base: var(--color-primary);
+  --color-base-hover: var(--color-primary-hover);
+}
+.btn-variant-destructive { 
+  --color-base: var(--color-danger);
+  --color-base-hover: var(--color-danger-hover);
+}
+.btn-variant-danger { 
+  --color-base: var(--color-danger);
+  --color-base-hover: var(--color-danger-hover);
+}
+.btn-variant-confirm { 
+  --color-base: var(--color-success);
+  --color-base-hover: var(--color-success-hover);
+}
+.btn-variant-edit { 
+  --color-base: var(--color-surface);
+  --color-base-hover: var(--color-surface-hover);
+}
+.btn-variant-outline { 
+  --color-base: var(--color-surface);
+  --color-base-hover: var(--color-surface-hover);
+}
+.btn-variant-ghost { 
+  --color-base: transparent;
+  --color-base-hover: transparent;
+}
+
+/* Utility: ensure hover class for danger exists if used in className */
+.hover\:bg-danger-hover:hover { background-color: var(--color-danger-hover); }
 
 .glass-strong {
   background: rgba(255, 255, 255, 0.15);
