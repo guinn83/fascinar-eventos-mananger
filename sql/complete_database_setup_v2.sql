@@ -244,6 +244,30 @@ CREATE TABLE IF NOT EXISTS staff_availability (
   CHECK (start_time < end_time OR (start_time IS NULL AND end_time IS NULL))
 );
 
+-- Tabela de disponibilidade de staff por evento específico
+CREATE TABLE IF NOT EXISTS staff_event_availability (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  staff_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  
+  -- Status de disponibilidade
+  is_available BOOLEAN NOT NULL DEFAULT false,
+  
+  -- Horários opcionais (dentro do evento)
+  available_from TIME NULL,  -- NULL = desde o início do evento
+  available_until TIME NULL, -- NULL = até o final do evento
+  
+  -- Observações
+  notes TEXT,
+  
+  -- Auditoria
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  -- Constraint: um registro por staff por evento
+  UNIQUE(staff_id, event_id)
+);
+
 -- Tabela de roles padrão para staff
 CREATE TABLE IF NOT EXISTS default_staff_roles (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -287,6 +311,10 @@ CREATE TRIGGER update_staff_availability_updated_at
   BEFORE UPDATE ON staff_availability 
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_staff_event_availability_updated_at 
+  BEFORE UPDATE ON staff_event_availability 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 CREATE TRIGGER update_default_staff_roles_updated_at 
   BEFORE UPDATE ON default_staff_roles 
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -294,6 +322,9 @@ CREATE TRIGGER update_default_staff_roles_updated_at
 -- Índices para performance
 CREATE INDEX IF NOT EXISTS idx_staff_availability_profile_id ON staff_availability(profile_id);
 CREATE INDEX IF NOT EXISTS idx_staff_availability_date ON staff_availability(available_date);
+CREATE INDEX IF NOT EXISTS idx_staff_event_availability_staff ON staff_event_availability(staff_id);
+CREATE INDEX IF NOT EXISTS idx_staff_event_availability_event ON staff_event_availability(event_id);
+CREATE INDEX IF NOT EXISTS idx_staff_event_availability_available ON staff_event_availability(is_available);
 CREATE INDEX IF NOT EXISTS idx_default_staff_roles_profile_id ON default_staff_roles(profile_id);
 CREATE INDEX IF NOT EXISTS idx_default_staff_roles_role ON default_staff_roles(staff_role);
 CREATE INDEX IF NOT EXISTS idx_event_staff_event_id ON event_staff(event_id);

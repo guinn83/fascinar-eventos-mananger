@@ -3,6 +3,35 @@
 
 console.log('🔍 PWA Debug Helper - Fascinar Eventos');
 
+// Função para limpar completamente o Service Worker
+const clearServiceWorker = async () => {
+  if ('serviceWorker' in navigator) {
+    try {
+      console.log('🧹 Limpando Service Worker...');
+      
+      // Desregistrar todos os service workers
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (let registration of registrations) {
+        console.log('Desregistrando SW:', registration.scope);
+        await registration.unregister();
+      }
+      
+      // Limpar todos os caches
+      const cacheNames = await caches.keys();
+      for (let cacheName of cacheNames) {
+        console.log('Deletando cache:', cacheName);
+        await caches.delete(cacheName);
+      }
+      
+      console.log('✅ Service Worker e caches limpos!');
+      console.log('🔄 Recarregue a página para aplicar as mudanças');
+      
+    } catch (error) {
+      console.error('❌ Erro ao limpar SW:', error);
+    }
+  }
+};
+
 // Verificar critérios de instalação
 const checkPWAInstallCriteria = () => {
   const criteria = {
@@ -109,6 +138,7 @@ checkServiceWorker()      - Status do Service Worker
 checkManifest()           - Verificar manifest.json
 simulateUserEngagement()  - Simular engajamento do usuário
 clearPWAData()            - Limpar dados PWA salvos
+clearServiceWorker()      - LIMPAR SERVICE WORKER (resolver problemas de rede)
 forceInstallPrompt()      - Forçar prompt de instalação
 showPWACommands()         - Mostrar estes comandos novamente
   `);
@@ -126,5 +156,6 @@ window.checkServiceWorker = checkServiceWorker;
 window.checkManifest = checkManifest;
 window.simulateUserEngagement = simulateUserEngagement;
 window.clearPWAData = clearPWAData;
+window.clearServiceWorker = clearServiceWorker;
 window.forceInstallPrompt = forceInstallPrompt;
 window.showPWACommands = showPWACommands;

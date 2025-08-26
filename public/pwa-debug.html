@@ -65,6 +65,7 @@
         <h2>🎛️ PWA Actions</h2>
         <button onclick="simulateEngagement()">Simular User Engagement</button>
         <button onclick="clearPWAData()">Limpar Dados PWA</button>
+        <button onclick="clearServiceWorker()" style="background: #ff4444; color: white;">🧹 LIMPAR SERVICE WORKER</button>
         <button onclick="forceInstall()">Forçar Instalação</button>
         <button onclick="goToApp()">Ir para App</button>
     </div>
@@ -176,6 +177,38 @@
             keys.forEach(key => localStorage.removeItem(key));
             alert('🧹 Dados PWA limpos!');
             updateStatus();
+        }
+
+        // Clear Service Worker (resolve problemas de rede)
+        async function clearServiceWorker() {
+            if (!confirm('Isso vai limpar completamente o Service Worker e caches. Continuar?')) {
+                return;
+            }
+            
+            try {
+                console.log('🧹 Limpando Service Worker...');
+                
+                // Desregistrar todos os service workers
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                    console.log('Desregistrando SW:', registration.scope);
+                    await registration.unregister();
+                }
+                
+                // Limpar todos os caches
+                const cacheNames = await caches.keys();
+                for (let cacheName of cacheNames) {
+                    console.log('Deletando cache:', cacheName);
+                    await caches.delete(cacheName);
+                }
+                
+                alert('✅ Service Worker e caches limpos! A página será recarregada.');
+                window.location.reload();
+                
+            } catch (error) {
+                console.error('❌ Erro ao limpar SW:', error);
+                alert('❌ Erro: ' + error.message);
+            }
         }
 
         // Force install prompt

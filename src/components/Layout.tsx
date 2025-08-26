@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { ThemeToggle } from './ThemeToggle'
-import { pageTokens } from './ui/theme'
+import { Icon } from './ui/icons'
+import { pageTokens, uiTokens } from './ui/theme'
 import { Modal } from './ui/Modal'
 
 interface LayoutProps {
@@ -32,10 +33,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-xl bg-primary/10 text-icon-2 hover:bg-primary/90 transition-colors"
+              className="p-2 rounded-xl bg-surface-hover text-icon-2 hover:bg-surface-hover transition-colors"
               aria-label="Toggle sidebar"
             >
-              <i className="fas fa-bars text-lg"></i>
+              <Icon name="AlignLeft" className="text-lg" />
             </button>
               <h1 className="text-xl font-bold text-text">
                 Fascinar
@@ -43,16 +44,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
             <button
               onClick={handleLogout}
-              className="p-2 rounded-xl text-icon-1 hover:text-danger hover:bg-danger/10 transition-colors"
+              className="p-2 rounded-xl text-icon-1 hover:text-text hover:bg-surface-hover transition-colors"
               aria-label="Logout"
             >
-              <i className="fas fa-sign-out-alt text-lg"></i>
+              <Icon name="ArrowLeft" className="text-lg" />
             </button>
         </div>
       </header>
 
       {/* Sidebar Overlay (Mobile) */}
-      <Modal open={sidebarOpen} onClose={() => setSidebarOpen(false)} backdropClassName="md:hidden bg-black/50 z-40" className="p-0">
+  <Modal open={sidebarOpen} onClose={() => setSidebarOpen(false)} backdropClassName={`md:hidden ${uiTokens.backdrop} z-40`} className="p-0">
         <div />
       </Modal>
 
@@ -64,9 +65,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-  <div className={`flex items-center space-x-3 ${pageTokens.headerPadding} py-6 border-b border-border`}>
+        <div className={`flex items-center space-x-3 ${pageTokens.headerPadding} py-6 border-b border-border`}>
         <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
-                  <i className="fas fa-calendar-star text-white text-lg"></i>
+                  <Icon name="CalendarCheck" className="text-white text-lg" />
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-text">
@@ -80,7 +81,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 className="md:hidden p-1 rounded-lg text-text-muted hover:text-text-secondary hover:bg-surface-hover transition-colors"
               aria-label="Close sidebar"
             >
-              <i className="fas fa-times"></i>
+              <Icon name="XCircle" className="" />
             </button>
           
 
@@ -90,11 +91,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               onClick={() => handleNavigation('/dashboard')}
               className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 location.pathname === '/dashboard'
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'text-text hover:text-primary hover:bg-primary/10'
+                  ? 'bg-surface-title text-text shadow-lg'
+                  : 'text-text hover:text-primary hover:bg-surface-hover'
               }`}
             >
-              <i className="fas fa-chart-line mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+              <Icon name="TrendingUp" className="mr-3 text-lg group-hover:scale-110 transition-transform" />
               Dashboard
             </button>
 
@@ -102,11 +103,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               onClick={() => handleNavigation('/clientes')}
               className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 location.pathname === '/clientes'
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'text-text hover:text-primary hover:bg-primary/10'
+                  ? 'bg-surface-title text-text shadow-lg'
+                  : 'text-text hover:text-primary hover:bg-surface-hover'
               }`}
             >
-              <i className="fas fa-users mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+              <Icon name="Users" className="mr-3 text-lg group-hover:scale-110 transition-transform" />
               Clientes
             </button>
 
@@ -114,11 +115,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               onClick={() => handleNavigation('/eventos')}
               className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 location.pathname === '/eventos'
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'text-text hover:text-primary hover:bg-primary/10'
+                  ? 'bg-surface-title text-text shadow-lg'
+                  : 'text-text hover:text-primary hover:bg-surface-hover'
               }`}
             >
-              <i className="fas fa-calendar-alt mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+              <Icon name="Calendar" className="mr-3 text-lg group-hover:scale-110 transition-transform" />
               Eventos
             </button>
 
@@ -126,19 +127,31 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               onClick={() => handleNavigation('/disponibilidade')}
               className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 location.pathname === '/disponibilidade'
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'text-text hover:text-primary hover:bg-primary/10'
+                  ? 'bg-surface-title text-text shadow-lg'
+                  : 'text-text hover:text-primary hover:bg-surface-hover'
               }`}
             >
-              <i className="fas fa-calendar-check mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+              <Icon name="CalendarCheck" className="mr-3 text-lg group-hover:scale-110 transition-transform" />
               Minha Disponibilidade
+            </button>
+
+            <button
+              onClick={() => handleNavigation('/admin/disponibilidades')}
+              className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                location.pathname === '/admin/disponibilidades'
+                  ? 'bg-surface-title text-text shadow-lg'
+                  : 'text-text hover:text-primary hover:bg-surface-hover'
+              }`}
+            >
+              <Icon name="UserCheck" className="mr-3 text-lg group-hover:scale-110 transition-transform" />
+              Admin - Disponibilidades
             </button>
           </nav>
 
           {/* User Section */}
           <div className="px-4 py-4 border-t border-border flex flex-col gap-0">
             <div className="group flex items-center px-2.5 py-0 gap-2 min-w-0 mb-0">
-              <i className="fas fa-user-circle text-text text-xl" title="Usuário"></i>
+              <Icon name="User" className="text-text text-xl" title="Usuário" />
               <span className="truncate text-text text-sm font-medium" title={userProfile?.full_name || user?.email || ''}>
                 {userProfile?.full_name && userProfile.full_name.trim() !== '' ? userProfile.full_name : user?.email}
               </span>
@@ -152,10 +165,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             <button
               onClick={handleLogout}
-              className="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 text-text hover:text-danger hover:bg-danger/10"
+              className={`group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 text-text hover:text-danger hover:bg-surface-2`}
               title="Sair"
             >
-              <i className="fas fa-sign-out-alt mr-2 text-lg group-hover:scale-110 transition-transform"></i>
+              <Icon name="ArrowLeft" className="mr-2 text-lg group-hover:scale-110 transition-transform" />
               Sair
             </button>
           </div>

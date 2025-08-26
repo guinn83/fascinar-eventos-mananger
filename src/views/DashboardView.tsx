@@ -17,8 +17,8 @@ const DashboardView: React.FC = () => {
             </p>
           </div>
           <div className="hidden sm:block">
-            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
-              <i className="fas fa-chart-line text-white text-2xl"></i>
+            <div className="w-16 h-16 bg-surface-2 rounded-2xl flex items-center justify-center shadow-lg">
+              <i className="fas fa-chart-line text-icon-2 text-2xl"></i>
             </div>
           </div>
         </div>
@@ -33,8 +33,8 @@ const DashboardView: React.FC = () => {
                 <p className="text-text-secondary text-sm font-medium">Total de Eventos</p>
                 <p className="text-h2 text-text mt-1">12</p>
               </div>
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
-                <i className="fas fa-calendar-alt text-white"></i>
+              <div className="w-12 h-12 bg-surface-2 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-calendar-alt text-icon-2"></i>
               </div>
             </div>
           </CardContent>
@@ -47,8 +47,8 @@ const DashboardView: React.FC = () => {
                 <p className="text-text-secondary text-sm font-medium">Eventos Ativos</p>
                 <p className="text-h2 text-text mt-1">8</p>
               </div>
-              <div className="w-12 h-12 bg-success rounded-xl flex items-center justify-center shadow-lg">
-                <i className="fas fa-play-circle text-white"></i>
+              <div className="w-12 h-12 bg-surface-2 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-play-circle text-icon-2"></i>
               </div>
             </div>
           </CardContent>
@@ -62,7 +62,7 @@ const DashboardView: React.FC = () => {
                 <p className="text-h2 text-text mt-1">247</p>
               </div>
               <div className="w-12 h-12 bg-surface rounded-xl flex items-center justify-center shadow-lg">
-                <i className="fas fa-users text-white"></i>
+                <i className="fas fa-users text-icon-2"></i>
               </div>
             </div>
           </CardContent>
@@ -75,8 +75,8 @@ const DashboardView: React.FC = () => {
                 <p className="text-text-secondary text-sm font-medium">Receita</p>
                 <p className="text-h2 text-text mt-1">R$ 15.8K</p>
               </div>
-              <div className="w-12 h-12 bg-warning rounded-xl flex items-center justify-center shadow-lg">
-                <i className="fas fa-dollar-sign text-white"></i>
+              <div className="w-12 h-12 bg-surface-2 rounded-xl flex items-center justify-center shadow-lg">
+                <i className="fas fa-dollar-sign text-icon-2"></i>
               </div>
             </div>
           </CardContent>
@@ -96,19 +96,19 @@ const DashboardView: React.FC = () => {
           </a>
         </div>
 
-        <div className="space-y-4">
+          <div className="space-y-4">
           <Card>
             <CardContent size="md" className="bg-surface-hover rounded-2xl border border-border">
               <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center">
-                  <i className="fas fa-music text-white text-sm"></i>
+                <div className="w-10 h-10 bg-surface-2 rounded-2xl flex items-center justify-center">
+                  <i className="fas fa-music text-icon-2 text-sm"></i>
                 </div>
                 <div>
                   <h3 className="font-semibold text-text">Festival de Música</h3>
                   <p className="text-text-secondary text-sm">15 de Dezembro, 2023</p>
                 </div>
               </div>
-              <span className="inline-flex items-center px-3 py-1 rounded-xl text-xs font-semibold bg-success/10 text-success">
+              <span className="inline-flex items-center px-3 py-1 rounded-xl text-xs font-semibold bg-surface-2 text-success">
                 <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
                 Ativo
               </span>
@@ -118,15 +118,15 @@ const DashboardView: React.FC = () => {
           <Card>
             <CardContent size="md" className="bg-surface-hover rounded-2xl border border-border">
               <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-info rounded-xl flex items-center justify-center">
-                  <i className="fas fa-graduation-cap text-white text-sm"></i>
+                <div className="w-10 h-10 bg-surface-2 rounded-xl flex items-center justify-center">
+                  <i className="fas fa-graduation-cap text-icon-2 text-sm"></i>
                 </div>
                 <div>
                   <h3 className="font-semibold text-text">Workshop de Tecnologia</h3>
                   <p className="text-text-secondary text-sm">20 de Dezembro, 2023</p>
                 </div>
               </div>
-              <span className="inline-flex items-center px-3 py-1 rounded-xl text-xs font-semibold bg-info/10 text-info">
+              <span className="inline-flex items-center px-3 py-1 rounded-xl text-xs font-semibold bg-surface-2 text-info">
                 <div className="w-2 h-2 bg-info rounded-full mr-2"></div>
                 Planejado
               </span>

@@ -21,15 +21,7 @@ import { Modal } from '../components/ui/Modal'
 
 // badge removed — status is shown as a colored dot next to the person name
 
-import { 
-  Users, 
-  Plus, 
-  CheckCircle, 
-  Edit,
-  Trash2,
-  AlertTriangle,
-  HelpCircle
-} from 'lucide-react'
+import { Icon } from '../components/ui/icons'
 
 export function EventStaffView() {
   const { id } = useParams<{ id: string }>()
@@ -367,7 +359,7 @@ export function EventStaffView() {
       <Card className="w-full resume-card" strong tone="emphasized">
         <CardContent size="md">
           <div className="flex items-center">
-            <Users className="icon-2xl text-icon-3 mr-3" />
+            <Icon name="Users" className="icon-2xl text-icon-3 mr-3" />
             <div>
               <p className="text-h3 font-bold text-text">{summary.total_roles} {summary.total_roles === 1 ? 'profissional' : 'profissionais'}</p>
               <p className="text-xs text-text-muted mt-0">
@@ -385,14 +377,14 @@ export function EventStaffView() {
       <CardHeader>
           <CardTitle className="flex items-center justify-between text-text">
               <span className="flex items-center gap-2">
-              <Users className="icon-sm text-icon-3" />
+              <Icon name="Users" className="icon-sm text-icon-3" />
               Equipe e Funções
             </span>
             {/* show Add button inside card header when there is at least one member */}
             {filteredStaff.length > 0 && (
               <div className="hidden md:flex">
                 <Button onClick={() => setShowAddRole(true)}>
-                  <Plus className="w-5 h-5 mr-2" />
+                  <Icon name="Plus" className="w-5 h-5 mr-2" />
                   Adicionar Função
                 </Button>
               </div>
@@ -401,8 +393,8 @@ export function EventStaffView() {
         </CardHeader>
   <CardContent size="md">
           {filteredStaff.length === 0 ? (
-            <div className="text-center text-text-muted">
-              <Users className="w-12 h-12 mx-auto mb-4 opacity-50 text-icon-3" />
+                <div className="text-center text-text-muted">
+              <Icon name="Users" className="w-12 h-12 mx-auto mb-4 opacity-50 text-icon-3" />
               <p>Nenhuma função de equipe definida ainda.</p>
               <div className="mt-4">
                 <Button onClick={() => setShowAddRole(true)}>Adicionar Primeira Função</Button>
@@ -427,15 +419,15 @@ export function EventStaffView() {
                       <p className={`text-sm ${isUnassigned ? 'text-text-muted italic' : 'text-text-secondary'} truncate`}>
                         {isUnassigned ? (
                           <span className="inline-flex items-center">
-                            <HelpCircle className="w-4 h-4 text-text-muted mr-1.5" aria-hidden />
+                            <Icon name="HelpCircle" className="w-4 h-4 text-text-muted mr-1.5" aria-hidden />
                             Não atribuído
                           </span>
                         ) : (
                           <span className="inline-flex items-center">
                             {staff.confirmed ? (
-                              <span aria-label="Confirmado" className="mr-1.5"><CheckCircle className="w-4 h-4 text-success" aria-hidden /></span>
+                              <span aria-label="Confirmado" className="mr-1.5"><Icon name="CheckCircle" className="w-4 h-4 text-success" aria-hidden /></span>
                             ) : (
-                              <span aria-label="Aguardando" className="mr-1.5"><AlertTriangle className="w-4 h-4 text-warning" aria-hidden /></span>
+                              <span aria-label="Aguardando" className="mr-1.5"><Icon name="AlertTriangle" className="w-4 h-4 text-warning" aria-hidden /></span>
                             )}
                             {displayName || 'Nome não informado'}
                           </span>
@@ -459,7 +451,7 @@ export function EventStaffView() {
                                 aria-label={`Confirmar ${displayName}`}
                                 disabled={loading}
                               >
-                                <CheckCircle className="w-6 h-6" />
+                                <Icon name="CheckCircle" className="w-6 h-6" />
                               </Button>
                           ) : null
                         })()
@@ -489,7 +481,7 @@ export function EventStaffView() {
                                 className="rounded-full"
                                 aria-label={`Editar atribuição de ${displayName}`}
                               >
-                                <Edit className="w-6 h-6" />
+                                <Icon name="Edit" className="w-6 h-6" />
                               </Button>
                             )
                           }
@@ -504,7 +496,7 @@ export function EventStaffView() {
                         aria-label={`Remover ${displayName || 'função'}`}
                         disabled={loading}
                       >
-                        <Trash2 className="w-6 h-6" />
+                        <Icon name="Trash2" className="w-6 h-6" />
                       </Button>
 
                     </div>
@@ -520,7 +512,7 @@ export function EventStaffView() {
                 onClick={() => setShowAddRole(true)}
                 className="flex-1 justify-center py-3"
               >
-                <Plus className="w-5 h-5 inline mr-2" /> Adicionar Função
+                <Icon name="Plus" className="w-5 h-5 inline mr-2" /> Adicionar Função
               </Button>
               <Button
                 variant="destructive"
@@ -528,7 +520,7 @@ export function EventStaffView() {
                 disabled={clearingAll}
                 className="flex-1 justify-center py-3 bg-danger bg-gradient-button"
               >
-                {clearingAll ? 'Limpando...' : (<><Trash2 className="w-5 h-5 inline mr-2" /> Limpar</>)}
+                {clearingAll ? 'Limpando...' : (<><Icon name="Trash2" className="w-5 h-5 inline mr-2" /> Limpar</>)}
               </Button>
             </div>
           )}
@@ -756,7 +748,7 @@ export function EventStaffView() {
                     }
                   }}
                 >
-                  <Plus className="w-5 h-5 mr-1" /> Atribuir
+                  <Icon name="Plus" className="w-5 h-5 mr-1" /> Atribuir
                 </Button>
               </div>
             </div>

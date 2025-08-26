@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { Card, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button'
+import { uiTokens } from '../components/ui/theme'
 
 type LoginStep = 'email' | 'create-password' | 'enter-password' | 'forgot-password';
 
@@ -92,16 +94,16 @@ const LoginView: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
       {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden">
-  <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-primary/10 blur-3xl"></div>
+    <div className="absolute inset-0 overflow-hidden">
+  <div className={`absolute -top-40 -right-40 w-80 h-80 rounded-full ${uiTokens.accentBackdrop} blur-3xl`}></div>
   <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-surface blur-3xl"></div>
-      </div>
+    </div>
       <div className="relative w-full max-w-md">
         <Card className="w-full">
           <CardContent size="md">
           <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <i className="fas fa-calendar-star text-white text-2xl"></i>
+            <div className="w-20 h-20 bg-surface-2 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <i className="fas fa-calendar-star text-icon-2 text-2xl"></i>
             </div>
             <h2 className="text-h2 text-text font-semibold">
               Fascinar Eventos
@@ -114,12 +116,12 @@ const LoginView: React.FC = () => {
             </p>
           </div>
           {error && (
-            <div className="bg-danger/10 border border-border text-danger px-4 py-3 rounded-2xl text-sm mb-4">
+            <div className="bg-surface-2 border border-border text-text-secondary px-4 py-3 rounded-2xl text-sm mb-4">
               {error}
             </div>
           )}
           {message && (
-            <div className="bg-success/10 border border-border text-success px-4 py-3 rounded-2xl text-sm mb-4">
+            <div className="bg-surface-2 border border-border text-text px-4 py-3 rounded-2xl text-sm mb-4">
               {message}
             </div>
           )}
@@ -138,18 +140,12 @@ const LoginView: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-border transition-all placeholder-text-muted text-text"
+        className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-2xl focus:outline-none transition-all placeholder-text-muted text-text"
                     placeholder="seu@email.com"
                   />
                 </div>
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-primary text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {loading ? 'Verificando...' : 'Continuar'}
-              </button>
+      <Button type="submit" disabled={loading} className="w-full" >{loading ? 'Verificando...' : 'Continuar'}</Button>
             </form>
           )}
           {/* Step 2a: Criar senha removido, agora sempre usa ResetPasswordView */}
@@ -168,7 +164,7 @@ const LoginView: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full pl-10 pr-12 py-3 bg-surface border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-border transition-all placeholder:text-text-muted text-text"
+                    className="w-full pl-10 pr-12 py-3 bg-surface border border-border rounded-2xl focus:outline-none transition-all placeholder:text-text-muted text-text"
                     placeholder="••••••••"
                   />
                   <button
@@ -181,17 +177,11 @@ const LoginView: React.FC = () => {
                   </button>
                 </div>
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-primary text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {loading ? 'Entrando...' : 'Entrar'}
-              </button>
+              <Button type="submit" disabled={loading} className="w-full">{loading ? 'Entrando...' : 'Entrar'}</Button>
               <button
                 type="button"
                 onClick={() => setStep('forgot-password')}
-                className="w-full text-primary hover:text-primary-hover text-sm font-semibold py-2 transition-colors"
+                className="w-full text-text-secondary hover:text-text text-sm font-semibold py-2 transition-colors"
               >
                 Esqueceu sua senha?
               </button>
@@ -212,13 +202,7 @@ const LoginView: React.FC = () => {
                   placeholder="seu@email.com"
                 />
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-primary text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {loading ? 'Enviando...' : 'Enviar email de recuperação'}
-              </button>
+              <Button type="submit" disabled={loading} className="w-full">{loading ? 'Enviando...' : 'Enviar email de recuperação'}</Button>
               <button
                 type="button"
                 onClick={() => setStep('email')}

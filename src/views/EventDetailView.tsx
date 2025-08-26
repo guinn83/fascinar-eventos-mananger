@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import { Icon } from '../components/ui/icons'
 import { Card, CardContent } from '../components/ui/card'
 import { useStaff } from '../hooks/useStaff'
 import { EventStaffSummary } from '../types/staff'
 import { pageTokens } from '../components/ui/theme'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../services/supabase'
+import { useAuthStore } from '../store/authStore'
 import type { Event } from '../types/event'
 
 // Função para calcular dias até o evento
@@ -29,14 +31,46 @@ const EventDetailView: React.FC = () => {
   const [event, setEvent] = useState<Event | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { getEventStaffSummary } = useStaff()
+  const { getEventStaffSummary, getUserEventStaffRole } = useStaff()
   const [summary, setSummary] = useState<EventStaffSummary | null>(null)
+  const { getUserRole, userProfile } = useAuthStore()
+  const [userStaffInfo, setUserStaffInfo] = useState<{ isStaff: boolean; role: string | null; confirmed: boolean }>({ 
+    isStaff: false, 
+    role: null, 
+    confirmed: false 
+  })
 
   useEffect(() => {
     if (id) {
       fetchEvent(id)
     }
   }, [id])
+
+  // Verificar staff do usuário quando userProfile estiver disponível
+  useEffect(() => {
+    if (id && userProfile?.id && event) {
+      checkUserEventStaff(id)
+    }
+  }, [id, userProfile?.id, event])
+
+  // Função para verificar se o usuário está escalado no evento
+  const checkUserEventStaff = async (eventId: string) => {
+    console.log('Verificando staff do usuário:', { eventId, userProfileId: userProfile?.id })
+    
+    if (!userProfile?.id) {
+      console.log('UserProfile não disponível ainda')
+      return
+    }
+
+    try {
+      const staffInfo = await getUserEventStaffRole(eventId, userProfile.id)
+      console.log('Resultado da verificação de staff:', staffInfo)
+      setUserStaffInfo(staffInfo)
+    } catch (err) {
+      console.error('Erro ao verificar staff do usuário:', err)
+      setUserStaffInfo({ isStaff: false, role: null, confirmed: false })
+    }
+  }
 
   const fetchEvent = async (eventId: string) => {
     try {
@@ -109,15 +143,9 @@ const EventDetailView: React.FC = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center max-w-md">
-          <i className="fas fa-exclamation-triangle text-6xl text-danger mb-4"></i>
+          <Icon name="AlertTriangle" className="text-6xl text-warning mb-4" />
           <h2 className="text-2xl font-bold text-text mb-2">Erro</h2>
           <p className="text-text-secondary mb-6">{error}</p>
-          <button
-            onClick={() => navigate('/eventos')}
-            className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl transition-colors"
-          >
-            Voltar aos Eventos
-          </button>
         </div>
       </div>
     )
@@ -132,7 +160,7 @@ const EventDetailView: React.FC = () => {
           <p className="text-text-secondary mb-6">O evento que você está procurando não existe ou foi removido.</p>
           <button
             onClick={() => navigate('/eventos')}
-            className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl transition-colors"
+            className="bg-surface border border-border px-6 py-3 rounded-xl transition-colors"
           >
             Voltar aos Eventos
           </button>
@@ -142,8 +170,7 @@ const EventDetailView: React.FC = () => {
   }
 
   return (
-    <>
-  <div className={`max-w-4xl mx-auto bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
+    <div className={`max-w-4xl mx-auto bg-background min-h-screen ${pageTokens.cardGap.sm}`}>
         
         {/* Header com imagem circular */}
         <div className="text-center space-y-4 mb-8">
@@ -162,11 +189,11 @@ const EventDetailView: React.FC = () => {
             </div>
             {/* Botão alterar imagem */}
             <button 
-              className="absolute -bottom-1 -right-1 w-8 h-8 bg-primary hover:bg-primary/90 text-white rounded-full text-xs transition-colors shadow-md"
+              className="absolute -bottom-1 -right-1 w-8 h-8 bg-surface-2 hover:bg-surface-hover text-icon-2 rounded-full text-xs transition-colors shadow-md"
               onClick={() => {/* TODO: implementar upload */}}
               title="Alterar imagem do evento"
             >
-              <i className="fas fa-camera"></i>
+              <Icon name="Camera" />
             </button>
           </div>
           
@@ -182,11 +209,11 @@ const EventDetailView: React.FC = () => {
                                  status === 'today' ? 'HOJE' :
                                  status === 'future' ? (days === 1 ? 'Amanhã' : `Faltam ${days} dias`) :
                                  'Realizado'
-                const statusColor = event.status === 'cancelled' ? 'bg-danger/10 text-danger' :
-                                  event.status === 'completed' ? 'bg-text-muted/10 text-text-muted' :
-                                  status === 'today' ? 'bg-warning/10 text-warning' :
-                                  status === 'future' ? 'bg-success/10 text-success' :
-                                  'bg-text-muted/10 text-text-muted'
+                const statusColor = event.status === 'cancelled' ? 'bg-surface-2 text-danger' :
+                                  event.status === 'completed' ? 'bg-surface text-text-muted' :
+                                  status === 'today' ? 'bg-surface-2 text-warning' :
+                                  status === 'future' ? 'bg-surface-2 text-success' :
+                                  'bg-surface text-text-muted'
                 
                 return (
                   <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium shadow-sm ${statusColor}`}>
@@ -206,11 +233,8 @@ const EventDetailView: React.FC = () => {
             className="absolute top-6 left-6 p-2 hover:bg-surface-hover rounded-lg transition-colors"
             aria-label="Voltar aos eventos"
           >
-                    <i className="fas fa-arrow-left text-text-secondary"></i>
+            <Icon name="ArrowLeft" className="text-text-secondary" />
           </button>
-        </div>
-
-        {/* Event Details Card */}
         <Card className="w-full details-card">
           <CardContent size="md">
               <div className={pageTokens.cardGap.sm}>
@@ -218,7 +242,7 @@ const EventDetailView: React.FC = () => {
               {event.description && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-text flex items-center gap-2">
-                    <i className="fas fa-align-left text-icon-2"></i>
+                    <Icon name="AlignLeft" className="text-icon-2" />
                     Descrição Detalhada
                   </h3>
                   <p className="text-text-secondary leading-relaxed">
@@ -233,7 +257,7 @@ const EventDetailView: React.FC = () => {
                 <div className="space-y-1">
                   <div className="flex items-center gap-1">
                     <div className="w-5 flex items-center justify-center">
-                      <i className="fas fa-calendar text-icon-3" aria-hidden></i>
+                      <Icon name="Calendar" className="text-icon-3" aria-hidden />
                     </div>
                     <div className="flex-1">
                       {(() => {
@@ -250,7 +274,7 @@ const EventDetailView: React.FC = () => {
                 <div className="space-y-1">
                   <div className="flex items-center gap-1">
                     <div className="w-5 flex items-center justify-center">
-                      <i className="fas fa-clock text-icon-3" aria-hidden></i>
+                      <Icon name="Clock" className="text-icon-3" aria-hidden />
                     </div>
                     <div className="flex-1">
                       {(() => {
@@ -267,7 +291,7 @@ const EventDetailView: React.FC = () => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-1">
                     <div className="w-5 flex items-center justify-center">
-                      <i className="fas fa-map-marker-alt text-icon-3" aria-hidden></i>
+                      <Icon name="MapPin" className="text-icon-3" aria-hidden />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-text">Local: <span className="font-normal text-text-secondary ml-1">{event.location || 'Local não informado'}</span></h3>
@@ -279,7 +303,7 @@ const EventDetailView: React.FC = () => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-1">
                     <div className="w-5 flex items-center justify-center">
-                      <i className="fas fa-users text-icon-3" aria-hidden></i>
+                      <Icon name="Users" className="text-icon-3" aria-hidden />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-text">Número de convidados: <span className="font-normal text-text-secondary ml-1">{event.attendees}</span></h3>
@@ -295,13 +319,44 @@ const EventDetailView: React.FC = () => {
         {/* Equipe Card (staffCard) - usar layout do resume-card */}
         <Card className="w-full staff-card">
           <CardContent size="md">
-              <div className="flex items-center">
-              <svg className="w-8 h-8 text-icon-3 mr-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M23 21v-2a4 4 0 00-3-3.87" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M16 3.13a4 4 0 010 7.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+            {/* Card Title */}
+            <div className="flex items-center gap-3 mb-4">
+              <Icon name="Users" className="w-8 h-8 text-icon-3" />
+              <h3 className="text-lg font-semibold text-text">Equipe do Evento</h3>
+            </div>
+
+            {/* Status para usuário organizer e admin */}
+            {(getUserRole() === 'organizer' || getUserRole() === 'admin') && (
+              <div className="mb-4">
+                {userStaffInfo.isStaff ? (
+                  <div className={`border rounded-lg px-4 py-3 ${
+                    userStaffInfo.confirmed 
+                      ? 'bg-surface-2 border-border' 
+                      : 'bg-surface-2 border-border'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      <i className={`fas ${userStaffInfo.confirmed ? 'fa-check-circle text-success' : 'fa-clock text-warning'}`}></i>
+                      <span className={`font-medium ${userStaffInfo.confirmed ? 'text-success' : 'text-warning'}`}>
+                        {userStaffInfo.confirmed ? 'Você está escalado e confirmado neste evento' : 'Você está escalado neste evento (aguardando confirmação)'}
+                      </span>
+                    </div>
+                    <p className={`text-sm mt-1 text-text-secondary`}>
+                      Função: <span className="font-medium capitalize">{userStaffInfo.role}</span>
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-surface-2 border border-border rounded-lg px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Icon name="Info" className="text-text-muted" />
+                      <span className="text-text-muted font-medium">Você não está escalado neste evento</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Resumo da equipe */}
+            <div className="flex items-center mb-4">
               <div>
                 <p className="text-xl font-bold text-text">{summary ? summary.total_roles : '—'} {summary && summary.total_roles === 1 ? 'profissional' : 'profissionais'}</p>
                 <p className="text-xs text-text-muted mt-0">
@@ -310,15 +365,18 @@ const EventDetailView: React.FC = () => {
               </div>
             </div>
             
-              <div className="flex flex-col sm:flex-row gap-4 mt-3">
-              <button
-                onClick={() => navigate(`/eventos/${event.id}/staff`)}
-                className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl transition-colors"
-              >
-                <i className="fas fa-users"></i>
-                Gerenciar Equipe
-              </button>
-            </div>
+            {/* Botão gerenciar equipe - apenas para admin */}
+            {getUserRole() === 'admin' && (
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={() => navigate(`/eventos/${event.id}/staff`) }
+                  className="flex items-center justify-center gap-2 bg-surface-2 hover:bg-surface-hover text-icon-2 px-6 py-3 rounded-xl transition-colors"
+                >
+                  <Icon name="Users" />
+                  Gerenciar Equipe
+                </button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -327,11 +385,11 @@ const EventDetailView: React.FC = () => {
           <CardContent size="md">
             <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-text flex items-center gap-2">
-                <i className="fas fa-dollar-sign text-icon-3"></i>
+                <Icon name="DollarSign" className="text-icon-3" />
                 Informações Financeiras
               </h3>
               <div>
-        <div className="bg-success/10 border border-border rounded-lg px-3 py-2">
+  <div className="bg-surface-2 border border-border rounded-lg px-3 py-2">
                   <div className="flex items-center justify-between">
           <span className="text-success font-medium">Valor do Evento</span>
           <span className="text-2xl font-bold text-success">
@@ -347,10 +405,10 @@ const EventDetailView: React.FC = () => {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">
           <button
-            onClick={() => navigate(`/eventos/${event.id}/editar`)}
-            className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl transition-colors"
+            onClick={() => navigate(`/eventos/${event.id}/editar`) }
+            className="flex items-center justify-center gap-2 bg-surface-2 hover:bg-surface-hover text-icon-2 px-6 py-3 rounded-xl transition-colors"
           >
-            <i className="fas fa-edit"></i>
+            <Icon name="Edit" />
             Editar Evento
           </button>
           
@@ -358,13 +416,13 @@ const EventDetailView: React.FC = () => {
             onClick={() => window.print()}
             className="flex items-center justify-center gap-2 bg-surface hover:bg-surface-hover text-text px-6 py-3 rounded-xl transition-colors"
           >
-            <i className="fas fa-print"></i>
+            <Icon name="Printer" />
             Imprimir
           </button>
         </div>
 
-      </div>
-    </>
+    </div>
+  </div>
   )
 }
 

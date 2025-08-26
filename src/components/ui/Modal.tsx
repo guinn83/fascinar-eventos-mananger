@@ -8,6 +8,8 @@ type ModalProps = {
   backdropClassName?: string
 }
 
+import { uiTokens } from './theme'
+
 export function Modal({ children, open, onClose, className = '', backdropClassName = '' }: ModalProps) {
   useEffect(() => {
     if (!open) return
@@ -22,7 +24,7 @@ export function Modal({ children, open, onClose, className = '', backdropClassNa
     <div
       role="dialog"
       aria-modal="true"
-      className={`fixed inset-0 flex items-center justify-center z-50 ${backdropClassName || 'bg-black bg-opacity-70'}`}
+      className={`fixed inset-0 flex items-center justify-center z-50 ${backdropClassName || uiTokens.backdrop}`}
       onClick={(e) => {
         // Close when clicking on backdrop
         if (e.target === e.currentTarget && onClose) onClose()

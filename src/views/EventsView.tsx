@@ -4,6 +4,8 @@ import { useEvents } from '../hooks/useEvents'
 import { useAuthStore } from '../store/authStore'
 import { testSupabaseConnection } from '../utils/testConnection'
 import { Card, CardContent } from '../components/ui/card'
+import { Button } from '../components/ui/button'
+import { Badge } from '../components/ui/badge'
 import { pageTokens } from '../components/ui/theme'
 import { canViewAllEvents } from '../types/user'
 
@@ -120,9 +122,9 @@ const EventsView: React.FC = () => {
                   {canViewAll ? `Visualizando todos os eventos (${userRole})` : 'Gerencie seus eventos'}
                 </p>
                 {/* Indicador de nível de acesso */}
-                <div className="mt-3 flex items-center gap-2">
+                  <div className="mt-3 flex items-center gap-2">
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                    userRole === 'admin' ? 'bg-danger/10 text-danger' : userRole === 'organizer' ? 'bg-info/10 text-info' : 'bg-text-muted/10 text-text-muted'
+                    userRole === 'admin' ? 'bg-surface-hover text-text' : userRole === 'organizer' ? 'bg-surface-hover text-text' : 'bg-surface-hover text-text-muted'
                   }`}>
                     <i className={`fas ${
                       userRole === 'admin' ? 'fa-crown' 
@@ -134,10 +136,10 @@ const EventsView: React.FC = () => {
                      : 'Cliente'}
                   </span>
                   {canViewAll && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success/10 text-success">
+                    <Badge className="inline-flex" variant="secondary">
                       <i className="fas fa-globe mr-1"></i>
                       Acesso Total
-                    </span>
+                    </Badge>
                   )}
                 </div>
               </div>
@@ -151,8 +153,8 @@ const EventsView: React.FC = () => {
             <CardContent size="lg">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
-                    <i className="fas fa-database text-warning text-xl"></i>
+                  <div className="w-12 h-12 bg-surface-2 rounded-xl flex items-center justify-center">
+                    <i className="fas fa-database text-icon-2 text-xl"></i>
                   </div>
                 </div>
                 <div className="flex-1">
@@ -163,7 +165,7 @@ const EventsView: React.FC = () => {
                     A tabela "events" ainda não foi criada no seu projeto Supabase. 
                     É necessário executar o script SQL para criar a estrutura do banco de dados.
                   </p>
-                  <div className="bg-warning/5 rounded-xl px-3 py-2 mb-4">
+                  <div className="bg-surface-2 rounded-xl px-3 py-2 mb-4">
                     <h4 className="font-semibold text-text mb-2 flex items-center gap-2">
                       <i className="fas fa-list-ol"></i>
                       Passos para Configuração:
@@ -176,30 +178,25 @@ const EventsView: React.FC = () => {
                     </ol>
                   </div>
                     <div className="flex gap-3">
-                    <button 
-                      onClick={() => window.location.reload()}
-                      className="bg-warning hover:bg-warning/90 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
-                    >
-                      <i className="fas fa-redo"></i>
-                      Recarregar Página
-                    </button>
-                    <button 
-                      onClick={handleTestConnection}
-                      disabled={testing}
-                      className="bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
-                    >
-                      <i className={`fas ${testing ? 'fa-spinner fa-spin' : 'fa-stethoscope'}`}></i>
-                      {testing ? 'Testando...' : 'Diagnosticar'}
-                    </button>
-                    <a 
-                      href="https://app.supabase.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="bg-surface border border-warning/40 hover:bg-surface-hover text-warning font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
-                    >
-                      <i className="fas fa-external-link-alt"></i>
-                      Abrir Supabase
-                    </a>
+                    <div className="flex gap-3">
+                      <Button onClick={() => window.location.reload()} variant="outline" className="text-sm">
+                        <i className="fas fa-redo"></i>
+                        Recarregar Página
+                      </Button>
+                      <Button onClick={handleTestConnection} disabled={testing} variant="default" className="text-sm">
+                        <i className={`fas ${testing ? 'fa-spinner fa-spin' : 'fa-stethoscope'}`}></i>
+                        {testing ? 'Testando...' : 'Diagnosticar'}
+                      </Button>
+                      <a
+                        href="https://app.supabase.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-3 py-2 rounded-xl text-sm bg-surface border border-border hover:bg-surface-hover"
+                      >
+                        <i className="fas fa-external-link-alt"></i>
+                        <span className="ml-2">Abrir Supabase</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -216,21 +213,14 @@ const EventsView: React.FC = () => {
                 </div>
               </div>
               <div className="flex gap-3">
-                <button 
-                  onClick={handleTestConnection}
-                  disabled={testing}
-                  className="bg-danger hover:bg-danger-hover disabled:bg-danger/50 text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
-                >
+                <Button onClick={handleTestConnection} disabled={testing} variant="danger" className="text-sm">
                   <i className={`fas ${testing ? 'fa-spinner fa-spin' : 'fa-stethoscope'}`}></i>
                   {testing ? 'Diagnosticando...' : 'Diagnosticar Problema'}
-                </button>
-                <button 
-                  onClick={() => window.location.reload()}
-                  className="bg-surface text-white font-medium py-2 px-4 rounded-xl transition-colors text-sm flex items-center gap-2"
-                >
+                </Button>
+                <Button onClick={() => window.location.reload()} variant="outline" className="text-sm">
                   <i className="fas fa-redo"></i>
                   Recarregar
-                </button>
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -303,10 +293,30 @@ const EventsView: React.FC = () => {
                 Gerencie todos os seus eventos
               </p>
             </div>
-              <button className="bg-primary text-white font-semibold px-6 py-3 rounded-2xl hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] w-full">
-              <i className="fas fa-plus mr-2"></i>
-              Novo Evento
-            </button>
+            
+            {/* Botões de ação */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button 
+                onClick={() => navigate('/eventos/novo')}
+                className="bg-primary text-white font-semibold px-6 py-3 rounded-2xl hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] flex-1 sm:flex-none"
+              >
+                <i className="fas fa-plus mr-2"></i>
+                Novo Evento
+              </button>
+              
+              {/* Botão Disponibilidade - apenas para organizer e admin */}
+              {(userRole === 'organizer' || userRole === 'admin') && (
+                <button 
+                  onClick={() => navigate('/disponibilidade')}
+                  className="bg-surface hover:bg-surface-hover text-text font-semibold px-6 py-3 rounded-2xl border border-border transition-all duration-200 transform hover:scale-[1.02] flex-1 sm:flex-none relative"
+                >
+                  <i className="fas fa-calendar-check mr-2 text-primary"></i>
+                  Disponibilidade
+                  {/* Badge de notificação - placeholder para futuro */}
+                  {/* <span className="absolute -top-1 -right-1 bg-warning text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span> */}
+                </button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -349,12 +359,12 @@ const EventsView: React.FC = () => {
                   <div className="absolute top-0 right-1 md:hidden z-10">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-small ${
                       event.status === 'cancelled'
-                        ? 'bg-danger/10 text-danger'
+                        ? 'bg-surface-2 text-text-secondary'
                         : event.status === 'completed'
-                        ? 'bg-danger/10 text-danger'
+                        ? 'bg-surface text-text-secondary'
                         : status === 'today'
-                        ? 'bg-danger/10 text-danger'
-                        : 'bg-primary/10 text-primary'
+                        ? 'bg-surface-2 text-text-secondary'
+                        : 'bg-surface-2 text-text'
                     }`}>
                       {event.status === 'cancelled' ? 'Cancelado' :
                         event.status === 'completed' ? 'Realizado' :
@@ -407,7 +417,7 @@ const EventsView: React.FC = () => {
                         {/* Status no canto direito - desktop */}
                         <div className="hidden md:flex flex-col items-end ml-4">
                           <span className={`px-1 py-1 rounded-full text-xs font-medium ${
-                            event.status === 'cancelled' ? 'bg-danger/10 text-danger' : event.status === 'completed' ? 'bg-surface text-text-secondary' : status === 'today' ? 'bg-danger/10 text-danger' : 'bg-primary/10 text-primary'
+                            event.status === 'cancelled' ? 'bg-surface-2 text-danger' : event.status === 'completed' ? 'bg-surface text-text-secondary' : status === 'today' ? 'bg-surface-2 text-danger' : 'bg-surface-2 text-primary'
                           }`}>
                             {event.status === 'cancelled' ? 'Cancelado' :
                              event.status === 'completed' ? 'Realizado' :

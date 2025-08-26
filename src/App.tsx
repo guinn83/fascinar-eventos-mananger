@@ -8,7 +8,8 @@ import DashboardView from './views/DashboardView'
 import EventsView from './views/EventsView'
 import EventDetailView from './views/EventDetailView'
 import { EventStaffView } from './views/EventStaffView'
-import { StaffAvailabilityView } from './views/StaffAvailabilityView'
+import { EventAvailabilityView } from './views/EventAvailabilityView'
+import { AdminAvailabilityView } from './views/AdminAvailabilityView'
 import ClientsView from './views/ClientsView'
 import SupabaseTest from './components/SupabaseTest'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
@@ -38,12 +39,12 @@ function App() {
               Fascinar Eventos
             </h2>
             <p className="text-text-secondary font-medium">
-              Carregando sua experiência...
+          Carregando sua experiência...
             </p>
             <div className="mt-6 flex justify-center space-x-1">
-              <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-primary rounded-full animate-bounce animation-delay-100"></div>
-              <div className="w-2 h-2 bg-primary rounded-full animate-bounce animation-delay-200"></div>
+              <div className="w-2 h-2 bg-surface-hover rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-surface-hover rounded-full animate-bounce animation-delay-100"></div>
+              <div className="w-2 h-2 bg-surface-hover rounded-full animate-bounce animation-delay-200"></div>
             </div>
           </div>
         </div>
@@ -76,7 +77,8 @@ function App() {
                   <Route path="/eventos" element={<EventsView />} />
                   <Route path="/eventos/:id" element={<EventDetailView />} />
                   <Route path="/eventos/:id/staff" element={<EventStaffView />} />
-                  <Route path="/disponibilidade" element={<StaffAvailabilityView />} />
+                  <Route path="/disponibilidade" element={<EventAvailabilityView />} />
+                  <Route path="/admin/disponibilidades" element={<AdminAvailabilityView />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </Layout>

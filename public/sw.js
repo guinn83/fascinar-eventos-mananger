@@ -1,5 +1,5 @@
 // Service Worker para PWA Fascinar Eventos
-const CACHE_NAME = 'fascinar-eventos-v1'
+const CACHE_NAME = 'fascinar-eventos-v2'
 
 // URLs essenciais para cache
 const STATIC_CACHE_URLS = [
@@ -72,13 +72,18 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
+  // Pular completamente requisições do Supabase para evitar interferência
+  if (request.url.includes('supabase.co')) {
+    return
+  }
+
   // Network first para APIs
   if (NETWORK_FIRST_URLS.some(pattern => request.url.includes(pattern))) {
     event.respondWith(
       fetch(request)
         .then(response => {
           // Se conseguiu da rede, retorna
-          if (response.ok) {
+          if (response && response.ok) {
             return response
           }
           throw new Error('Network response not ok')
@@ -101,8 +106,8 @@ self.addEventListener('fetch', (event) => {
         
         return fetch(request)
           .then((networkResponse) => {
-            // Só cachear recursos da mesma origem
-            if (networkResponse.ok && url.origin === location.origin) {
+            // Só cachear recursos da mesma origem e que sejam válidos
+            if (networkResponse && networkResponse.ok && url.origin === location.origin) {
               const responseToCache = networkResponse.clone()
               caches.open(CACHE_NAME)
                 .then((cache) => {

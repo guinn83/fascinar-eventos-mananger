@@ -561,6 +561,36 @@ export function useStaff() {
     }
   }
 
+  // Verificar se o usuário está escalado em um evento específico
+  const getUserEventStaffRole = async (eventId: string, profileId: string): Promise<{ isStaff: boolean; role: string | null; confirmed: boolean }> => {
+    try {
+      const { data, error } = await supabase
+        .from('event_staff')
+        .select('staff_role, confirmed')
+        .eq('event_id', eventId)
+        .eq('profile_id', profileId)
+        .single()
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.error('Erro ao verificar staff do usuário:', error)
+        return { isStaff: false, role: null, confirmed: false }
+      }
+
+      if (data) {
+        return { 
+          isStaff: true, 
+          role: data.staff_role, 
+          confirmed: data.confirmed 
+        }
+      } else {
+        return { isStaff: false, role: null, confirmed: false }
+      }
+    } catch (err) {
+      console.error('Erro ao verificar staff do usuário:', err)
+      return { isStaff: false, role: null, confirmed: false }
+    }
+  }
+
   return {
     loading,
     error,
@@ -573,16 +603,16 @@ export function useStaff() {
     getDefaultStaffRoles,
     setDefaultStaffRole,
     
-  // Event staff management
-  getEventStaff,
-  getEventStaffById,
-  addRoleToEvent,
-  assignPersonToRole,
-  assignPersonToRoleWithName,
-  assignStaffToEvent,
-  assignStaffToEventWithName,
-  confirmStaffAssignment,
-  removeStaffFromEvent,
+    // Event staff management
+    getEventStaff,
+    getEventStaffById,
+    addRoleToEvent,
+    assignPersonToRole,
+    assignPersonToRoleWithName,
+    assignStaffToEvent,
+    assignStaffToEventWithName,
+    confirmStaffAssignment,
+    removeStaffFromEvent,
     
     // Suggestions and availability
     getStaffSuggestions,
@@ -590,6 +620,7 @@ export function useStaff() {
     
     // Analytics
     calculateEventStaffCost,
-    getEventStaffSummary
+    getEventStaffSummary,
+    getUserEventStaffRole
   }
 }

@@ -7,8 +7,9 @@ const __dirname = path.dirname(__filename)
 const root = path.resolve(__dirname, '..')
 const src = path.join(root, 'src')
 
-// Regex to find common hardcoded Tailwind color utilities and gradients
-const regex = /\b(text|bg|from|to|via|border)-(?:slate|gray|white|black|blue|green|red|yellow|indigo|purple|pink|sky|emerald|amber|danger|success|info|primary|secondary)(?:-[0-9]{1,3}|(?:\/\d{1,3})?)?\b|bg-gradient-to-[lrtb]|bg-\w+\/[0-9]{1,3}|text-[0-9]{3}/g
+// Regex to find hardcoded Tailwind color utilities that include numeric scales or explicit opacity.
+// We intentionally avoid matching semantic token names like `text-success`, `text-primary`, `text-danger`.
+const regex = /\b(?:text|bg|border|from|to|via)-(?:slate|gray|white|black|blue|green|red|yellow|indigo|purple|pink|sky|emerald|amber)(?:-[0-9]{1,3}|(?:\/\d{1,3}))\b|bg-\w+\/\d{1,3}|bg-gradient-to-[lrtb]|text-[0-9]{3}/g
 
 const results = []
 
@@ -19,6 +20,8 @@ function walk(dir) {
     const stat = fs.statSync(full)
     if (stat.isDirectory()) {
       if (f === 'node_modules' || f === '.git') continue
+      // Skip the UI primitives and types directory (these are the canonical token definitions)
+      if (full.includes(path.join('src', 'components', 'ui')) || full.includes(path.join('src', 'types'))) continue
       walk(full)
       continue
     }
@@ -27,7 +30,10 @@ function walk(dir) {
     const content = fs.readFileSync(full, 'utf8')
     const matches = content.match(regex)
     if (matches && matches.length > 0) {
-      results.push({ file: path.relative(root, full), matches: Array.from(new Set(matches)) })
+      // Skip files that are intentionally allowed to contain token definitions
+      const rel = path.relative(root, full)
+      if (rel.startsWith('src/components/ui') || rel.startsWith('src/types')) return
+      results.push({ file: rel, matches: Array.from(new Set(matches)) })
     }
   }
 }
@@ -43,5 +49,6 @@ for (const r of results) {
   console.log(r.file)
   console.log('  ', r.matches.join(', '))
 }
-
 console.log('\nTotal files with matches:', results.length)
+console.error('\nERROR: Found raw Tailwind color utilities. Please replace with theme tokens or justify in PR.')
+process.exit(1)

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTheme } from './ThemeProvider'
-import { Moon, Sun } from 'lucide-react'
+import { Icon } from './ui/icons'
 
 interface ThemeToggleProps {
   className?: string
@@ -25,9 +25,9 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
     >
       <div className="relative">
         {theme === 'light' ? (
-          <Moon className="h-5 w-5 transition-transform duration-200" />
+          <Icon name="Moon" className="h-5 w-5 transition-transform duration-200" />
         ) : (
-          <Sun className="h-5 w-5 transition-transform duration-200" />
+          <Icon name="Sun" className="h-5 w-5 transition-transform duration-200" />
         )}
       </div>
     </button>
@@ -51,12 +51,12 @@ export const ThemeToggleCompact: React.FC<ThemeToggleProps> = ({ className = '' 
     >
       {theme === 'light' ? (
         <>
-          <Moon className="h-4 w-4" />
+          <Icon name="Moon" className="h-4 w-4" />
           Tema Escuro
         </>
       ) : (
         <>
-          <Sun className="h-4 w-4" />
+          <Icon name="Sun" className="h-4 w-4" />
           Tema Claro
         </>
       )}

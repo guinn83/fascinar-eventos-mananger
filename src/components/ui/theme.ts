@@ -263,6 +263,9 @@ export const getCardItemClasses = (extraClasses: string = '') => {
 
 export const uiTokens = {
   focusRing: 'focus:outline-none focus:ring-2 focus:ring-primary/40',
+  backdrop: 'bg-black/50',
+  // subtle brand-tinted decorative backdrop used by auth screens
+  accentBackdrop: 'bg-primary/10'
 }
 
 // Page-level spacing tokens for Layout and views to consume.

@@ -69,7 +69,7 @@ const SupabaseTest: React.FC = () => {
           <button
             onClick={testConnection}
             disabled={loading}
-            className="bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
+            className="bg-surface-hover text-primary disabled:opacity-60 font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
             <i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-play'}`}></i>
             {loading ? 'Testando...' : 'Executar Teste'}
@@ -77,8 +77,8 @@ const SupabaseTest: React.FC = () => {
 
           {result && (
             <div className="mt-4">
-              <Card>
-                <CardContent size="md" className={`${result.success ? 'bg-success/10 border border-border' : 'bg-danger/10 border border-border'}`}>
+                <Card>
+                <CardContent size="md" className={`${result.success ? 'bg-surface-hover border border-border text-success' : 'bg-surface-hover border border-border text-danger'}`}>
                   <h3 className={`font-bold mb-2 ${result.success ? 'text-success' : 'text-danger'}`}>
                     {result.success ? '✅ Sucesso!' : '❌ Erro'}
                   </h3>

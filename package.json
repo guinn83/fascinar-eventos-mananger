@@ -8,7 +8,8 @@
     "dev:network": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+  "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+  "check:raw-colors": "node ./tools/find-raw-colors.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.43.4",

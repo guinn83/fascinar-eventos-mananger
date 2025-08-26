@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Card, CardContent } from '../components/ui/card'
-import { pageTokens } from '../components/ui/theme'
+import { Button } from '../components/ui/button'
+import { pageTokens, uiTokens } from '../components/ui/theme'
 import { useClients } from '../hooks/useClients'
 import { Modal } from '../components/ui/Modal'
 import type { Client } from '../types/client'
@@ -93,13 +94,10 @@ const ClientsView: React.FC = () => {
             <h1 className="text-h1 text-text">Clientes</h1>
             <p className="text-text-secondary mt-1">Gerencie seus clientes e relacionamentos</p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl transition-colors shadow-lg"
-          >
+          <Button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2" variant="outline">
             <i className="fas fa-plus"></i>
             Novo Cliente
-          </button>
+          </Button>
         </div>
 
   {/* Search */}
@@ -112,7 +110,7 @@ const ClientsView: React.FC = () => {
                 placeholder="Buscar clientes por nome, telefone, CPF ou email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-border transition-colors bg-background text-text"
+                className="w-full pl-12 pr-4 py-3 border border-border rounded-xl transition-colors bg-background text-text"
               />
             </div>
           </CardContent>
@@ -120,7 +118,7 @@ const ClientsView: React.FC = () => {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-danger/10 border border-border text-danger px-4 py-3 rounded-xl">
+          <div className="bg-surface-2 border border-border text-danger px-4 py-3 rounded-xl">
             <i className="fas fa-exclamation-circle mr-2"></i>
             {error}
           </div>
@@ -142,13 +140,10 @@ const ClientsView: React.FC = () => {
                 }
               </p>
               {!searchTerm && (
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl transition-colors"
-                >
+                <Button onClick={() => setShowCreateModal(true)} variant="outline">
                   <i className="fas fa-plus mr-2 text-icon-2"></i>
                   Criar Primeiro Cliente
-                </button>
+                </Button>
               )}
               </CardContent>
             </Card>
@@ -162,7 +157,7 @@ const ClientsView: React.FC = () => {
                       <div className="flex items-center gap-3">
                         <h3 className="text-h4 text-text">{client.name}</h3>
                         {client.related_client && (
-                          <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-xs font-medium">
+                          <span className="bg-surface-2 text-text-secondary px-2 py-1 rounded-lg text-xs font-medium">
                             {client.relationship_type}
                           </span>
                         )}
@@ -198,18 +193,18 @@ const ClientsView: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => openEditModal(client)}
-                        className="p-2 text-text-secondary hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                        title="Editar cliente"
-                        aria-label="Editar cliente"
-                      >
-                        <i className="fas fa-edit"></i>
-                      </button>
+                            <button
+                              onClick={() => openEditModal(client)}
+                              className="p-2 text-text-secondary hover:text-text hover:bg-surface-hover rounded-lg transition-colors"
+                              title="Editar cliente"
+                              aria-label="Editar cliente"
+                            >
+                              <i className="fas fa-edit"></i>
+                            </button>
                       
                       <button
                         onClick={() => handleDeleteClient(client.id)}
-                        className="p-2 text-text-secondary hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
+                        className="p-2 text-text-secondary hover:text-text hover:bg-surface-hover rounded-lg transition-colors"
                         title="Excluir cliente"
                         aria-label="Excluir cliente"
                       >
@@ -243,19 +238,19 @@ const ClientsView: React.FC = () => {
               </div>
 
               <form onSubmit={handleCreateClient} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-text mb-2">
-                  Nome completo *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-border transition-colors"
-                  placeholder="Digite o nome completo"
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-text mb-2">
+                    Nome completo *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full p-3 border border-border rounded-lg bg-surface transition-colors"
+                    placeholder="Digite o nome completo"
+                  />
+                </div>
 
               <div>
                 <label className="block text-sm font-medium text-text mb-2">
@@ -265,7 +260,7 @@ const ClientsView: React.FC = () => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-border transition-colors"
+                  className={`w-full p-3 border border-border rounded-lg bg-surface ${uiTokens.focusRing} focus:border-border transition-colors`}
                   placeholder="email@exemplo.com"
                 />
               </div>
@@ -278,7 +273,7 @@ const ClientsView: React.FC = () => {
                   type="text"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-border transition-colors"
+                  className={`w-full p-3 border border-border rounded-lg bg-surface ${uiTokens.focusRing} focus:border-border transition-colors`}
                   placeholder="(11) 99999-9999"
                 />
               </div>
@@ -292,7 +287,7 @@ const ClientsView: React.FC = () => {
                   required
                   value={formData.cpf}
                   onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-border transition-colors"
+                  className={`w-full p-3 border border-border rounded-lg bg-surface ${uiTokens.focusRing} focus:border-border transition-colors`}
                   placeholder="000.000.000-00"
                 />
               </div>
@@ -305,12 +300,7 @@ const ClientsView: React.FC = () => {
                 >
                   Cancelar
                 </button>
-                <button
-                  type="submit"
-                  className="flex-1 bg-primary hover:bg-primary/90 text-white py-3 rounded-lg transition-colors"
-                >
-                  Criar Cliente
-                </button>
+                <Button type="submit" className="flex-1">Criar Cliente</Button>
               </div>
             </form>
             </CardContent>
@@ -344,7 +334,7 @@ const ClientsView: React.FC = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full p-3 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-primary/20 focus:border-border transition-colors"
+                  className={`w-full p-3 border border-border rounded-lg bg-surface ${uiTokens.focusRing} focus:border-border transition-colors`}
                   placeholder="Digite o nome completo"
                 />
               </div>
@@ -357,7 +347,7 @@ const ClientsView: React.FC = () => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-border transition-colors"
+                  className={`w-full p-3 border border-border rounded-lg ${uiTokens.focusRing} focus:border-border transition-colors`}
                   placeholder="email@exemplo.com"
                 />
               </div>
@@ -370,7 +360,7 @@ const ClientsView: React.FC = () => {
                   type="text"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-border transition-colors"
+                  className={`w-full p-3 border border-border rounded-lg ${uiTokens.focusRing} focus:border-border transition-colors`}
                   placeholder="(11) 99999-9999"
                 />
               </div>
@@ -384,7 +374,7 @@ const ClientsView: React.FC = () => {
                   required
                   value={formData.cpf}
                   onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                  className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-border transition-colors"
+                  className={`w-full p-3 border border-border rounded-lg ${uiTokens.focusRing} focus:border-border transition-colors`}
                   placeholder="000.000.000-00"
                 />
               </div>
@@ -397,12 +387,7 @@ const ClientsView: React.FC = () => {
                 >
                   Cancelar
                 </button>
-                <button
-                  type="submit"
-                  className="flex-1 bg-primary hover:bg-primary/90 text-white py-3 rounded-lg transition-colors"
-                >
-                  Salvar Alterações
-                </button>
+                <Button type="submit" className="flex-1">Salvar Alterações</Button>
               </div>
             </form>
             </CardContent>

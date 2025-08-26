@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent } from '../components/ui/card'
+import { uiTokens } from '../components/ui/theme'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { usePWAWindowManager } from '../hooks/usePWA'
@@ -154,8 +155,8 @@ const ResetPasswordView: React.FC = () => {
         <div className="w-full max-w-md">
           <Card className="w-full">
             <CardContent size="lg">
-              <div className="w-20 h-20 bg-success rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <i className="fas fa-check text-white text-2xl"></i>
+              <div className="w-20 h-20 bg-surface-2 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <i className="fas fa-check text-icon-2 text-2xl"></i>
               </div>
               <h2 className="text-2xl font-bold text-text mb-4">
                 Senha criada!
@@ -164,7 +165,7 @@ const ResetPasswordView: React.FC = () => {
                 Sua senha foi criada com sucesso. Agora você já pode acessar o app normalmente.
               </p>
               <button
-                className="w-full bg-primary text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] mt-4"
+                className="w-full bg-surface border border-border font-semibold py-3 px-4 rounded-2xl hover:shadow-sm transition-colors mt-4"
                 onClick={() => navigate('/')}
               >
                 Abrir o app
@@ -179,10 +180,10 @@ const ResetPasswordView: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
       {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden">
-  <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-primary/10 blur-3xl"></div>
+    <div className="absolute inset-0 overflow-hidden">
+  <div className={`absolute -top-40 -right-40 w-80 h-80 rounded-full ${uiTokens.accentBackdrop} blur-3xl`}></div>
   <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-surface blur-3xl"></div>
-      </div>
+    </div>
 
       {/* Reset Password Card */}
       <div className="relative w-full max-w-md">
@@ -204,14 +205,14 @@ const ResetPasswordView: React.FC = () => {
             {/* Reset Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="bg-danger/10 border border-border text-danger px-4 py-3 rounded-2xl text-sm">
+                <div className="bg-surface-2 border border-border text-text-secondary px-4 py-3 rounded-2xl text-sm">
                   {error}
                   {error.includes('expirou') && (
                     <div className="mt-3">
                       <button
                         type="button"
                         onClick={() => navigate('/login')}
-                        className="text-primary hover:text-primary-hover underline text-sm"
+                        className="text-text-secondary hover:text-text underline text-sm"
                       >
                         Voltar ao login para solicitar novo link
                       </button>
@@ -279,19 +280,19 @@ const ResetPasswordView: React.FC = () => {
 
                 <div className="space-y-4">
                   <button
-                    type="submit"
-                    disabled={loading || !canSubmit}
-                    className="w-full bg-primary text-white font-semibold py-3 px-4 rounded-2xl hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                  >
-                    {loading ? (
-                      <div className="flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-border border-t-transparent mr-2"></div>
-                        Atualizando...
-                      </div>
-                    ) : (
-                      'Atualizar Senha'
-                    )}
-                  </button>
+                      type="submit"
+                      disabled={loading || !canSubmit}
+                      className="w-full bg-surface border border-border font-semibold py-3 px-4 rounded-2xl hover:shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {loading ? (
+                        <div className="flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-border border-t-transparent mr-2"></div>
+                          Atualizando...
+                        </div>
+                      ) : (
+                        'Atualizar Senha'
+                      )}
+                    </button>
 
                   <button
                     type="button"

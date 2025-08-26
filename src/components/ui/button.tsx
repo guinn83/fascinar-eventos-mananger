@@ -1,4 +1,5 @@
 import React from 'react'
+import { uiTokens } from './theme'
 
 interface ButtonProps {
   children: React.ReactNode
@@ -23,13 +24,13 @@ export function Button({
 
   // variant -> base classes (background color, text, focus)
   const variantClasses: Record<string,string> = {
-  default: 'text-white focus:ring-primary/40',
-    outline: 'border border-border bg-surface text-text hover:bg-surface-hover focus:ring-primary/40',
-    ghost: 'text-text hover:bg-surface-hover focus:ring-primary/40',
-  destructive: 'text-white focus:ring-danger/40',
-  danger: 'text-white focus:ring-danger/40',
-  confirm: 'bg-success text-white focus:ring-primary/40',
-    edit: 'bg-surface text-text hover:bg-surface-hover border border-border focus:ring-primary/40'
+    default: 'text-text',
+    outline: `border border-border bg-surface text-text hover:bg-surface-hover ${uiTokens.focusRing}`,
+    ghost: `text-text hover:bg-surface-hover ${uiTokens.focusRing}`,
+    destructive: `text-text ${uiTokens.focusRing}`,
+    danger: `text-text ${uiTokens.focusRing}`,
+    confirm: `bg-surface-hover text-text ${uiTokens.focusRing}`,
+    edit: `bg-surface text-text hover:bg-surface-hover border border-border ${uiTokens.focusRing}`
   }
   
   const sizeClasses = {

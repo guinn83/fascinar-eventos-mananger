@@ -14,10 +14,10 @@ export function Badge({
   const baseClasses = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium'
   
   const variantClasses = {
-    default: 'bg-primary/10 text-primary',
+  default: 'bg-surface-2 text-text',
   secondary: 'bg-surface text-text-secondary',
-    destructive: 'bg-danger/10 text-danger',
-    outline: 'border border-border text-text-secondary'
+  destructive: 'bg-surface-hover text-danger',
+  outline: 'border border-border text-text-secondary'
   }
   
   return (
