@@ -4,7 +4,7 @@
 -- Data: 15/08/2025
 -- Versão: 2.0 (com estrutura unificada e sistema de staff)
 
--- CREATE TABLE IF NOT EXISTS event_staff (
+CREATE TABLE IF NOT EXISTS event_staff (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
   profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
@@ -23,7 +23,8 @@
   CHECK (hours_planned > 0),
   CHECK (hours_worked >= 0 OR hours_worked IS NULL),
   CHECK (profile_id IS NOT NULL OR person_name IS NOT NULL) -- Pelo menos um deve estar preenchido
-);========================
+);
+-- ========================
 -- 1. ENUMS E TIPOS PERSONALIZADOS
 -- ==========================================
 
@@ -144,6 +145,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 ) TABLESPACE pg_default;
 
 -- Trigger para updated_at
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
 CREATE TRIGGER update_profiles_updated_at 
   BEFORE UPDATE ON profiles 
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -188,6 +190,7 @@ CREATE TABLE IF NOT EXISTS public.events (
 ) TABLESPACE pg_default;
 
 -- Trigger para updated_at
+DROP TRIGGER IF EXISTS update_events_updated_at ON public.events;
 CREATE TRIGGER update_events_updated_at 
   BEFORE UPDATE ON events 
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -216,10 +219,12 @@ CREATE TABLE IF NOT EXISTS public.event_registrations (
 ) TABLESPACE pg_default;
 
 -- Triggers para atualizar contagem de participantes
+DROP TRIGGER IF EXISTS update_attendees_on_registration ON public.event_registrations;
 CREATE TRIGGER update_attendees_on_registration
   AFTER INSERT ON event_registrations 
   FOR EACH ROW EXECUTE FUNCTION update_event_attendees();
 
+DROP TRIGGER IF EXISTS update_attendees_on_cancellation ON public.event_registrations;
 CREATE TRIGGER update_attendees_on_cancellation
   AFTER DELETE ON event_registrations 
   FOR EACH ROW EXECUTE FUNCTION update_event_attendees();
@@ -228,20 +233,19 @@ CREATE TRIGGER update_attendees_on_cancellation
 -- 6. TABELAS DO SISTEMA DE STAFF
 -- ==========================================
 
--- Tabela de disponibilidade de staff
 CREATE TABLE IF NOT EXISTS staff_availability (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  available_date DATE NOT NULL,
-  start_time TIME,
-  end_time TIME,
-  status availability_status DEFAULT 'available',
+  staff_id UUID NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  event_id UUID NULL REFERENCES events(id) ON DELETE CASCADE,
+  is_available BOOLEAN NOT NULL DEFAULT false,
+  available_from TIME NULL,
+  available_until TIME NULL,
   notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
-  UNIQUE(profile_id, available_date),
-  CHECK (start_time < end_time OR (start_time IS NULL AND end_time IS NULL))
+  UNIQUE(staff_id, event_id),
+  CHECK ((available_from < available_until) OR (available_from IS NULL AND available_until IS NULL))
 );
 
 -- Tabela de disponibilidade de staff por evento específico
@@ -307,21 +311,25 @@ CREATE TABLE IF NOT EXISTS event_staff (
 );
 
 -- Triggers para updated_at nas tabelas de staff
-CREATE TRIGGER update_staff_availability_updated_at 
-  BEFORE UPDATE ON staff_availability 
+-- Trigger to keep updated_at current
+DROP TRIGGER IF EXISTS trigger_staff_availability_updated_at ON public.staff_availability;
+CREATE TRIGGER trigger_staff_availability_updated_at
+  BEFORE UPDATE ON staff_availability
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_staff_event_availability_updated_at ON public.staff_event_availability;
 CREATE TRIGGER update_staff_event_availability_updated_at 
   BEFORE UPDATE ON staff_event_availability 
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_default_staff_roles_updated_at ON public.default_staff_roles;
 CREATE TRIGGER update_default_staff_roles_updated_at 
   BEFORE UPDATE ON default_staff_roles 
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Índices para performance
-CREATE INDEX IF NOT EXISTS idx_staff_availability_profile_id ON staff_availability(profile_id);
-CREATE INDEX IF NOT EXISTS idx_staff_availability_date ON staff_availability(available_date);
+CREATE INDEX IF NOT EXISTS idx_staff_availability_staff ON staff_availability(staff_id);
+CREATE INDEX IF NOT EXISTS idx_staff_availability_event ON staff_availability(event_id);
 CREATE INDEX IF NOT EXISTS idx_staff_event_availability_staff ON staff_event_availability(staff_id);
 CREATE INDEX IF NOT EXISTS idx_staff_event_availability_event ON staff_event_availability(event_id);
 CREATE INDEX IF NOT EXISTS idx_staff_event_availability_available ON staff_event_availability(is_available);
@@ -366,43 +374,67 @@ CREATE INDEX IF NOT EXISTS idx_clients_related_client_id ON public.clients USING
 -- RLS para profiles
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
+-- Helper functions to avoid recursive SELECTs inside policies.
+-- These run with definer privileges to read the profiles table without invoking RLS.
+CREATE OR REPLACE FUNCTION public.is_current_user_admin() RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER AS $$
+  SELECT EXISTS(SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin');
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_current_user_organizer() RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER AS $$
+  SELECT EXISTS(SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'organizer');
+$$;
+
+-- Returns the profile id (if any) for the current authenticated user; runs with definer privileges
+CREATE OR REPLACE FUNCTION public.current_user_profile_id() RETURNS uuid
+LANGUAGE sql STABLE SECURITY DEFINER AS $$
+  SELECT id FROM public.profiles WHERE user_id = auth.uid() LIMIT 1;
+$$;
+
+DROP POLICY IF EXISTS "profiles_select_policy" ON profiles;
 CREATE POLICY "profiles_select_policy" ON profiles
   FOR SELECT USING (
     user_id = auth.uid()
-    OR EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role = 'admin')
-    OR EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role = 'organizer' AND profiles.role IN ('organizer', 'client'))
+    OR public.is_current_user_admin()
+    OR (public.is_current_user_organizer() AND profiles.role IN ('organizer', 'client'))
   );
 
+DROP POLICY IF EXISTS "profiles_insert_policy" ON profiles;
 CREATE POLICY "profiles_insert_policy" ON profiles
   FOR INSERT WITH CHECK (
     user_id = auth.uid()
-    OR EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role = 'admin')
+    OR public.is_current_user_admin()
   );
 
+DROP POLICY IF EXISTS "profiles_update_policy" ON profiles;
 CREATE POLICY "profiles_update_policy" ON profiles
   FOR UPDATE USING (
     user_id = auth.uid()
-    OR EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role = 'admin')
+    OR public.is_current_user_admin()
   );
 
 -- RLS para events
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "events_select_policy" ON events;
 CREATE POLICY "events_select_policy" ON events
   FOR SELECT USING (
-    EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role IN ('admin', 'organizer'))
-    OR EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.id = events.client_profile_id)
+    (public.is_current_user_admin() OR public.is_current_user_organizer())
+    OR (public.current_user_profile_id() = events.client_profile_id)
     OR profile_id = auth.uid()
   );
 
+DROP POLICY IF EXISTS "events_insert_policy" ON events;
 CREATE POLICY "events_insert_policy" ON events
   FOR INSERT WITH CHECK (
-    EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role IN ('admin', 'organizer'))
+    (public.is_current_user_admin() OR public.is_current_user_organizer())
   );
 
+DROP POLICY IF EXISTS "events_update_policy" ON events;
 CREATE POLICY "events_update_policy" ON events
   FOR UPDATE USING (
-    EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role IN ('admin', 'organizer'))
+    (public.is_current_user_admin() OR public.is_current_user_organizer())
     OR profile_id = auth.uid()
   );
 
@@ -412,37 +444,41 @@ ALTER TABLE default_staff_roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE event_staff ENABLE ROW LEVEL SECURITY;
 
 -- Policies básicas para staff
+DROP POLICY IF EXISTS "staff_select_policy" ON staff_availability;
 CREATE POLICY "staff_select_policy" ON staff_availability
   FOR SELECT USING (
-    EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role IN ('admin', 'organizer'))
-    OR EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.id = profile_id)
+  (public.is_current_user_admin() OR public.is_current_user_organizer())
+  OR (public.current_user_profile_id() = staff_id)
   );
 
+DROP POLICY IF EXISTS "staff_roles_select_policy" ON default_staff_roles;
 CREATE POLICY "staff_roles_select_policy" ON default_staff_roles
   FOR SELECT USING (
-    EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role IN ('admin', 'organizer'))
-    OR EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.id = profile_id)
+  (public.is_current_user_admin() OR public.is_current_user_organizer())
+  OR (public.current_user_profile_id() = profile_id)
   );
 
+DROP POLICY IF EXISTS "event_staff_select_policy" ON event_staff;
 CREATE POLICY "event_staff_select_policy" ON event_staff
   FOR SELECT USING (
-    EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role IN ('admin', 'organizer'))
-    OR EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.id = profile_id)
+  (public.is_current_user_admin() OR public.is_current_user_organizer())
+  OR (public.current_user_profile_id() = profile_id)
     OR EXISTS (SELECT 1 FROM profiles p JOIN events e ON e.client_profile_id = p.id WHERE p.user_id = auth.uid() AND e.id = event_id)
   );
 
 -- Allow deletes on event_staff for admins/organizers, the staff profile itself, the event client, or the user who assigned the staff
+DROP POLICY IF EXISTS "event_staff_delete_policy" ON event_staff;
 CREATE POLICY "event_staff_delete_policy" ON event_staff
   FOR DELETE USING (
-    EXISTS (SELECT 1 FROM profiles p WHERE p.user_id = auth.uid() AND p.role = 'admin')
+  public.is_current_user_admin()
   );
 
 -- ==========================================
 -- 9. VIEWS ÚTEIS
 -- ==========================================
 
--- View para eventos com informações completas
-CREATE OR REPLACE VIEW events_with_profiles AS
+DROP VIEW IF EXISTS events_with_profiles;
+CREATE VIEW events_with_profiles AS
 SELECT 
   e.*,
   client.full_name as client_name,
@@ -456,7 +492,8 @@ LEFT JOIN profiles client ON client.id = e.client_profile_id
 LEFT JOIN profiles creator ON creator.id = e.created_by_profile_id;
 
 -- View para staff de eventos com detalhes
-CREATE OR REPLACE VIEW event_staff_details AS
+DROP VIEW IF EXISTS event_staff_details;
+CREATE VIEW event_staff_details AS
 SELECT 
   es.id,
   es.event_id,
@@ -602,14 +639,78 @@ BEGIN
     dsr.staff_role,
     dsr.experience_level,
     dsr.hourly_rate,
-    COALESCE(sa.status, 'available'::availability_status)
+    -- Map boolean is_available (when present) to availability_status; default to 'available'
+    CASE
+      WHEN sa.is_available IS NULL THEN 'available'::availability_status
+      WHEN sa.is_available THEN 'available'::availability_status
+      ELSE 'unavailable'::availability_status
+    END
   FROM profiles p
   JOIN default_staff_roles dsr ON dsr.profile_id = p.id
-  LEFT JOIN staff_availability sa ON sa.profile_id = p.id AND sa.available_date = target_date
+  -- In this deployment staff_availability stores per-event availability (event_id) and optionally default rows with event_id IS NULL
+  LEFT JOIN staff_availability sa ON sa.staff_id = p.id AND sa.event_id IS NULL
   WHERE 
     dsr.is_active = true
     AND (required_role IS NULL OR dsr.staff_role = required_role)
-    AND COALESCE(sa.status, 'available'::availability_status) IN ('available', 'maybe')
+    AND (sa.is_available IS NULL OR sa.is_available = true)
+    AND NOT EXISTS (
+      SELECT 1 FROM event_staff es
+      JOIN events e ON e.id = es.event_id
+      WHERE es.profile_id = p.id
+      AND DATE(e.event_date) = target_date
+      AND es.confirmed = true
+    )
+  ORDER BY dsr.experience_level DESC, dsr.hourly_rate ASC;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Enhanced version that respects per-event overrides in staff_event_availability.
+CREATE OR REPLACE FUNCTION get_available_staff_for_date_v2(
+  target_date DATE,
+  required_role staff_role DEFAULT NULL,
+  event_uuid UUID DEFAULT NULL
+)
+RETURNS TABLE (
+  profile_id UUID,
+  full_name TEXT,
+  staff_role staff_role,
+  experience_level INTEGER,
+  hourly_rate DECIMAL(8,2),
+  availability_status availability_status,
+  event_override BOOLEAN
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    p.id,
+    p.full_name,
+    dsr.staff_role,
+    dsr.experience_level,
+    dsr.hourly_rate,
+    -- Resolve availability giving precedence to per-event availability records (staff_availability.event_id)
+    CASE
+      WHEN sa.is_available IS NOT NULL THEN CASE WHEN sa.is_available THEN 'available'::availability_status ELSE 'unavailable'::availability_status END
+      WHEN sea.is_available IS NOT NULL THEN CASE WHEN sea.is_available THEN 'available'::availability_status ELSE 'unavailable'::availability_status END
+      ELSE 'available'::availability_status
+    END AS availability_status,
+    (sa.is_available IS NOT NULL OR sea.is_available IS NOT NULL) AS event_override
+  FROM profiles p
+  JOIN default_staff_roles dsr ON dsr.profile_id = p.id
+  -- Prefer staff_availability rows that reference the specific event; fall back to staff_event_availability if present
+  LEFT JOIN staff_availability sa ON sa.staff_id = p.id AND (event_uuid IS NULL OR sa.event_id = event_uuid)
+  LEFT JOIN staff_event_availability sea ON sea.staff_id = p.id AND (event_uuid IS NULL OR sea.event_id = event_uuid)
+  WHERE
+    dsr.is_active = true
+    AND (required_role IS NULL OR dsr.staff_role = required_role)
+    AND NOT (
+      (sa.is_available = false)
+      OR (sea.is_available = false)
+    )
+    AND (
+      sa.is_available = true
+      OR sea.is_available = true
+      OR (sa.is_available IS NULL AND sea.is_available IS NULL)
+    )
     AND NOT EXISTS (
       SELECT 1 FROM event_staff es
       JOIN events e ON e.id = es.event_id

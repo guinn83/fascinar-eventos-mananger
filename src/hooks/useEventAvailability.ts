@@ -64,8 +64,6 @@ export const useEventAvailability = () => {
 
       // Como a tabela staff_event_availability não existe, vamos buscar pelo staff_availability
       // que tem disponibilidade por data, não por evento específico
-      const eventDates = events.map(e => e.event_date.split('T')[0]) // Extrair apenas a data
-      
       // Buscar perfil do usuário para obter o profile_id
       const { data: userProfile, error: profileError } = await supabase
         .from('profiles')
@@ -78,11 +76,13 @@ export const useEventAvailability = () => {
         return { events: [], hasMore: false }
       }
 
+      // Query event-specific availability rows for the user's profile
+      const eventIdsList = events.map(e => e.id)
       const { data: availabilities, error: availError } = await supabase
         .from('staff_availability')
         .select('*')
         .eq('profile_id', userProfile.id)
-        .in('available_date', eventDates)
+        .in('event_id', eventIdsList)
 
       // Se a tabela não existir, continuar sem disponibilidades
       if (availError && !availError.message?.includes('does not exist')) {
@@ -101,8 +101,7 @@ export const useEventAvailability = () => {
 
       // Combinar dados
       const enrichedEvents: EventAvailability[] = events.map(event => {
-        const eventDate = event.event_date.split('T')[0]
-        const availability = availabilities?.find(a => a.available_date === eventDate)
+  const availability = availabilities?.find(a => a.event_id === event.id)
         const isScheduled = scheduledEvents?.some(s => s.event_id === event.id)
 
         return {
@@ -117,9 +116,9 @@ export const useEventAvailability = () => {
             location: event.location || '',
             status: event.status
           },
-          is_available: availability?.status === 'available' || false,
-          available_from: availability?.start_time,
-          available_until: availability?.end_time,
+          is_available: availability?.is_available ?? (availability?.status === 'available' ? true : false),
+          available_from: availability?.available_from || availability?.start_time,
+          available_until: availability?.available_until || availability?.end_time,
           notes: availability?.notes,
           is_scheduled: isScheduled
         }
@@ -191,19 +190,18 @@ export const useEventAvailability = () => {
         throw new Error('Evento não encontrado')
       }
 
-      const eventDate = event.event_date.split('T')[0]
-
-      // Upsert da disponibilidade na tabela staff_availability (por data)
+      // Upsert availability for this profile/event using event_id
       const { error } = await supabase
         .from('staff_availability')
         .upsert({
           profile_id: userProfile.id,
-          available_date: eventDate,
-          status: input.is_available ? 'available' : 'unavailable',
-          start_time: input.available_from || null,
-          end_time: input.available_until || null,
+          staff_id: userProfile.id,
+          event_id: input.event_id,
+          is_available: input.is_available,
+          available_from: input.available_from || null,
+          available_until: input.available_until || null,
           notes: input.notes || null
-        })
+        }, { onConflict: 'staff_id,event_id' })
 
       if (error) {
         throw error
@@ -244,14 +242,12 @@ export const useEventAvailability = () => {
 
       if (eventError) throw eventError
 
-      const eventDate = event.event_date.split('T')[0]
-
-      // Buscar disponibilidade pela data
+      // Buscar disponibilidade específica para este evento
       const { data: availability, error: availError } = await supabase
         .from('staff_availability')
         .select('*')
         .eq('profile_id', userProfile.id)
-        .eq('available_date', eventDate)
+        .eq('event_id', eventId)
         .single()
 
       if (availError && availError.code !== 'PGRST116') throw availError
@@ -277,9 +273,9 @@ export const useEventAvailability = () => {
           location: event.location || '',
           status: event.status
         },
-        is_available: availability?.status === 'available' || false,
-        available_from: availability?.start_time,
-        available_until: availability?.end_time,
+  is_available: availability?.is_available ?? (availability?.status === 'available' ? true : false),
+  available_from: availability?.available_from || availability?.start_time,
+  available_until: availability?.available_until || availability?.end_time,
         notes: availability?.notes,
         is_scheduled: !!scheduled && scheduled.length > 0
       }
@@ -337,22 +333,11 @@ export const useEventAvailability = () => {
 
       if (staffError) throw staffError
 
-      // Buscar dados do evento para obter a data
-      const { data: event, error: eventError } = await supabase
-        .from('events')
-        .select('event_date')
-        .eq('id', eventId)
-        .single()
-
-      if (eventError) throw eventError
-
-      const eventDate = event.event_date.split('T')[0]
-
-      // Buscar disponibilidades para esta data
+  // Buscar disponibilidades específicas para este eventId
       const { data: availabilities, error: availError } = await supabase
         .from('staff_availability')
         .select('*, profiles(id, full_name, email)')
-        .eq('available_date', eventDate)
+        .eq('event_id', eventId)
         .eq('profiles.role', 'organizer')
 
       if (availError) throw availError
@@ -366,7 +351,7 @@ export const useEventAvailability = () => {
         
         if (!availability) {
           notResponded.push(staff)
-        } else if (availability.status === 'available') {
+        } else if (availability.is_available ?? availability.status === 'available') {
           available.push({
             ...staff,
             ...availability

@@ -15,12 +15,13 @@ export function useStaff() {
   const [error, setError] = useState<string | null>(null)
 
   // Buscar disponibilidade de staff para uma data
-  const getStaffAvailability = async (date: string): Promise<StaffAvailability[]> => {
+  const getStaffAvailability = async (eventId: string | null = null): Promise<StaffAvailability[]> => {
     try {
       setLoading(true)
       setError(null)
 
-      const { data, error } = await supabase
+      // Prefer event-specific availability when eventId is provided; otherwise query default rows (event_id IS NULL)
+      const query = supabase
         .from('staff_availability')
         .select(`
           *,
@@ -32,8 +33,11 @@ export function useStaff() {
             role
           )
         `)
-        .eq('available_date', date)
         .order('created_at', { ascending: false })
+
+      const { data, error } = eventId
+        ? await query.eq('event_id', eventId)
+        : await query.is('event_id', null)
 
       if (error) throw error
       return data || []
@@ -49,7 +53,7 @@ export function useStaff() {
   // Definir disponibilidade de staff
   const setStaffAvailability = async (
     profileId: string,
-    date: string,
+    _date: string,
     status: AvailabilityStatus,
     startTime?: string,
     endTime?: string,
@@ -59,17 +63,22 @@ export function useStaff() {
       setLoading(true)
       setError(null)
 
+      // Upsert into staff_availability. Prefer writing event-specific rows when date corresponds to an event.
+      const upsertPayload: any = {
+        profile_id: profileId,
+        staff_id: profileId, // write both for compatibility
+        event_id: null,
+        is_available: status === 'available' ? true : status === 'unavailable' ? false : null,
+        status,
+        start_time: startTime,
+        end_time: endTime,
+        notes
+      }
+
       const { error } = await supabase
         .from('staff_availability')
-        .upsert({
-          profile_id: profileId,
-          available_date: date,
-          status,
-          start_time: startTime,
-          end_time: endTime,
-          notes
-        }, {
-          onConflict: 'profile_id,available_date'
+        .upsert(upsertPayload, {
+          onConflict: 'staff_id,event_id'
         })
 
       if (error) throw error

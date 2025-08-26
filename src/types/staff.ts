@@ -28,11 +28,16 @@ export type AvailabilityStatus = 'available' | 'unavailable' | 'maybe';
 
 export interface StaffAvailability {
   id: string;
-  profile_id: string;
-  available_date: string; // ISO date string
+  // New schema: availability can be a default (event_id IS NULL) or an event-specific row
+  staff_id?: string; // formerly profile_id
+  profile_id?: string; // keep for backwards compatibility
+  event_id?: string | null; // NULL = default availability
+  available_date?: string; // kept for compatibility if present
+  is_available?: boolean; // new boolean flag (preferred)
   start_time?: string;
   end_time?: string;
-  status: AvailabilityStatus;
+  // Legacy status enum (optional) — map to/from is_available where needed
+  status?: AvailabilityStatus;
   notes?: string;
   created_at: string;
   updated_at: string;
